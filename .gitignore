@@ -7,3 +7,7 @@ futura-book/
 *.otf
 # QA screenshots are evidence only (~70 MB); reports (*.md) are committed
 docs/qa/**/*.png
+*.tsbuildinfo
+docs/qa/**/*.jpg
+docs/qa/**/*.jpeg
+docs/qa/**/*.webp
