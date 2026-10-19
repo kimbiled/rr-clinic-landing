@@ -59,6 +59,14 @@ export function Team() {
       if (!doctorsWithCases.has(doctor.id)) return false;
       selectDoctor(doctor.id);
       document.getElementById('hero')?.scrollIntoView({ behavior: reducedMotion ? 'auto' : 'smooth', block: 'start' });
+      // R3-7: move keyboard focus with the view. The filter chip ("<name> ×") is the natural landing spot:
+      // its label says what is shown and how to reset, and HeroChips' polite live region announces the
+      // filter. Wait a frame so the chip has dropped data-hidden (visibility: hidden can't take focus);
+      // preventScroll lets the smooth scroll above do the moving.
+      requestAnimationFrame(() => {
+        const chip = document.querySelector<HTMLElement>('#hero .rr-filter-chip');
+        chip?.focus({ preventScroll: true });
+      });
       return true;
     },
     [doctorsWithCases, reducedMotion, selectDoctor],
@@ -66,7 +74,7 @@ export function Team() {
 
   return (
     <AntdProvider theme={lightTheme}>
-      <section id="doctors" aria-labelledby="team-title" className="relative overflow-hidden bg-white text-neutral-900">
+      <section id="doctors" aria-labelledby="team-title" className="team-section relative overflow-hidden bg-white text-neutral-900">
         <div className="relative mx-auto max-w-[1440px]">
           <span aria-hidden="true" className="team__hline" />
           <span aria-hidden="true" className="team__vline" />

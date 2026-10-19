@@ -30,16 +30,22 @@ function Arrow({ dir }: { dir: 'left' | 'right' }) {
 /**
  * Figma "Carousel controls" 190×52: ← (48) · 66 px rule · → (44).
  * Enabled = filled gold disc (44 inside a 48 hit box); disabled = 48 outline ring with a gold arrow,
- * which is how the design shows "prev" at the start of the row.
+ * which is how the design shows "prev" at the start of the row. Edge buttons use aria-disabled, not disabled.
  */
 export function CarouselControls({ prevDisabled, nextDisabled, onPrev, onNext, label }: CarouselControlsProps) {
+  // R3-4b: `disabled` on the focused button would drop focus to <body>; aria-disabled keeps it focusable
+  // (and still announced as unavailable) while the click becomes a no-op.
+  const guard = (disabled: boolean, action: () => void) => () => {
+    if (!disabled) action();
+  };
+
   return (
     <div className="team-controls relative left-px mx-auto mt-8 flex h-[52px] w-[192px] items-center" role="group" aria-label={`Навигация: ${label}`}>
-      <button type="button" className="team-nav-btn" onClick={onPrev} disabled={prevDisabled} aria-label="Предыдущий врач">
+      <button type="button" className="team-nav-btn" onClick={guard(prevDisabled, onPrev)} aria-disabled={prevDisabled} aria-label="Предыдущий врач">
         <Arrow dir="left" />
       </button>
       <span aria-hidden="true" className="mr-3.5 ml-4 h-0.5 w-[66px] rounded-full bg-[#e1b976]" />
-      <button type="button" className="team-nav-btn" onClick={onNext} disabled={nextDisabled} aria-label="Следующий врач">
+      <button type="button" className="team-nav-btn" onClick={guard(nextDisabled, onNext)} aria-disabled={nextDisabled} aria-label="Следующий врач">
         <Arrow dir="right" />
       </button>
     </div>

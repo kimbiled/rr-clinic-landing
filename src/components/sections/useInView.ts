@@ -37,7 +37,10 @@ export function useInView<T extends Element = HTMLElement>({
     }
     const io = new IntersectionObserver(
       ([entry]) => {
-        if (entry.isIntersecting) {
+        // The first callback fires on observe() with isIntersecting = true for ANY overlap (even edge-adjacent),
+        // whatever the threshold — so a non-zero threshold must also be checked against the ratio.
+        const hit = entry.isIntersecting && (threshold <= 0 || entry.intersectionRatio >= threshold - 0.001);
+        if (hit) {
           setInView(true);
           if (once) io.disconnect();
         } else if (!once) {

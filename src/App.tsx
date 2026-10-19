@@ -1,4 +1,4 @@
-import { lazy, Suspense, useEffect, useState } from 'react';
+import { lazy, Suspense, useEffect, useRef, useState, type Ref } from 'react';
 import { HeroProvider, useHero } from './components/hero/HeroContext';
 import { Hero } from './components/hero/Hero';
 import { Navbar } from './components/nav/Navbar';
@@ -6,16 +6,49 @@ import { loadSurgeonMenu } from './components/surgeon-menu/menuTrigger';
 import { SurgeonMenuFallback } from './components/surgeon-menu/SurgeonMenuFallback';
 import { About } from './components/sections/About';
 import { StatsBand } from './components/sections/StatsBand';
+import { Contacts } from './components/sections/Contacts';
 import { Trust } from './components/sections/Trust';
 
-// The surgeon menu (antd Modal/List/Avatar) is only needed on click: keep it out of the first-paint
-// bundle and prefetch it once the page is idle so the first open is instant.
-// Below the fold and the only section using antd Segmented: split it out. The fallback keeps the
-// #doctors anchor and the section height (Figma 1011) so nothing shifts when it arrives.
+// Team is below the fold and is the only section using antd (Segmented). It is code-split AND only
+// requested when the visitor scrolls within ~800 px of it (R3-1), so antd never competes with the
+// first screen. The placeholder keeps the #doctors anchor and the section height (Figma 1011), so
+// nothing shifts when it arrives and nav "Врачи" still lands in the right place.
 const Team = lazy(() => import('./components/team/Team').then((m) => ({ default: m.Team })));
-const TEAM_FALLBACK = <section id="doctors" aria-label="Наша команда" style={{ minHeight: 1011, background: '#fff' }} />;
+const TEAM_HEIGHT = 1011;
 
-// The loader lives in menuTrigger.ts so the triggers can also prefetch it on hover/focus (N2-3).
+function TeamPlaceholder({ sectionRef }: { sectionRef?: Ref<HTMLElement> }) {
+  return <section ref={sectionRef} id="doctors" aria-label="Наша команда" style={{ minHeight: TEAM_HEIGHT, background: '#fff' }} />;
+}
+
+function DeferredTeam() {
+  const placeholderRef = useRef<HTMLElement>(null);
+  const [near, setNear] = useState(() => window.location.hash === '#doctors');
+
+  useEffect(() => {
+    if (near) return;
+    const el = placeholderRef.current;
+    if (!el) return;
+    const io = new IntersectionObserver(
+      (entries) => {
+        if (entries.some((entry) => entry.isIntersecting)) setNear(true);
+      },
+      { rootMargin: '800px 0px' },
+    );
+    io.observe(el);
+    return () => io.disconnect();
+  }, [near]);
+
+  if (!near) return <TeamPlaceholder sectionRef={placeholderRef} />;
+  return (
+    <Suspense fallback={<TeamPlaceholder />}>
+      <Team />
+    </Suspense>
+  );
+}
+
+// The surgeon menu (antd Modal/List/Avatar) is only needed on click. Its loader lives in
+// menuTrigger.ts so the triggers prefetch it on hover/focus (N2-3); there is no idle prefetch, so
+// antd stays off the network until the visitor shows intent (R3-1).
 const SurgeonMenu = lazy(() => loadSurgeonMenu().then((m) => ({ default: m.SurgeonMenu })));
 
 function DeferredSurgeonMenu() {
@@ -25,16 +58,6 @@ function DeferredSurgeonMenu() {
   useEffect(() => {
     if (surgeonMenuOpen) setMounted(true);
   }, [surgeonMenuOpen]);
-
-  useEffect(() => {
-    const prefetch = () => void loadSurgeonMenu();
-    if (typeof window.requestIdleCallback === 'function') {
-      const id = window.requestIdleCallback(prefetch, { timeout: 4000 });
-      return () => window.cancelIdleCallback(id);
-    }
-    const id = window.setTimeout(prefetch, 2500);
-    return () => window.clearTimeout(id);
-  }, []);
 
   if (!mounted) return null;
   return (
@@ -54,13 +77,12 @@ export default function App() {
         <StatsBand />
         <About />
         <Trust />
-        <Suspense fallback={TEAM_FALLBACK}>
-          <Team />
-        </Suspense>
+        <DeferredTeam />
         {/* "Смотреть работы" target — the cases section is the next design to come. */}
         <section id="cases" className="page-placeholder" aria-label="Кейсы до и после">
           <p>Здесь будет блок кейсов «до/после» — следующий в очереди дизайна.</p>
         </section>
+        <Contacts />
       </main>
       <DeferredSurgeonMenu />
     </HeroProvider>

@@ -2,11 +2,11 @@ import { useSyncExternalStore } from 'react';
 
 export const STAGE_W = 1440;
 export const STAGE_H = 720;
-const STAGE_MAX_SCALE = 2;
+const STAGE_MAX_SCALE = 2.25; // 2560×1600 → 2.22
 /** body has min-width 1280 (desktop scope); below that the page scrolls horizontally. */
 const MIN_LAYOUT_W = 1280;
 /** Never crop the composition narrower than this many stage px (keeps statue + strip readable). */
-const MIN_STAGE_W = 1200;
+const MIN_STAGE_W = 1080; // 1080 = 720 × 3/2, so 16:9, 16:10 and 3:2 screens are filled edge to edge (R3-2)
 
 export interface Stage {
   /** CSS px per stage px. Divide client-coordinate deltas by it; multiply canvas backing size by it. */
@@ -39,8 +39,8 @@ function subscribe(onChange: () => void) {
 
 /**
  * The hero is the 1440×720 Figma composition scaled as one unit so the strip, statue and text keep
- * their relationship at every desktop size. Scale = cover(vw/1440, vh/720), clamped to 1…2 and to
- * vw/1200 (1920×1080 → 1.5, 2560×1440 → 2, 1440×900 → 1.2, 1280×720 → 1).
+ * their relationship at every desktop size. Scale = cover(vw/1440, vh/720), clamped to 1…2.25 and to
+ * vw/1080 (1920×1080 → 1.5, 2560×1440 → 2, 1440×900 → 1.25, 1512×982 → 1.364, 1280×720 → 1).
  */
 export function useStageScale(): Stage {
   return useSyncExternalStore(subscribe, measure, () => current);

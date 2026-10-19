@@ -21,6 +21,12 @@
     pointer-events: none;
   }
 
+  /* ---------- Focus ring on this light section (R3-4c) ----------
+     The global gold ring (#d7a561) is ~2:1 on white; #8f6526 is ~5.2:1 (WCAG 1.4.11 needs 3:1). */
+  .team-section :focus-visible {
+    outline-color: #8f6526;
+  }
+
   /* ---------- Capsule tabs: antd Segmented restyled to Figma "Вкладки / капсула" ---------- */
   .team-tabs.ant-segmented {
     position: relative;
@@ -48,6 +54,12 @@
   .team-tabs .ant-segmented-item-selected,
   .team-tabs .ant-segmented-thumb {
     box-shadow: none;
+  }
+
+  /* R3-4a: the focus lands on the hidden radio input, so ring the visible item around it (WCAG 2.4.7). */
+  .team-tabs .ant-segmented-item:has(.ant-segmented-item-input:focus-visible) {
+    outline: 2px solid #8f6526;
+    outline-offset: 2px;
   }
 
   /* ---------- Doctor row (full-bleed scroller, content inset matches the 1440 grid) ---------- */
@@ -130,15 +142,16 @@
       transform 250ms var(--ease-out);
   }
 
-  .team-nav-btn:hover:not(:disabled) {
+  .team-nav-btn:hover:not([aria-disabled='true']) {
     background-color: #d7a561;
   }
 
-  .team-nav-btn:active:not(:disabled) {
+  .team-nav-btn:active:not([aria-disabled='true']) {
     transform: scale(0.95);
   }
 
-  .team-nav-btn:disabled {
+  /* aria-disabled (not `disabled`) keeps a focused button focusable at the row's edge (R3-4b). */
+  .team-nav-btn[aria-disabled='true'] {
     border-color: #e1b976;
     background-color: transparent;
     color: #e1b976;
