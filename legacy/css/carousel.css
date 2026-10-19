@@ -1,0 +1,595 @@
+/* FE-2 — cases carousel, lifted card + doctor panel, before/after, video cases.
+   Spec: docs/design-spec.md §4 (strip + cards), §5 (hover panel), §6 (slider), §9.4 (timings). */
+
+@property --pos {
+  syntax: "<percentage>";
+  inherits: true;
+  initial-value: 50%;
+}
+
+/* ---------- layer + static grid ---------- */
+[data-carousel].cc {
+  pointer-events: none; /* only cards catch the pointer */
+  overflow: hidden;
+  overflow: clip; /* not a scroll container: focusing an off-screen card can't scroll it */
+}
+
+.cc-grid {
+  position: absolute;
+  inset: 0;
+  pointer-events: none;
+  /* §4.4: lines fade to 35% behind the statue */
+  -webkit-mask-image: linear-gradient(90deg, #000 calc(50% - 330px), rgba(0, 0, 0, 0.35) calc(50% - 210px), rgba(0, 0, 0, 0.35) calc(50% + 210px), #000 calc(50% + 330px));
+  mask-image: linear-gradient(90deg, #000 calc(50% - 330px), rgba(0, 0, 0, 0.35) calc(50% - 210px), rgba(0, 0, 0, 0.35) calc(50% + 210px), #000 calc(50% + 330px));
+}
+
+.cc-grid__h {
+  position: absolute;
+  left: 0;
+  right: 0;
+  height: 1px;
+  background: rgba(255, 255, 255, 0.12);
+}
+
+.cc-grid__v {
+  position: absolute;
+  top: 92px; /* card band 124–344, extended 32 px with a fade */
+  width: 1px;
+  height: 284px;
+  background: linear-gradient(180deg, rgba(255, 255, 255, 0) 0, rgba(255, 255, 255, 0.12) 32px, rgba(255, 255, 255, 0.12) calc(100% - 32px), rgba(255, 255, 255, 0) 100%);
+}
+
+/* ---------- strip ---------- */
+.cc-track {
+  position: absolute;
+  left: 0;
+  top: 124px;
+  height: 220px;
+  will-change: transform;
+}
+
+.cc-card {
+  position: absolute;
+  top: 0;
+  width: 200px;
+  height: 220px;
+  overflow: hidden;
+  background: #4a3624;
+  pointer-events: auto;
+  user-select: none;
+  -webkit-user-select: none;
+  -webkit-tap-highlight-color: transparent;
+  transition: opacity 400ms var(--ease-out), filter 400ms var(--ease-out);
+}
+
+/* surgeon:select — other doctors' cases recede */
+.cc-card.is-dim {
+  opacity: 0.35;
+  filter: saturate(0.15);
+}
+
+/* the card is shown by its lift in the overlay layer */
+.cc-card.is-lifted {
+  opacity: 0 !important;
+  transition: none;
+}
+
+.cc.is-intro-wait .cc-card {
+  opacity: 0;
+}
+
+.cc.is-intro .cc-card {
+  animation: cc-card-in 600ms var(--ease-out) backwards;
+}
+
+@keyframes cc-card-in {
+  from {
+    opacity: 0;
+    transform: translateY(12px);
+  }
+}
+
+/* ---------- card media (shared by strip cards and lifts) ---------- */
+.cc-media {
+  position: absolute;
+  inset: 0;
+  overflow: hidden;
+  background: #4a3624;
+  color: var(--c-white, #fff);
+  font-family: var(--font-text);
+  font-weight: 400;
+}
+
+.cc-media img {
+  max-width: none;
+}
+
+.cc-shade {
+  position: absolute;
+  left: 0;
+  right: 0;
+  pointer-events: none;
+}
+
+.cc-shade--bottom {
+  bottom: 0;
+  height: 88px;
+  background: linear-gradient(180deg, rgba(45, 32, 16, 0) 0%, var(--c-case-shade, rgba(45, 32, 16, 0.4)) 100%);
+}
+
+.cc-shade--top {
+  top: 0;
+  height: 64px;
+  background: linear-gradient(0deg, rgba(45, 32, 16, 0) 0%, rgba(45, 32, 16, 0.28) 100%);
+}
+
+.cc-title,
+.cc-vid__title,
+.cc-vid__caption {
+  position: absolute;
+  left: 16px;
+  right: 16px;
+  margin: 0;
+  font-size: 12px;
+  line-height: 14px;
+  color: #fff;
+  pointer-events: none;
+  display: -webkit-box;
+  -webkit-box-orient: vertical;
+  -webkit-line-clamp: 2;
+  overflow: hidden;
+}
+
+.cc-title,
+.cc-vid__caption {
+  bottom: 16px;
+}
+
+.cc-vid__title {
+  top: 16px;
+}
+
+/* ---------- before / after ---------- */
+.cc-ba__pane {
+  position: absolute;
+  inset: 0;
+  overflow: hidden;
+}
+
+.cc-ba--clip .cc-ba__pane--before {
+  clip-path: inset(0 calc(100% - var(--pos)) 0 0);
+}
+
+.cc-ba--clip .cc-ba__pane--after {
+  clip-path: inset(0 0 0 var(--pos));
+}
+
+.cc-ba__img--framed {
+  position: absolute;
+  object-fit: cover;
+}
+
+/* half-crop sources (no framing): each side fills its own pane, anchored at the divider */
+.cc-ba--split .cc-ba__pane--before {
+  right: auto;
+  width: var(--pos);
+}
+
+.cc-ba--split .cc-ba__pane--after {
+  left: var(--pos);
+}
+
+.cc-ba__img--cover {
+  position: absolute;
+  inset: 0;
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+}
+
+.cc-ba__pane--before .cc-ba__img--cover {
+  object-position: 100% 50%;
+}
+
+.cc-ba__pane--after .cc-ba__img--cover {
+  object-position: 0% 50%;
+}
+
+.cc-ba__label {
+  position: absolute;
+  top: 16px;
+  font-size: 12px;
+  line-height: 12px;
+  letter-spacing: 0.02em;
+  text-transform: uppercase;
+  color: rgba(255, 255, 255, 0.85);
+  pointer-events: none;
+}
+
+.cc-ba__label--before {
+  left: 16px;
+}
+
+.cc-ba__label--after {
+  right: 16px;
+}
+
+.cc-ba__line {
+  position: absolute;
+  top: 0;
+  bottom: 0;
+  left: var(--pos);
+  width: 1px;
+  transform: translateX(-50%);
+  background: rgba(255, 255, 255, 0.6);
+  pointer-events: none;
+  transition: width 160ms var(--ease-out), background-color 160ms var(--ease-out);
+}
+
+.cc-ba__knob {
+  position: absolute;
+  left: var(--pos);
+  top: 110px;
+  width: 22px;
+  height: 22px;
+  margin: -11px 0 0 -11px;
+  border: 1px solid rgba(255, 255, 255, 0.4);
+  border-radius: 50%;
+  background: rgba(255, 255, 255, 0.24);
+  color: #fff;
+  transition: transform 160ms var(--ease-out), background-color 160ms var(--ease-out), border-color 160ms var(--ease-out), color 160ms var(--ease-out);
+}
+
+.cc-ba__arrow {
+  position: absolute;
+  top: 50%;
+  left: 50%;
+  width: 12px;
+  height: 12px;
+  margin: -6px 0 0 -6px;
+}
+
+.cc-ba__arrow--left {
+  transform: translateX(-2.4px);
+}
+
+.cc-ba__arrow--right {
+  transform: translateX(2.4px);
+}
+
+.cc-ba.is-resetting {
+  transition: --pos 500ms var(--ease-out) 600ms;
+}
+
+/* ---------- video / interview ---------- */
+.cc-vid__poster {
+  position: absolute;
+  inset: 0;
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+}
+
+.cc-vid__video {
+  position: absolute;
+  inset: 0;
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  opacity: 0;
+  transition: opacity 240ms var(--ease-out);
+}
+
+.cc-vid.is-playing .cc-vid__video {
+  opacity: 1;
+}
+
+.cc-vid__play {
+  position: absolute;
+  left: 16px;
+  bottom: 46px;
+  width: 22px;
+  height: 22px;
+  pointer-events: none;
+  transition: opacity 200ms var(--ease-out), transform 200ms var(--ease-out);
+}
+
+.cc-vid.is-playing .cc-vid__play {
+  opacity: 0;
+  transform: scale(0.8);
+}
+
+/* ---------- lift: hovered/focused card re-rendered above the text (z-overlay) ---------- */
+[data-hero-overlay] > .cc-lift {
+  position: absolute;
+  left: 0;
+  top: 0;
+  width: 200px;
+  height: 220px;
+  pointer-events: auto;
+  will-change: transform;
+}
+
+[data-hero-overlay] > .cc-lift.is-pending {
+  visibility: hidden;
+  pointer-events: none;
+}
+
+[data-hero-overlay] > .cc-lift.is-leaving {
+  pointer-events: none;
+}
+
+.cc-lift__body {
+  position: relative;
+  width: 200px;
+  height: 220px;
+  /* leave: card down 280 ms from +80 ms */
+  transition: transform 280ms var(--ease-out) 80ms;
+}
+
+.cc-lift.is-on .cc-lift__body {
+  transform: translateY(-16px);
+  transition: transform 320ms var(--ease-lift, var(--ease-out));
+}
+
+.cc-lift__shadow {
+  position: absolute;
+  left: 0;
+  top: 0;
+  width: 100%;
+  height: calc(220px + var(--panel-h, 82px));
+  box-shadow: var(--shadow-card-lift, 0 18px 40px rgba(20, 13, 6, 0.45));
+  opacity: 0;
+  transform: scaleY(var(--shadow-s, 0.73));
+  transform-origin: 50% 0;
+  pointer-events: none;
+  transition: opacity 220ms ease-in, transform 220ms ease-in;
+}
+
+.cc-lift.is-on .cc-lift__shadow {
+  opacity: 1;
+  transform: none;
+  transition: opacity 320ms var(--ease-lift, var(--ease-out)), transform 380ms var(--ease-lift, var(--ease-out)) 60ms;
+}
+
+.cc-lift.is-focus .cc-lift__shadow {
+  outline: 2px solid var(--c-gold-400);
+  outline-offset: 3px;
+}
+
+.cc-lift__media {
+  position: relative;
+  width: 200px;
+  height: 220px;
+  overflow: hidden;
+  background: #4a3624;
+}
+
+.cc-lift__layer {
+  position: absolute;
+  inset: 0;
+  transition: opacity 200ms var(--ease-out);
+}
+
+.cc-lift__layer.is-entering {
+  opacity: 0;
+}
+
+.cc-lift .cc-ba {
+  cursor: ew-resize;
+  touch-action: none;
+}
+
+.cc-lift .cc-ba__knob {
+  -webkit-backdrop-filter: blur(12px);
+  backdrop-filter: blur(12px);
+  background: rgba(255, 255, 255, 0.2);
+}
+
+.cc-lift .cc-ba__knob:hover {
+  transform: scale(1.12);
+  background: rgba(255, 255, 255, 0.32);
+}
+
+.cc-ba.is-dragging .cc-ba__knob {
+  transform: none;
+  border-color: transparent;
+  background: rgba(215, 165, 97, 0.9);
+  color: var(--c-gold-950);
+}
+
+.cc-ba.is-dragging .cc-ba__line {
+  width: 2px;
+  background: #fff;
+}
+
+/* first B/A hover per session: the knob nudges ±10 px twice */
+.cc-ba.is-hint .cc-ba__knob {
+  animation: cc-nudge 900ms ease-in-out 360ms 1;
+}
+
+@keyframes cc-nudge {
+  0%,
+  100% {
+    translate: 0 0;
+  }
+  20% {
+    translate: 10px 0;
+  }
+  45% {
+    translate: -10px 0;
+  }
+  70% {
+    translate: 10px 0;
+  }
+  88% {
+    translate: -6px 0;
+  }
+}
+
+/* ---------- info panel (§5.1 Figma + §5.3 avatar / cases) ---------- */
+.cc-panel {
+  position: absolute;
+  left: 0;
+  top: 220px;
+  width: 200px;
+  background: var(--c-panel, rgba(41, 29, 16, 0.96));
+  color: #fff;
+  font-family: var(--font-text);
+  font-weight: 400;
+  clip-path: inset(0 0 100% 0);
+  transition: clip-path 220ms cubic-bezier(0.4, 0, 1, 1);
+}
+
+.cc-lift.is-on .cc-panel {
+  clip-path: inset(0 0 0 0);
+  transition: clip-path 380ms var(--ease-lift, var(--ease-out)) 60ms;
+}
+
+.cc-panel__inner {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+  padding: 14px 12px 12px;
+}
+
+.cc-panel__inner > * {
+  opacity: 0;
+  transform: translateY(8px);
+  transition: opacity 160ms ease-in, transform 160ms ease-in;
+}
+
+.cc-lift.is-on .cc-panel__inner > * {
+  opacity: 1;
+  transform: none;
+  transition: opacity 260ms var(--ease-lift, var(--ease-out)) 60ms, transform 260ms var(--ease-lift, var(--ease-out)) 60ms;
+}
+
+.cc-lift.is-on .cc-panel__inner > :nth-child(2) {
+  transition-delay: 120ms;
+}
+
+.cc-lift.is-on .cc-panel__inner > :nth-child(3) {
+  transition-delay: 180ms;
+}
+
+.cc-panel__title {
+  margin: 0;
+  font-size: 16px;
+  line-height: 18px;
+  display: -webkit-box;
+  -webkit-box-orient: vertical;
+  -webkit-line-clamp: 2;
+  overflow: hidden;
+}
+
+.cc-panel__doctor {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  min-width: 0;
+  font-size: 13px;
+  line-height: 16px;
+  color: rgba(227, 224, 222, 0.8);
+}
+
+.cc-panel__name {
+  overflow: hidden;
+  white-space: nowrap;
+  text-overflow: ellipsis;
+}
+
+.cc-avatar {
+  flex: none;
+  display: grid;
+  place-items: center;
+  width: 24px;
+  height: 24px;
+  overflow: hidden;
+  border-radius: 50%;
+  background: rgba(215, 165, 97, 0.22);
+  color: var(--c-gold-400);
+  font-size: 10px;
+  line-height: 1;
+  letter-spacing: 0.02em;
+}
+
+.cc-avatar__img {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+}
+
+.cc-panel__cases {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  margin-top: 2px;
+}
+
+.cc-thumb {
+  flex: none;
+  width: 36px;
+  height: 36px;
+  overflow: hidden;
+  border-radius: 4px;
+  outline: 1px solid transparent;
+  outline-offset: -1px;
+  opacity: 0.7;
+  cursor: pointer;
+  transition: opacity 200ms var(--ease-out), outline-color 200ms var(--ease-out);
+}
+
+.cc-thumb:hover,
+.cc-thumb.is-current {
+  opacity: 1;
+}
+
+.cc-thumb.is-current {
+  outline-color: var(--c-gold-400);
+}
+
+.cc-thumb__img {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+}
+
+.cc-panel__more {
+  margin-left: auto;
+  font-size: 12px;
+  line-height: 14px;
+  color: var(--c-gold-400);
+  white-space: nowrap;
+}
+
+.cc-panel__arrow {
+  display: inline-block;
+  transition: transform 200ms var(--ease-out);
+}
+
+.cc-panel__more:hover .cc-panel__arrow {
+  transform: translateX(3px);
+}
+
+/* ---------- reduced motion (§9.7): static strip, instant lift + panel ---------- */
+@media (prefers-reduced-motion: reduce) {
+  .cc-card,
+  .cc-lift__body,
+  .cc-lift__shadow,
+  .cc-lift__layer,
+  .cc-panel,
+  .cc-panel__inner > *,
+  .cc-vid__video,
+  .cc-vid__play,
+  .cc-ba__knob,
+  .cc-ba__line,
+  .cc-ba.is-resetting {
+    transition: none !important;
+  }
+
+  .cc.is-intro .cc-card,
+  .cc-ba.is-hint .cc-ba__knob {
+    animation: none !important;
+  }
+}

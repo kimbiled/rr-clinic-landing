@@ -1,0 +1,340 @@
+/* FE-2 — cases carousel: the stateful bits Tailwind utilities can't express cleanly
+   (the --pos divider, data-phase transitions with distinct enter/leave curves, masks, keyframes).
+   Layout/typography live in the components as Tailwind utilities.
+   Spec: docs/design-spec.md §4, §5, §6, §9.3–9.4, §9.7. */
+
+/* Same order as styles/index.css — this file may be evaluated first (it's imported from the component
+   tree before main.tsx imports index.css), and the first @layer statement fixes the order. */
+@layer theme, base, antd, components, utilities;
+
+@property --pos {
+  syntax: '<percentage>';
+  inherits: true;
+  initial-value: 50%;
+}
+
+@layer components {
+  /* ---------- static grid (§4.4): 35 % behind the statue ---------- */
+  .cc-grid {
+    -webkit-mask-image: linear-gradient(90deg, #000 calc(50% - 330px), rgb(0 0 0 / 0.35) calc(50% - 210px), rgb(0 0 0 / 0.35) calc(50% + 210px), #000 calc(50% + 330px));
+    mask-image: linear-gradient(90deg, #000 calc(50% - 330px), rgb(0 0 0 / 0.35) calc(50% - 210px), rgb(0 0 0 / 0.35) calc(50% + 210px), #000 calc(50% + 330px));
+  }
+
+  .cc-grid__v {
+    background: linear-gradient(180deg, rgb(255 255 255 / 0) 0, rgb(255 255 255 / 0.12) 32px, rgb(255 255 255 / 0.12) calc(100% - 32px), rgb(255 255 255 / 0) 100%);
+  }
+
+  /* ---------- strip cards ---------- */
+  .cc-card {
+    transition: opacity 400ms var(--ease-out, cubic-bezier(0.22, 1, 0.36, 1)), filter 400ms var(--ease-out, cubic-bezier(0.22, 1, 0.36, 1));
+  }
+
+  /* selected surgeon: other doctors' cases recede, theirs get a gold hairline */
+  .cc-card[data-dim] {
+    opacity: 0.35;
+    filter: saturate(0.15);
+  }
+
+  .cc-card[data-match]::after {
+    content: '';
+    position: absolute;
+    inset: 0;
+    box-shadow: inset 0 0 0 1px rgb(215 165 97 / 0.8);
+    pointer-events: none;
+  }
+
+  /* shown by its lift in the overlay layer */
+  .cc-card[data-lifted] {
+    opacity: 0 !important;
+    transition: none;
+  }
+
+  .cc-root[data-intro='wait'] .cc-card {
+    opacity: 0;
+  }
+
+  .cc-root[data-intro='run'] .cc-card {
+    animation: cc-card-in 600ms var(--ease-out, cubic-bezier(0.22, 1, 0.36, 1)) backwards;
+  }
+
+  /* ---------- shared media bits ---------- */
+  .cc-shade-bottom,
+  .cc-shade-top {
+    position: absolute;
+    left: 0;
+    right: 0;
+    pointer-events: none;
+  }
+
+  .cc-shade-bottom {
+    bottom: 0;
+    height: 88px;
+    background: linear-gradient(180deg, rgb(45 32 16 / 0) 0%, rgb(45 32 16 / 0.4) 100%);
+  }
+
+  .cc-shade-top {
+    top: 0;
+    height: 64px;
+    background: linear-gradient(0deg, rgb(45 32 16 / 0) 0%, rgb(45 32 16 / 0.28) 100%);
+  }
+
+  /* ---------- before / after (§4.2, §6) ---------- */
+  .cc-ba--clip .cc-ba__pane--before {
+    clip-path: inset(0 calc(100% - var(--pos)) 0 0);
+  }
+
+  .cc-ba--clip .cc-ba__pane--after {
+    clip-path: inset(0 0 0 var(--pos));
+  }
+
+  /* half-crop sources (no framing): each side fills its own pane, anchored at the divider */
+  .cc-ba--split .cc-ba__pane--before {
+    right: auto;
+    width: var(--pos);
+  }
+
+  .cc-ba--split .cc-ba__pane--after {
+    left: var(--pos);
+  }
+
+  .cc-ba__line {
+    position: absolute;
+    top: 0;
+    bottom: 0;
+    left: var(--pos);
+    width: 1px;
+    transform: translateX(-50%);
+    background: rgb(255 255 255 / 0.6);
+    pointer-events: none;
+    transition: width 160ms var(--ease-out, cubic-bezier(0.22, 1, 0.36, 1)), background-color 160ms var(--ease-out, cubic-bezier(0.22, 1, 0.36, 1));
+  }
+
+  .cc-ba__knob {
+    position: absolute;
+    /* divider clamps to 4–96 % (§6); 4 % of 200 = 8 px < the knob's 11 px radius, so the knob
+       itself is held fully inside the card (QA m-1) */
+    left: clamp(13px, var(--pos), calc(100% - 13px)); /* 13 = radius × 1.12 hover scale */
+    top: 110px;
+    width: 22px;
+    height: 22px;
+    margin: -11px 0 0 -11px;
+    border: 1px solid rgb(255 255 255 / 0.4);
+    border-radius: 50%;
+    background: rgb(255 255 255 / 0.24);
+    color: #fff;
+    transition: transform 160ms var(--ease-out, cubic-bezier(0.22, 1, 0.36, 1)), background-color 160ms var(--ease-out, cubic-bezier(0.22, 1, 0.36, 1)), border-color 160ms var(--ease-out, cubic-bezier(0.22, 1, 0.36, 1)), color 160ms var(--ease-out, cubic-bezier(0.22, 1, 0.36, 1));
+  }
+
+  .cc-ba[data-interactive] .cc-ba__knob {
+    -webkit-backdrop-filter: blur(var(--glass-blur, 12px));
+    backdrop-filter: blur(var(--glass-blur, 12px));
+    background: rgb(255 255 255 / 0.2);
+  }
+
+  .cc-ba[data-interactive] .cc-ba__knob:hover {
+    transform: scale(1.12);
+    background: rgb(255 255 255 / 0.32);
+  }
+
+  .cc-ba[data-dragging] .cc-ba__knob {
+    transform: none;
+    border-color: transparent;
+    background: rgb(215 165 97 / 0.9);
+    color: var(--color-gold-950, #291d10);
+  }
+
+  .cc-ba[data-dragging] .cc-ba__line {
+    width: 2px;
+    background: #fff;
+  }
+
+  .cc-ba[data-resetting] {
+    transition: --pos 500ms var(--ease-out, cubic-bezier(0.22, 1, 0.36, 1)) 600ms;
+  }
+
+  /* first B/A hover per session: the knob nudges ±10 px twice */
+  .cc-ba[data-hint] .cc-ba__knob {
+    animation: cc-nudge 900ms ease-in-out 360ms 1;
+  }
+
+  /* ---------- video / interview (§4.3) ---------- */
+  .cc-vid__video {
+    opacity: 0;
+    transition: opacity 240ms var(--ease-out, cubic-bezier(0.22, 1, 0.36, 1));
+  }
+
+  .cc-vid[data-playing] .cc-vid__video {
+    opacity: 1;
+  }
+
+  .cc-vid__play {
+    transition: opacity 200ms var(--ease-out, cubic-bezier(0.22, 1, 0.36, 1)), transform 200ms var(--ease-out, cubic-bezier(0.22, 1, 0.36, 1));
+  }
+
+  .cc-vid[data-playing] .cc-vid__play {
+    opacity: 0;
+    transform: scale(0.8);
+  }
+
+  /* ---------- lift (§5, §9.4) ---------- */
+  .cc-lift__body {
+    /* leave: card down 280 ms from +80 ms */
+    transition: transform 280ms var(--ease-out, cubic-bezier(0.22, 1, 0.36, 1)) 80ms;
+  }
+
+  .cc-lift[data-phase='on'] .cc-lift__body {
+    transform: translateY(-16px);
+    transition: transform 320ms var(--ease-lift, cubic-bezier(0.22, 1, 0.36, 1));
+  }
+
+  /* Shadow around card + panel, clipped so nothing spills below the panel's first 82 px:
+     the drop shadow never greys the H1 (QA m-4). */
+  .cc-lift__shadow {
+    position: absolute;
+    left: 0;
+    top: 0;
+    width: 100%;
+    height: calc(220px + var(--panel-h, 82px));
+    box-shadow: var(--shadow-card-lift, 0 18px 40px rgb(20 13 6 / 0.45));
+    clip-path: polygon(-64px -64px, calc(100% + 64px) -64px, calc(100% + 64px) 302px, 100% 302px, 100% 100%, 0 100%, 0 302px, -64px 302px);
+    opacity: 0;
+    transform: scaleY(var(--shadow-s, 0.73));
+    transform-origin: 50% 0;
+    pointer-events: none;
+    transition: opacity 220ms ease-in, transform 220ms ease-in;
+  }
+
+  .cc-lift[data-phase='on'] .cc-lift__shadow {
+    opacity: 1;
+    transform: none;
+    transition: opacity 320ms var(--ease-lift, cubic-bezier(0.22, 1, 0.36, 1)), transform 380ms var(--ease-lift, cubic-bezier(0.22, 1, 0.36, 1)) 60ms;
+  }
+
+  .cc-lift__ring {
+    position: absolute;
+    left: 0;
+    top: 0;
+    width: 100%;
+    height: calc(220px + var(--panel-h, 82px));
+    pointer-events: none;
+  }
+
+  .cc-lift[data-focus] .cc-lift__ring {
+    outline: 2px solid var(--color-gold-400, #d7a561);
+    outline-offset: 3px;
+  }
+
+  .cc-lift__layer {
+    transition: opacity 200ms var(--ease-out, cubic-bezier(0.22, 1, 0.36, 1));
+  }
+
+  .cc-lift__layer[data-entering] {
+    opacity: 0;
+  }
+
+  /* QA P-1: the strip card sits under .hero__shade (vignette + glow); the overlay clone doesn't.
+     This layer holds a full copy of that layer placed at the card's stage position (vars from
+     StripMotion.place) so the hand-over matches, then fades out with the rise instead of jumping. */
+  .cc-lift__dim {
+    position: absolute;
+    inset: 0;
+    overflow: hidden;
+    pointer-events: none;
+    transition: opacity 280ms var(--ease-out, cubic-bezier(0.22, 1, 0.36, 1)) 80ms;
+  }
+
+  /* full-stage copy of .hero__shade, offset so the card's slot lines up with the strip card's */
+  .cc-lift__dim > .cc-lift__shade {
+    position: absolute;
+    left: calc(-1 * var(--cc-lx, 0px));
+    top: -124px;
+    width: var(--cc-stage-w, 1440px);
+    height: 720px;
+    z-index: auto;
+  }
+
+  .cc-lift[data-phase='on'] .cc-lift__dim {
+    opacity: 0;
+    transition: opacity 320ms var(--ease-lift, cubic-bezier(0.22, 1, 0.36, 1));
+  }
+
+  /* ---------- doctor panel (§5.1, §5.3) ---------- */
+  .cc-panel {
+    clip-path: inset(0 0 100% 0);
+    transition: clip-path 220ms cubic-bezier(0.4, 0, 1, 1);
+  }
+
+  .cc-lift[data-phase='on'] .cc-panel {
+    clip-path: inset(0 0 0 0);
+    transition: clip-path 380ms var(--ease-lift, cubic-bezier(0.22, 1, 0.36, 1)) 60ms;
+  }
+
+  .cc-panel__inner > * {
+    opacity: 0;
+    transform: translateY(8px);
+    transition: opacity 160ms ease-in, transform 160ms ease-in;
+  }
+
+  .cc-lift[data-phase='on'] .cc-panel__inner > * {
+    opacity: 1;
+    transform: none;
+    transition: opacity 260ms var(--ease-lift, cubic-bezier(0.22, 1, 0.36, 1)) 60ms, transform 260ms var(--ease-lift, cubic-bezier(0.22, 1, 0.36, 1)) 60ms;
+  }
+
+  .cc-lift[data-phase='on'] .cc-panel__inner > :nth-child(2) {
+    transition-delay: 120ms;
+  }
+
+  .cc-lift[data-phase='on'] .cc-panel__inner > :nth-child(3) {
+    transition-delay: 180ms;
+  }
+
+  /* ---------- reduced motion (§9.7): static strip, instant lift + panel ---------- */
+  @media (prefers-reduced-motion: reduce) {
+    .cc-card,
+    .cc-lift__body,
+    .cc-lift__shadow,
+    .cc-lift__layer,
+    .cc-lift__dim,
+    .cc-panel,
+    .cc-panel__inner > *,
+    .cc-vid__video,
+    .cc-vid__play,
+    .cc-ba__knob,
+    .cc-ba__line,
+    .cc-ba[data-resetting] {
+      transition: none !important;
+    }
+
+    .cc-root .cc-card,
+    .cc-ba[data-hint] .cc-ba__knob {
+      animation: none !important;
+    }
+  }
+}
+
+@keyframes cc-card-in {
+  from {
+    opacity: 0;
+    transform: translateY(12px);
+  }
+}
+
+@keyframes cc-nudge {
+  0%,
+  100% {
+    translate: 0 0;
+  }
+  20% {
+    translate: 10px 0;
+  }
+  45% {
+    translate: -10px 0;
+  }
+  70% {
+    translate: 10px 0;
+  }
+  88% {
+    translate: -6px 0;
+  }
+}

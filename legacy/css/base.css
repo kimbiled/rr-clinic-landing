@@ -1,0 +1,211 @@
+*,
+*::before,
+*::after {
+  box-sizing: border-box;
+}
+
+html {
+  -webkit-text-size-adjust: 100%;
+  scroll-padding-top: 96px; /* keeps focused/anchored targets clear of the fixed navbar island */
+}
+
+body {
+  margin: 0;
+  min-width: 1280px; /* desktop-only scope for now */
+  background: var(--c-gold-950);
+  color: var(--c-white);
+  font-family: var(--font-text);
+  -webkit-font-smoothing: antialiased;
+}
+
+img,
+svg,
+video,
+canvas {
+  display: block;
+  max-width: 100%;
+}
+
+button {
+  font: inherit;
+  color: inherit;
+  background: none;
+  border: 0;
+  padding: 0;
+  cursor: pointer;
+}
+
+a {
+  color: inherit;
+  text-decoration: none;
+}
+
+p,
+h1,
+h2,
+h3 {
+  margin: 0;
+}
+
+ul {
+  margin: 0;
+  padding: 0;
+  list-style: none;
+}
+
+:focus-visible {
+  outline: 2px solid var(--c-gold-400);
+  outline-offset: 3px;
+}
+
+.visually-hidden {
+  position: absolute;
+  width: 1px;
+  height: 1px;
+  overflow: hidden;
+  clip: rect(0 0 0 0);
+  white-space: nowrap;
+}
+
+/* ---------- Hero stage: static layers (owned by lead) ---------- */
+/* The hero is the 1440×720 Figma composition scaled as one unit, so the strip, statue and
+   text keep their relationship at every desktop size. js/main.js sets --stage-scale
+   (min(vw/1440, vh/720), clamped 1…1.6); without JS it stays at 1. */
+.hero {
+  --stage-scale: 1;
+  position: relative;
+  height: calc(var(--hero-height) * var(--stage-scale));
+  overflow: hidden;
+  isolation: isolate;
+  background: var(--c-gold-950);
+}
+
+.hero__stage {
+  position: absolute;
+  left: 0;
+  top: 0;
+  width: calc(100% / var(--stage-scale));
+  height: var(--hero-height);
+  transform: scale(var(--stage-scale));
+  transform-origin: 0 0;
+}
+
+.hero__layer {
+  position: absolute;
+  inset: 0;
+  pointer-events: none;
+}
+
+.hero__bg {
+  z-index: var(--z-bg);
+}
+
+.hero__bg img {
+  position: absolute;
+  left: 50%;
+  top: 50%;
+  width: max(100%, 1440px);
+  height: calc(100% + 84px);
+  object-fit: cover;
+  transform: translate(-50%, -50%);
+}
+
+.hero__light {
+  z-index: var(--z-light);
+  width: 100%;
+  height: 100%;
+}
+
+.hero__carousel {
+  z-index: var(--z-carousel);
+  pointer-events: auto;
+}
+
+.hero__statue {
+  z-index: var(--z-statue);
+}
+
+.hero__statue img {
+  position: absolute;
+  left: 50%;
+  bottom: 0;
+  width: 1289px;
+  height: 720px;
+  max-width: none;
+  object-fit: cover;
+  transform: translateX(-50%);
+}
+
+.hero__shade {
+  z-index: var(--z-shade);
+}
+
+/* Figma 1610:429 "Shadow": radial vignette */
+.hero__shade::before {
+  content: "";
+  position: absolute;
+  inset: 0;
+  background: radial-gradient(72% 50% at 50% 50%, rgba(81, 73, 66, 0) 0%, rgba(81, 73, 66, 0.2) 100%);
+}
+
+/* Figma 1610:430 "Overlay": bottom fade to brown */
+.hero__shade::after {
+  content: "";
+  position: absolute;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  height: 374px;
+  background: linear-gradient(180deg, rgba(68, 48, 25, 0) 0%, var(--c-brown-overlay) 100%);
+}
+
+/* Figma 1610:431 "Ellipse 894": blurred dark glow under the text */
+.hero__glow {
+  position: absolute;
+  left: 50%;
+  bottom: -88px;
+  width: 868px;
+  height: 296px;
+  margin-left: -14px;
+  transform: translateX(-50%);
+  border-radius: 50%;
+  background: var(--c-gold-950);
+  filter: blur(200px);
+}
+
+.hero__particles {
+  z-index: var(--z-particles);
+  width: 100%;
+  height: 100%;
+}
+
+.hero__content-layer {
+  z-index: var(--z-content);
+  pointer-events: none;
+}
+
+.hero__content-layer > * {
+  pointer-events: auto;
+}
+
+.hero__overlay {
+  z-index: var(--z-overlay);
+}
+
+.hero__overlay > * {
+  pointer-events: auto;
+}
+
+/* ---------- Placeholder below hero (scroll room to test navbar collapse) ---------- */
+.page-placeholder {
+  min-height: 160vh;
+  padding: 120px var(--nav-pad-x);
+  background: var(--c-taupe-50);
+  color: var(--c-neutral-900);
+  font-family: var(--font-display);
+}
+
+.page-placeholder p {
+  max-width: 560px;
+  color: #5c5752;
+}

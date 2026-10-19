@@ -1,0 +1,258 @@
+/* Navbar (owner FE-3): Figma 1610:466 expanded bar ⇄ PROPOSED island (design-spec §2.2, §9.6).
+   m-6: the morph never changes layout. Every item keeps its expanded box; the island is reached with
+   translateX() values computed in Navbar.tsx, and the dark-glass surface is a fixed-size island box that is
+   transform-scaled onto the expanded bar. Transform + opacity only → compositor-friendly, CLS 0. */
+
+@layer theme, base, antd, components, utilities;
+
+@layer components {
+  .rr-nav {
+    --nav-morph: 420ms;
+    --nav-ease: cubic-bezier(0.22, 1, 0.36, 1);
+  }
+
+  /* ---------- morphing parts (transitions only once the geometry is settled: data-anim="on") ---------- */
+  .rr-nav[data-anim='on'] .rr-nav__flip,
+  .rr-nav[data-anim='on'] .rr-nav__menu-bg,
+  .rr-nav[data-anim='on'] .rr-nav__logo-img {
+    transition: transform var(--nav-morph) var(--nav-ease);
+  }
+
+  .rr-nav__flip,
+  .rr-nav__menu-bg,
+  .rr-nav__surface {
+    transform-origin: 0 0;
+  }
+
+  /* Island surface: dark glass. Spec says .55; .74 keeps white 13–14 px links ≥ 4.5:1 over the light
+     Taupe/50 sections below the hero (M-3). */
+  .rr-nav__surface {
+    background: rgb(41 29 16 / 0.74);
+    -webkit-backdrop-filter: blur(16px) saturate(140%);
+    backdrop-filter: blur(16px) saturate(140%);
+    box-shadow:
+      inset 0 0 0 1px rgb(255 255 255 / 0.12),
+      inset 0 1px 0 rgb(255 255 255 / 0.08),
+      0 10px 30px rgb(20 13 6 / 0.25);
+    opacity: 0;
+    pointer-events: none;
+  }
+
+  .rr-nav[data-state='island'] .rr-nav__surface {
+    opacity: 1;
+    pointer-events: auto;
+  }
+
+  .rr-nav[data-anim='on'] .rr-nav__surface {
+    transition:
+      transform var(--nav-morph) var(--nav-ease),
+      opacity 200ms var(--nav-ease);
+  }
+
+  .rr-nav[data-anim='on'][data-state='island'] .rr-nav__surface {
+    transition:
+      transform var(--nav-morph) var(--nav-ease),
+      opacity 280ms var(--nav-ease) 40ms;
+  }
+
+  /* Glass menu pill (Figma 1610:477). M-3: a warm dark tint under the white glass raises link contrast
+     (see Navbar.tsx header for the measured values) while keeping the light-glass look. */
+  .rr-nav__menu-bg {
+    background:
+      linear-gradient(rgb(255 255 255 / 0.2), rgb(255 255 255 / 0.2)),
+      rgb(41 29 16 / var(--nav-pill-tint, 0.3));
+    -webkit-backdrop-filter: blur(var(--glass-blur, 12px));
+    backdrop-filter: blur(var(--glass-blur, 12px));
+  }
+
+  .rr-nav[data-anim='on'] .rr-nav__menu-bg {
+    transition:
+      transform var(--nav-morph) var(--nav-ease),
+      opacity 240ms var(--nav-ease) 120ms;
+  }
+
+  .rr-nav[data-state='island'] .rr-nav__menu-bg {
+    opacity: 0;
+  }
+
+  .rr-nav[data-anim='on'][data-state='island'] .rr-nav__menu-bg {
+    transition:
+      transform var(--nav-morph) var(--nav-ease),
+      opacity 160ms var(--nav-ease);
+  }
+
+  .rr-nav[data-state='island'] .rr-nav__logo-img {
+    transform: scale(0.8125); /* 32 → 26 px tall in the island */
+  }
+
+  /* Divider: island only */
+  .rr-nav__divider {
+    opacity: 0;
+  }
+
+  .rr-nav[data-state='island'] .rr-nav__divider {
+    opacity: 1;
+  }
+
+  .rr-nav[data-anim='on'][data-state='island'] .rr-nav__divider {
+    transition: opacity 200ms linear calc(var(--nav-morph) * 0.45);
+  }
+
+  /* Phone: hidden in the island (and out of the tab order via visibility) */
+  .rr-nav__phone {
+    transition:
+      opacity 240ms var(--nav-ease) 160ms,
+      transform var(--nav-morph) var(--nav-ease),
+      visibility 0s linear 0s;
+  }
+
+  .rr-nav__phone:hover {
+    opacity: 0.8;
+    transition-delay: 0ms;
+  }
+
+  .rr-nav[data-state='island'] .rr-nav__phone {
+    opacity: 0;
+    visibility: hidden;
+    pointer-events: none;
+    transform: translateX(-16px);
+    transition:
+      opacity 140ms var(--nav-ease),
+      transform var(--nav-morph) var(--nav-ease),
+      visibility 0s linear 140ms;
+  }
+
+  .rr-nav[data-anim='off'] .rr-nav__phone {
+    transition: none;
+  }
+
+  /* ---------- links (spec §2.1 states, PROPOSED) ---------- */
+  .rr-nav__link {
+    /* M-3: subtle dark halo, keeps glyph edges legible on the bright parts of the glass */
+    text-shadow: 0 0 6px rgb(41 29 16 / 0.35), 0 1px 1px rgb(41 29 16 / 0.25);
+    transition: opacity 200ms var(--nav-ease);
+  }
+
+  .rr-nav[data-state='island'] .rr-nav__link {
+    text-shadow: none;
+  }
+
+  .rr-nav__link::after {
+    content: '';
+    position: absolute;
+    left: 0;
+    right: 0;
+    bottom: 8px;
+    height: 1px;
+    background: currentColor;
+    opacity: 0.6;
+    transform: scaleX(0);
+    transform-origin: 0 50%;
+    transition: transform 240ms var(--nav-ease);
+  }
+
+  .rr-nav__links:hover .rr-nav__link {
+    opacity: 0.72;
+  }
+
+  .rr-nav__links .rr-nav__link:hover,
+  .rr-nav__links .rr-nav__link:focus-visible {
+    opacity: 1;
+  }
+
+  .rr-nav__link:hover::after,
+  .rr-nav__link:focus-visible::after {
+    transform: scaleX(1);
+  }
+
+  .rr-nav__link[aria-current='true']::before {
+    content: '';
+    position: absolute;
+    left: 50%;
+    bottom: 2px;
+    width: 4px;
+    height: 4px;
+    margin-left: -2px;
+    border-radius: 50%;
+    background: var(--color-gold-400, #d7a561);
+  }
+
+  .rr-nav__link:focus-visible {
+    outline-offset: 2px;
+    border-radius: 2px;
+  }
+
+  /* ---------- "Связаться" + WhatsApp (Figma 1610:487 / 1610:489) ---------- */
+  .rr-nav__contact,
+  .rr-nav__wa {
+    transition:
+      background-color 200ms var(--nav-ease),
+      transform 200ms var(--nav-ease);
+  }
+
+  .rr-nav__contact:hover {
+    background: #fff;
+    transform: translateY(-1px);
+  }
+
+  .rr-nav__wa:hover {
+    background: #fff;
+  }
+
+  .rr-nav__wa img {
+    transition: transform 200ms var(--nav-ease);
+  }
+
+  .rr-nav__wa:hover img {
+    transform: rotate(-8deg);
+  }
+
+  .rr-nav__contact:active,
+  .rr-nav__wa:active {
+    transform: scale(0.97);
+  }
+
+  /* WhatsApp tooltip (replaces antd Tooltip, N2-4): shows on hover after 400 ms, or on keyboard focus */
+  .rr-nav__tip {
+    position: absolute;
+    top: calc(100% + 10px);
+    left: 50%;
+    padding: 6px 10px;
+    border-radius: 8px;
+    background: rgb(41 29 16 / 0.92);
+    box-shadow: 0 6px 16px rgb(20 13 6 / 0.3);
+    color: #fff;
+    font-size: 13px;
+    line-height: 16px;
+    font-weight: 400;
+    white-space: nowrap;
+    pointer-events: none;
+    opacity: 0;
+    visibility: hidden;
+    transform: translate(-50%, -4px);
+    transition:
+      opacity 160ms var(--nav-ease),
+      transform 160ms var(--nav-ease),
+      visibility 0s linear 160ms;
+  }
+
+  .rr-nav__wa:hover .rr-nav__tip,
+  .rr-nav__wa:focus-visible .rr-nav__tip {
+    opacity: 1;
+    visibility: visible;
+    transform: translate(-50%, 0);
+    transition-delay: 400ms, 400ms, 0s;
+  }
+
+  .rr-nav__wa:focus-visible .rr-nav__tip {
+    transition-delay: 0s;
+  }
+
+  @media (prefers-reduced-motion: reduce) {
+    .rr-nav *,
+    .rr-nav *::before,
+    .rr-nav *::after {
+      transition: none !important;
+    }
+  }
+}

@@ -1,0 +1,189 @@
+/* Layer order: antd (via <StyleProvider layer>) sits below Tailwind utilities so utilities win. */
+@layer theme, base, antd, components, utilities;
+
+@import 'tailwindcss';
+@import './fonts.css';
+
+/* ---------- Design tokens (Figma "RR Clinic/*" styles) → Tailwind theme ---------- */
+@theme {
+  --color-white: #ffffff;
+  --color-neutral-100: #f1efed;
+  --color-neutral-200: #e3e0de;
+  --color-neutral-900: #2e2c2c;
+  --color-taupe-50: #f6f3f0;
+  --color-taupe-400: #baab9b;
+  --color-gold-950: #291d10;
+  --color-gold-400: #d7a561;
+  --color-gold-600: #b98743;
+  --color-cta-top: #ddb37b;
+  --color-cta-bottom: #c19457;
+  --color-brown-overlay: #402e21;
+  --color-panel: rgb(41 29 16 / 0.96);
+  --color-outline: rgb(186 171 155 / 0.9);
+  --color-glass-light: rgb(255 255 255 / 0.2);
+  --color-glass-warm: rgb(241 239 237 / 0.1);
+
+  /* Futura PT: self-hosted client files (styles/fonts.css); Century Gothic only if the webfont fails. */
+  --font-display: 'Manrope', system-ui, sans-serif;
+  --font-text: 'Futura PT', 'Century Gothic', system-ui, sans-serif;
+
+  --radius-sm: 6px;
+  --radius-md: 14px;
+  --radius-pill: 99px;
+
+  --shadow-card-lift: 0 18px 40px rgb(20 13 6 / 0.45);
+
+  --ease-out: cubic-bezier(0.22, 1, 0.36, 1);
+  --ease-in-out: cubic-bezier(0.65, 0, 0.35, 1);
+  --ease-lift: cubic-bezier(0.22, 1, 0.36, 1);
+  --ease-carousel: cubic-bezier(0.33, 0, 0.2, 1);
+}
+
+/* Non-utility tokens shared by components */
+:root {
+  --glass-blur: 12px;
+  --hero-height: 720px;
+  --nav-pad-x: 101px;
+
+  /* Hero layer order (bottom → top). Mirrors Figma frame 1610:268 */
+  --z-bg: 0;
+  --z-light: 1;
+  --z-carousel: 2;
+  --z-statue: 3;
+  --z-shade: 4;
+  --z-particles: 5;
+  --z-content: 6;
+  --z-overlay: 7; /* lifted card + doctor panel — must sit ABOVE the text */
+  --z-nav: 50;
+  --z-menu: 60;
+}
+
+@layer base {
+  html {
+    scroll-padding-top: 96px; /* keeps focused/anchored targets clear of the fixed navbar island */
+  }
+
+  body {
+    min-width: 1280px; /* desktop-only scope for now */
+    background: var(--color-gold-950);
+    color: var(--color-white);
+    font-family: var(--font-text);
+    -webkit-font-smoothing: antialiased;
+  }
+
+  :focus-visible {
+    outline: 2px solid var(--color-gold-400);
+    outline-offset: 3px;
+  }
+}
+
+/* ---------- Hero stage: static layers (owner: lead) ---------- */
+@layer components {
+  /* The 1440×720 composition scaled as one unit; --stage-scale comes from useStageScale(). */
+  .hero {
+    --stage-scale: 1;
+    position: relative;
+    height: calc(var(--hero-height) * var(--stage-scale));
+    overflow: hidden;
+    isolation: isolate;
+    background: var(--color-gold-950);
+  }
+
+  .hero__stage {
+    position: absolute;
+    left: 0;
+    top: 0;
+    width: calc(100% / var(--stage-scale));
+    height: var(--hero-height);
+    transform: scale(var(--stage-scale));
+    transform-origin: 0 0;
+  }
+
+  .hero__layer {
+    position: absolute;
+    inset: 0;
+    pointer-events: none;
+  }
+
+  .hero__bg { z-index: var(--z-bg); }
+  .hero__light { z-index: var(--z-light); }
+  .hero__carousel { z-index: var(--z-carousel); }
+  .hero__statue { z-index: var(--z-statue); }
+  .hero__shade { z-index: var(--z-shade); }
+  .hero__particles { z-index: var(--z-particles); }
+  .hero__content-layer { z-index: var(--z-content); }
+  .hero__overlay { z-index: var(--z-overlay); }
+
+  /* Interactive children opt back in to pointer events. */
+  .hero__carousel > *,
+  .hero__overlay > *,
+  .hero__content-layer [data-interactive] {
+    pointer-events: auto;
+  }
+
+  .hero__bg img {
+    position: absolute;
+    left: 50%;
+    top: 50%;
+    width: max(100%, 1440px);
+    max-width: none;
+    height: calc(100% + 84px);
+    object-fit: cover;
+    transform: translate(-50%, -50%);
+  }
+
+  .hero__statue img {
+    position: absolute;
+    left: 50%;
+    bottom: 0;
+    width: 1289px;
+    height: 720px;
+    max-width: none;
+    object-fit: cover;
+    transform: translateX(-50%);
+  }
+
+  /* Figma 1610:429 "Shadow": radial vignette */
+  .hero__shade::before {
+    content: '';
+    position: absolute;
+    inset: 0;
+    background: radial-gradient(72% 50% at 50% 50%, rgb(81 73 66 / 0) 0%, rgb(81 73 66 / 0.2) 100%);
+  }
+
+  /* Figma 1610:430 "Overlay": bottom fade to brown */
+  .hero__shade::after {
+    content: '';
+    position: absolute;
+    inset: auto 0 0;
+    height: 374px;
+    background: linear-gradient(180deg, rgb(68 48 25 / 0) 0%, var(--color-brown-overlay) 100%);
+  }
+
+  /* Figma 1610:431 "Ellipse 894": blurred dark glow under the text */
+  .hero__glow {
+    position: absolute;
+    left: 50%;
+    bottom: -88px;
+    width: 868px;
+    height: 296px;
+    margin-left: -14px;
+    transform: translateX(-50%);
+    border-radius: 50%;
+    background: var(--color-gold-950);
+    filter: blur(200px);
+  }
+
+  /* Placeholder below the hero (scroll room to test the navbar island) */
+  .page-placeholder {
+    min-height: 60vh;
+    padding: 120px var(--nav-pad-x);
+    background: var(--color-taupe-50);
+    color: #5c5752;
+    font-family: var(--font-display);
+  }
+
+  .page-placeholder p {
+    max-width: 560px;
+  }
+}

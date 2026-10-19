@@ -1,0 +1,150 @@
+<!doctype html>
+<html lang="ru">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>RR Clinic — пластическая хирургия в Астане</title>
+  <link rel="icon" href="assets/icons/favicon.svg" type="image/svg+xml">
+  <meta name="description" content="Комплексные операции тела, лица и груди в премиальной клинике RR Clinic.">
+
+  <link rel="preload" as="font" type="font/woff2" href="assets/fonts/manrope-cyrillic.woff2" crossorigin>
+  <link rel="stylesheet" href="css/fonts.css">
+
+  <link rel="preload" as="image" href="assets/img/web/bg-columns.webp">
+  <link rel="preload" as="image" href="assets/img/web/statue.webp">
+
+  <link rel="stylesheet" href="css/tokens.css">
+  <link rel="stylesheet" href="css/base.css">
+  <link rel="stylesheet" href="css/fx.css">
+  <link rel="stylesheet" href="css/carousel.css">
+  <link rel="stylesheet" href="css/nav.css">
+  <link rel="stylesheet" href="css/hero.css">
+</head>
+<body>
+  <!-- ========== NAVBAR (owner: FE-3 shell) ========== -->
+  <!-- Runs before the hero is parsed: hides [data-reveal] items until js/hero.js plays the reveal (no flash).
+       Without JS the class is never added, so the content is visible. CSS has a 4 s failsafe. -->
+  <script>document.documentElement.classList.add('js-reveal');</script>
+  <header class="nav" data-nav>
+    <div class="nav__surface" aria-hidden="true"></div>
+    <div class="nav__inner">
+      <a class="nav__logo" href="#hero" aria-label="RR Clinic — на главную" data-flip data-reveal="nav">
+        <img src="assets/icons/logo.svg" width="35" height="32" alt="">
+      </a>
+      <nav class="nav__menu" aria-label="Основное меню" data-reveal="nav">
+        <span class="nav__menu-bg" aria-hidden="true" data-flip="scale"></span>
+        <ul class="nav__links">
+          <li><a class="nav__link" href="#about" data-flip>О клинике</a></li>
+          <li><a class="nav__link" href="#services" data-flip>Услуги</a></li>
+          <li><a class="nav__link" href="#doctors" data-flip data-surgeon-trigger>Врачи</a></li>
+          <li><a class="nav__link" href="#cases" data-flip>До/после</a></li>
+          <li><a class="nav__link" href="#prices" data-flip>Цены</a></li>
+          <li><a class="nav__link" href="#contacts" data-flip>Контакты</a></li>
+        </ul>
+      </nav>
+      <a class="nav__phone" href="tel:+77475696969" data-flip data-reveal="nav">+7 (747) 569-69-69</a>
+      <span class="nav__divider" aria-hidden="true" data-flip></span>
+      <div class="nav__actions" data-flip data-reveal="nav">
+        <a class="nav__contact" href="#contacts">Связаться</a>
+        <a class="nav__wa" href="https://wa.me/77475696969" target="_blank" rel="noopener" aria-label="Написать в WhatsApp">
+          <img src="assets/icons/whatsapp.svg" width="16" height="16" alt="">
+        </a>
+      </div>
+    </div>
+  </header>
+  <!-- ========== /NAVBAR ========== -->
+
+  <main>
+    <section class="hero" id="hero" aria-label="RR Clinic">
+      <!-- Stage: the 1440×720 Figma composition, scaled as one unit by js/main.js (--stage-scale).
+           Paint order comes from the z-index tokens, so DOM order is free to follow the reading/Tab order. -->
+      <div class="hero__stage" data-hero-stage>
+      <!-- Static layers (owner: lead). Layering mirrors Figma frame 1610:268 -->
+      <div class="hero__layer hero__bg" aria-hidden="true">
+        <img src="assets/img/web/bg-columns.webp" alt="" fetchpriority="high">
+      </div>
+
+      <!-- FE-1: light shimmer -->
+      <canvas class="hero__layer hero__light" data-fx-light aria-hidden="true"></canvas>
+
+      <div class="hero__layer hero__statue" aria-hidden="true">
+        <img src="assets/img/web/statue.webp" alt="" fetchpriority="high">
+      </div>
+
+      <div class="hero__layer hero__shade" aria-hidden="true">
+        <div class="hero__glow"></div>
+      </div>
+
+      <!-- FE-1: particles -->
+      <canvas class="hero__layer hero__particles" data-fx-particles aria-hidden="true"></canvas>
+
+      <!-- ========== HERO CONTENT (owner: FE-3 shell) ========== -->
+      <div class="hero__layer hero__content-layer" data-hero-content>
+        <div class="hero-content">
+          <div class="hero-chips" data-hero-chips>
+            <p class="hero-chip hero-chip--location" data-reveal="chip">
+              <img src="assets/icons/location.svg" width="12" height="13" alt="">
+              <span data-hero-location>Пластическая хирургия в Астане</span>
+            </p>
+            <p class="hero-chip hero-chip--rating" data-reveal="chip">
+              <img class="hero-rating__logo" src="assets/img/web/2gis-icon.webp" width="26" height="26" alt="">
+              <span class="hero-rating" aria-hidden="true">
+                <span class="hero-rating__row"><span class="hero-rating__value" data-hero-rating-value>4,9</span> <span class="hero-rating__count" data-hero-rating-count>(264)</span></span>
+                <span class="hero-rating__stars">
+                  <img src="assets/icons/star-1.svg" width="7" height="7" alt="">
+                  <img src="assets/icons/star-2.svg" width="7" height="7" alt="">
+                  <img src="assets/icons/star-3.svg" width="7" height="7" alt="">
+                  <img src="assets/icons/star-4.svg" width="7" height="7" alt="">
+                  <img src="assets/icons/star-5.svg" width="7" height="7" alt="">
+                </span>
+              </span>
+              <span class="visually-hidden" data-hero-rating-label>Рейтинг в 2ГИС: 4,9 из 5, 264 отзыва</span>
+            </p>
+          </div>
+
+          <h1 class="hero-title" data-hero-title>
+            <span class="hero-title__line"><span class="hero-title__text" data-reveal="line">Комплексные операции тела, лица</span></span>
+            <span class="hero-title__line"><span class="hero-title__text" data-reveal="line">и&nbsp;груди в&nbsp;премиальной клинике</span></span>
+          </h1>
+
+          <p class="hero-subtitle" data-hero-subtitle data-reveal="subtitle">Мы собрали лучших узких специалистов под одной крышей и выстроили полный цикл заботы:<br> от онлайн-консультации до восстановления рядом с вами.</p>
+
+          <div class="hero-ctas">
+            <a class="cta cta--primary" href="#doctors" data-cta="pick-specialist" data-surgeon-trigger data-reveal="cta">
+              <span class="cta__shine" aria-hidden="true">
+                <img src="assets/icons/cta-shine-1.svg" alt="" style="left:87.6px;top:-37px" width="126" height="154">
+                <img src="assets/icons/cta-shine-2.svg" alt="" style="left:152.6px;top:-46px" width="150" height="172">
+                <img src="assets/icons/cta-shine-1.svg" alt="" style="left:247.6px;top:-37px" width="126" height="154">
+              </span>
+              <span class="cta__glint" aria-hidden="true"></span>
+              <span class="cta__label">Подобрать специалиста</span>
+              <img class="cta__icon" src="assets/icons/arrow-down-right.svg" width="20" height="20" alt="">
+            </a>
+            <a class="cta cta--secondary" href="#cases" data-cta="see-works" data-reveal="cta">
+              <span class="cta__glint" aria-hidden="true"></span>
+              <span class="cta__label">Смотреть работы</span>
+              <img class="cta__icon" src="assets/icons/arrow-down-right.svg" width="20" height="20" alt="" aria-hidden="true">
+            </a>
+          </div>
+        </div>
+      </div>
+      <!-- ========== /HERO CONTENT ========== -->
+
+      <!-- FE-2: cases carousel + grid lines are rendered into this layer from data.
+           Placed after the content so Tab reaches the CTAs before the cards; it still paints below (z 2). -->
+      <div class="hero__layer hero__carousel" data-carousel></div>
+
+      <!-- FE-2: hovered card + doctor card portal (sits above content) -->
+      <div class="hero__layer hero__overlay" data-hero-overlay></div>
+      </div>
+    </section>
+
+    <!-- Placeholder for the rest of the landing — gives scroll room to test the navbar island -->
+    <section class="page-placeholder" aria-label="Следующие блоки">
+      <p>Здесь будут следующие блоки лендинга. Секция-заглушка нужна, чтобы проверить сворачивание навбара в «островок» при скролле.</p>
+    </section>
+  </main>
+
+  <script type="module" src="js/main.js"></script>
+</body>
+</html>

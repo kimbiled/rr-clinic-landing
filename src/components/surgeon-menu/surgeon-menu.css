@@ -1,0 +1,112 @@
+/* Surgeon menu (owner FE-3, spec §7.2): antd Modal restyled into a full-screen dark-glass overlay.
+   Only motion lives here (rc-motion class hooks + the tile stagger); everything else is Tailwind on the
+   antd semantic slots. antd sits in @layer antd, so these component-layer rules win. */
+
+@layer theme, base, antd, components, utilities;
+
+@layer components {
+  /* Overlay fade 280 ms in / 240 ms out (transitionName/maskTransitionName = "smenu-fade") */
+  .smenu-fade-appear,
+  .smenu-fade-enter {
+    opacity: 0;
+  }
+
+  .smenu-fade-appear-active,
+  .smenu-fade-enter-active {
+    opacity: 1;
+    transition: opacity 280ms linear;
+  }
+
+  .smenu-fade-leave-active {
+    opacity: 0;
+    transition: opacity 240ms ease-in;
+  }
+
+  /* Panel content: translateY(24px) → 0 + opacity, 480 ms; close 240 ms reverse */
+  .smenu-panel-appear,
+  .smenu-panel-enter {
+    opacity: 0;
+    transform: translateY(24px);
+  }
+
+  .smenu-panel-appear-active,
+  .smenu-panel-enter-active {
+    opacity: 1;
+    transform: none;
+    transition:
+      opacity 480ms var(--ease-out, cubic-bezier(0.22, 1, 0.36, 1)),
+      transform 480ms var(--ease-out, cubic-bezier(0.22, 1, 0.36, 1));
+  }
+
+  .smenu-panel-leave-active {
+    opacity: 0;
+    transform: translateY(16px);
+    transition:
+      opacity 240ms ease-in,
+      transform 240ms ease-in;
+  }
+
+  /* Doctor tiles stagger in (40 ms apart, from +120 ms) */
+  @keyframes smenu-item-in {
+    from {
+      opacity: 0;
+      transform: translateY(12px);
+    }
+  }
+
+  .smenu-doc {
+    animation: smenu-item-in 420ms var(--ease-out, cubic-bezier(0.22, 1, 0.36, 1)) both;
+    animation-delay: calc(120ms + var(--i, 0) * 40ms);
+  }
+
+  .smenu-doc__avatar img {
+    transition: transform 600ms var(--ease-out, ease-out);
+  }
+
+  .smenu-doc:hover .smenu-doc__avatar img {
+    transform: scale(1.06);
+  }
+
+  .smenu-doc:hover .smenu-doc__arrow,
+  .smenu-doc:focus-visible .smenu-doc__arrow {
+    background: var(--color-gold-400, #d7a561);
+    transform: translate(1px, 1px);
+  }
+
+  .smenu-section-link {
+    transition:
+      color 240ms var(--ease-out, ease-out),
+      transform 240ms var(--ease-out, ease-out);
+  }
+
+  .smenu-section-link:hover,
+  .smenu-section-link:focus-visible {
+    transform: translateX(12px);
+  }
+
+  .smenu-close svg {
+    transition: transform 240ms var(--ease-out, ease-out);
+  }
+
+  .smenu-close:hover svg {
+    transform: rotate(90deg);
+  }
+
+  @media (prefers-reduced-motion: reduce) {
+    .smenu-doc {
+      animation: none;
+    }
+
+    .smenu-root *,
+    .smenu-root *::before,
+    .smenu-root *::after {
+      transition-duration: 0ms !important;
+    }
+
+    .smenu-section-link:hover,
+    .smenu-section-link:focus-visible,
+    .smenu-close:hover svg {
+      transform: none;
+    }
+  }
+}

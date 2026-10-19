@@ -1,0 +1,87 @@
+/* Sections below the hero (Stats, About, Trust) — owner FE-A.
+   Layout lives in Tailwind utilities; this file holds the shared side padding, the hairline dividers
+   and the light-background variants of the hero CtaButton. */
+
+/* Same order as styles/index.css: whichever stylesheet loads first fixes the layer order. */
+@layer theme, base, antd, components, utilities;
+
+@layer components {
+  /* 100 px side padding at 1440, shrinking proportionally below (body min-width is 1280). */
+  .rr-section {
+    --sec-pad: min(100px, calc(100vw * 100 / 1440));
+  }
+
+  /* About: hairline dividers (Neutral/100, 2 px), fading at their ends as in the design. */
+  .rr-about__vline {
+    background: linear-gradient(
+      180deg,
+      rgb(241 239 237 / 0) 0,
+      var(--color-neutral-100) 70px,
+      var(--color-neutral-100) calc(100% - 120px),
+      rgb(241 239 237 / 0) 100%
+    );
+  }
+
+  .rr-about__hline {
+    background: linear-gradient(90deg, var(--color-neutral-100) 50%, rgb(241 239 237 / 0) 100%);
+  }
+
+  /* ---- CtaButton on light backgrounds ---------------------------------------------------- */
+
+  /* Flat gold fill, no shine vectors (the glint sweep stays). */
+  .rr-cta[data-flat] .rr-cta__shine {
+    display: none;
+  }
+
+  .rr-cta[data-flat]:focus-visible,
+  .rr-cta.rr-cta--light:focus-visible {
+    outline-color: var(--color-gold-600);
+  }
+
+  /* Outline pill, grey label/border; darkens on hover. */
+  .rr-cta.rr-cta--light {
+    box-shadow: inset 0 0 0 1.5px #96918e;
+  }
+
+  .rr-cta.rr-cta--light:hover,
+  .rr-cta.rr-cta--light:focus-visible {
+    background-color: var(--color-taupe-50);
+    box-shadow: inset 0 0 0 1.5px var(--color-neutral-900);
+  }
+
+  .rr-cta.rr-cta--light .rr-cta__icon {
+    filter: brightness(0.18);
+  }
+
+  .rr-cta.rr-cta--light .rr-cta__glint {
+    opacity: 0;
+  }
+
+  /* Arrow hidden at rest, slides in on hover while the label shifts left (like the hero secondary). */
+  .rr-cta[data-arrow='hover'] .rr-cta__icon {
+    position: absolute;
+    right: 24px;
+    top: calc(50% - 10px);
+    opacity: 0;
+    transform: translateX(-10px);
+  }
+
+  .rr-cta[data-arrow='hover']:hover .rr-cta__label,
+  .rr-cta[data-arrow='hover']:focus-visible .rr-cta__label {
+    transform: translateX(-10px);
+  }
+
+  .rr-cta[data-arrow='hover']:hover .rr-cta__icon,
+  .rr-cta[data-arrow='hover']:focus-visible .rr-cta__icon {
+    opacity: 1;
+    transform: none;
+  }
+
+  @media (prefers-reduced-motion: reduce) {
+    .rr-cta[data-arrow='hover'] .rr-cta__icon,
+    .rr-cta[data-arrow='hover']:hover .rr-cta__label,
+    .rr-cta[data-arrow='hover']:focus-visible .rr-cta__label {
+      transform: none;
+    }
+  }
+}

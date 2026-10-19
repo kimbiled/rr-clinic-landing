@@ -1,0 +1,454 @@
+{
+  "_meta": {
+    "schemaVersion": 1,
+    "updated": "2026-10-19",
+    "source": "Figma i0lxHphgDIACH19ZkD95WY — animation frame 1713:3971 / hover 1715:4160 (order + doctors, via docs/design-spec.md §4.1), v1 hero 1610:268 (images, texts), team 1748:6973",
+    "imageRoot": "assets/img/web",
+    "notes": [
+      "ORDER (QA M-1): cases follow the Figma animation-frame strip 1713:3971, left→right = hover frames 1–7 (design-spec §4.1). The extra v1 video 'Интервью с Аэлитой' (case-5) is LAST, so in the loop it sits just before case-1. Case ids are stable v1 ids and do not equal positions.",
+      "CONFIRMED doctor mapping (design-spec §4.1, hover frame 1715:4160 for card 1): case-1 Темирханов, case-2 Тулепбергенова, case-3 Муса, case-4 Кодзоева, case-6 Тулепбергенова, case-7 Савельев, case-8 Романовская — read from Figma hover labels by the designer; only card 1 has a downloaded hover reference (assets/ref/hover-amir-1715-4160.png). TO CONFIRM against hover frames 2–7 (spec §11 Q3).",
+      "UNCONFIRMED: case-5 (Аэлита, v1-only card) → temirkhanov-amir is a placeholder; Figma names no doctor for it.",
+      "UNCONFIRMED: case-4 is the card hidden behind the statue in Figma; its real images are not downloaded (spec §10 'case-lejla-*'). It reuses the v1 case4 breast before/after images as a stand-in.",
+      "UNCONFIRMED procedure titles for case-3, case-4, case-6 (no caption visible in the design, showTitle=false; spec §11).",
+      "Томирис Тулепбергенова appears only in the hero hover frames, not in the team block 1748:6973: role/specialty are placeholders, photo null. Final doctor list/order is a client question (spec §11 Q7).",
+      "PLACEHOLDER doctor photos: team cards 1763:7302…1763:7322 hold only 'Фото врача' wireframe placeholders → photo/avatar null for everyone except Евгений Савельев (hero avatar). doctor.href is '#doctors' for all until personal landings exist.",
+      "PLACEHOLDER: Савельев role/specialty (not in team block); city 'Астана' for all doctors; whatsappHref reuses the phone number; rating.url unknown.",
+      "VIDEOS — CLIENT DEPENDENCY (QA M-5): no interview videos have been supplied and no placeholder clips can be produced here (no source footage, no ffmpeg on the build machine). video=null for case-2, case-5, case-8; the hover play path cannot be demoed until the client sends clips (target: assets/video/case*-interview.mp4 + .webm, 3–5 s, muted, ≤ 600 KB–1 MB, 400×440). Then set video: {src, type}.",
+      "framing = the visible region designed in Figma, normalized 0..1 to the src image ({x,y,w,h}). Omitted = show full image (object-fit: cover).",
+      "case-3/case-6 are split from one side-by-side image; 'pair' documents the source and region (left half = before, right half = after)."
+    ]
+  },
+  "clinic": {
+    "name": "RR Clinic",
+    "location": "Пластическая хирургия в Астане",
+    "phone": "+7 (747) 569-69-69",
+    "phoneHref": "tel:+77475696969",
+    "whatsappHref": "https://wa.me/77475696969",
+    "rating": {
+      "source": "2GIS",
+      "value": 4.9,
+      "max": 5,
+      "count": 264,
+      "logo": {
+        "src": "assets/img/web/2gis-icon.webp",
+        "width": 104,
+        "height": 104
+      },
+      "url": null,
+      "wordmark": {
+        "src": "assets/img/web/2gis-sprite.webp",
+        "width": 960,
+        "height": 271
+      }
+    }
+  },
+  "nav": [
+    {
+      "id": "about",
+      "label": "О клинике",
+      "href": "#about"
+    },
+    {
+      "id": "services",
+      "label": "Услуги",
+      "href": "#services"
+    },
+    {
+      "id": "doctors",
+      "label": "Врачи",
+      "href": "#doctors"
+    },
+    {
+      "id": "cases",
+      "label": "До/после",
+      "href": "#cases"
+    },
+    {
+      "id": "prices",
+      "label": "Цены",
+      "href": "#prices"
+    },
+    {
+      "id": "contacts",
+      "label": "Контакты",
+      "href": "#contacts"
+    }
+  ],
+  "hero": {
+    "title": "Комплексные операции тела, лица и груди в премиальной клинике",
+    "subtitle": "Мы собрали лучших узких специалистов под одной крышей и выстроили полный цикл заботы: от онлайн-консультации до восстановления рядом с вами.",
+    "ctas": [
+      {
+        "id": "pick-specialist",
+        "label": "Подобрать специалиста",
+        "href": "#doctors",
+        "variant": "primary",
+        "icon": "assets/icons/arrow-down-right.svg"
+      },
+      {
+        "id": "see-works",
+        "label": "Смотреть работы",
+        "href": "#cases",
+        "variant": "secondary",
+        "icon": null
+      }
+    ],
+    "background": {
+      "src": "assets/img/web/bg-columns.webp",
+      "width": 1678,
+      "height": 937
+    },
+    "statue": {
+      "src": "assets/img/web/statue.webp",
+      "width": 1024,
+      "height": 572,
+      "alt": ""
+    }
+  },
+  "doctors": [
+    {
+      "id": "kurmanbaev-rustam",
+      "name": "Курманбаев Рустам",
+      "firstName": "Рустам",
+      "lastName": "Курманбаев",
+      "role": "Пластический хирург",
+      "specialty": "Специалист по абдоминопластике с ушиванием диастаза",
+      "photo": null,
+      "avatar": null,
+      "city": "Астана",
+      "href": "#doctors",
+      "figmaNodeId": "1763:7302"
+    },
+    {
+      "id": "romanovskaya-tatyana",
+      "name": "Романовская Татьяна",
+      "firstName": "Татьяна",
+      "lastName": "Романовская",
+      "role": "Пластический хирург",
+      "specialty": "Автор методики «Голливудский фейслифтинг»",
+      "photo": null,
+      "avatar": null,
+      "city": "Астана",
+      "href": "#doctors",
+      "figmaNodeId": "1763:7307"
+    },
+    {
+      "id": "musa-baurzhan",
+      "name": "Муса Бауржан",
+      "firstName": "Бауржан",
+      "lastName": "Муса",
+      "role": "Пластический хирург",
+      "specialty": "Пластика век, увеличение и подтяжка груди",
+      "photo": null,
+      "avatar": null,
+      "city": "Астана",
+      "href": "#doctors",
+      "figmaNodeId": "1763:7312"
+    },
+    {
+      "id": "temirkhanov-amir",
+      "name": "Темирханов Амир",
+      "firstName": "Амир",
+      "lastName": "Темирханов",
+      "role": "Пластический хирург",
+      "specialty": "Абдоминопластика, липомоделирование и комплексная коррекция фигуры",
+      "photo": null,
+      "avatar": null,
+      "city": "Астана",
+      "href": "#doctors",
+      "figmaNodeId": "1763:7317"
+    },
+    {
+      "id": "kodzoeva-leyla",
+      "name": "Кодзоева Лейла",
+      "firstName": "Лейла",
+      "lastName": "Кодзоева",
+      "role": "Пластический хирург",
+      "specialty": "Специалист по интимной пластике и пластике груди",
+      "photo": null,
+      "avatar": null,
+      "city": "Астана",
+      "href": "#doctors",
+      "figmaNodeId": "1763:7333"
+    },
+    {
+      "id": "chatinyan-garik",
+      "name": "Чатинян Гарик",
+      "firstName": "Гарик",
+      "lastName": "Чатинян",
+      "role": "Пластический и челюстно-лицевой хирург",
+      "specialty": "Пластический и челюстно-лицевой хирург. Открытая и закрытая ринопластика",
+      "photo": null,
+      "avatar": null,
+      "city": "Астана",
+      "href": "#doctors",
+      "figmaNodeId": "1763:7322"
+    },
+    {
+      "id": "tulepbergenova-tomiris",
+      "name": "Тулепбергенова Томирис",
+      "firstName": "Томирис",
+      "lastName": "Тулепбергенова",
+      "role": "Пластический хирург",
+      "specialty": "Пластика век и лица",
+      "photo": null,
+      "avatar": null,
+      "city": "Астана",
+      "href": "#doctors",
+      "figmaNodeId": "1715:4160"
+    },
+    {
+      "id": "savelyev-evgeniy",
+      "name": "Савельев Евгений",
+      "firstName": "Евгений",
+      "lastName": "Савельев",
+      "role": "Пластический хирург",
+      "specialty": "Пластический хирург",
+      "photo": {
+        "src": "assets/img/web/avatar-savelyev.webp",
+        "width": 403,
+        "height": 600
+      },
+      "avatar": {
+        "src": "assets/img/web/avatar-savelyev-face.webp",
+        "width": 192,
+        "height": 192
+      },
+      "city": "Астана",
+      "href": "#doctors",
+      "figmaNodeId": "1610:402"
+    }
+  ],
+  "cases": [
+    {
+      "id": "case-1",
+      "type": "beforeAfter",
+      "title": "Увеличение молочных желез",
+      "caption": null,
+      "showTitle": true,
+      "doctorId": "temirkhanov-amir",
+      "before": {
+        "src": "assets/img/web/case1-before.webp",
+        "width": 341,
+        "height": 600,
+        "framing": {
+          "x": 0.001,
+          "y": 0.109,
+          "w": 0.484,
+          "h": 0.604
+        }
+      },
+      "after": {
+        "src": "assets/img/web/case1-after.webp",
+        "width": 341,
+        "height": 600,
+        "framing": {
+          "x": 0.531,
+          "y": 0.176,
+          "w": 0.468,
+          "h": 0.584
+        }
+      },
+      "figmaNodeId": "1610:272"
+    },
+    {
+      "id": "case-2",
+      "type": "video",
+      "title": "Верхняя блефаропластика",
+      "caption": "Впечатления после операции",
+      "showTitle": true,
+      "doctorId": "tulepbergenova-tomiris",
+      "poster": {
+        "src": "assets/img/web/case2-interview.webp",
+        "width": 600,
+        "height": 600,
+        "framing": {
+          "x": 0.19,
+          "y": 0.055,
+          "w": 0.619,
+          "h": 0.681
+        }
+      },
+      "video": null,
+      "figmaNodeId": "1610:285"
+    },
+    {
+      "id": "case-3",
+      "type": "beforeAfter",
+      "title": "Омоложение лица",
+      "caption": null,
+      "showTitle": false,
+      "doctorId": "musa-baurzhan",
+      "before": {
+        "src": "assets/img/web/case3-before.webp",
+        "width": 400,
+        "height": 600,
+        "framing": {
+          "x": 0.026,
+          "y": 0.149,
+          "w": 0.474,
+          "h": 0.695
+        }
+      },
+      "after": {
+        "src": "assets/img/web/case3-after.webp",
+        "width": 400,
+        "height": 600,
+        "framing": {
+          "x": 0.478,
+          "y": 0.145,
+          "w": 0.464,
+          "h": 0.68
+        }
+      },
+      "pair": {
+        "src": "assets/img/web/case3-face-pair.webp",
+        "width": 1000,
+        "height": 750,
+        "before": {
+          "x": 0,
+          "y": 0,
+          "w": 0.5,
+          "h": 1
+        },
+        "after": {
+          "x": 0.5,
+          "y": 0,
+          "w": 0.5,
+          "h": 1
+        }
+      },
+      "figmaNodeId": "1610:294"
+    },
+    {
+      "id": "case-4",
+      "type": "beforeAfter",
+      "title": "Маммопластика",
+      "caption": null,
+      "showTitle": false,
+      "doctorId": "kodzoeva-leyla",
+      "before": {
+        "src": "assets/img/web/case4-before.webp",
+        "width": 273,
+        "height": 600
+      },
+      "after": {
+        "src": "assets/img/web/case4-after.webp",
+        "width": 273,
+        "height": 600
+      },
+      "figmaNodeId": "1610:315",
+      "behindStatue": true
+    },
+    {
+      "id": "case-6",
+      "type": "beforeAfter",
+      "title": "Пластика лица",
+      "caption": null,
+      "showTitle": false,
+      "doctorId": "tulepbergenova-tomiris",
+      "before": {
+        "src": "assets/img/web/case6-before.webp",
+        "width": 400,
+        "height": 600,
+        "framing": {
+          "x": 0,
+          "y": 0.045,
+          "w": 0.498,
+          "h": 0.73
+        }
+      },
+      "after": {
+        "src": "assets/img/web/case6-after.webp",
+        "width": 400,
+        "height": 600,
+        "framing": {
+          "x": 0.469,
+          "y": 0.044,
+          "w": 0.531,
+          "h": 0.779
+        }
+      },
+      "pair": {
+        "src": "assets/img/web/case6-face-pair.webp",
+        "width": 1000,
+        "height": 750,
+        "before": {
+          "x": 0,
+          "y": 0,
+          "w": 0.5,
+          "h": 1
+        },
+        "after": {
+          "x": 0.5,
+          "y": 0,
+          "w": 0.5,
+          "h": 1
+        }
+      },
+      "figmaNodeId": "1610:341"
+    },
+    {
+      "id": "case-7",
+      "type": "beforeAfter",
+      "title": "Подтяжка груди с круглыми имплантами",
+      "caption": null,
+      "showTitle": false,
+      "doctorId": "savelyev-evgeniy",
+      "featured": true,
+      "before": {
+        "src": "assets/img/web/case7-before.webp",
+        "width": 273,
+        "height": 600
+      },
+      "after": {
+        "src": "assets/img/web/case7-after.webp",
+        "width": 273,
+        "height": 600
+      },
+      "figmaNodeId": "1610:381"
+    },
+    {
+      "id": "case-8",
+      "type": "video",
+      "title": "Голливудский фейслифтинг",
+      "caption": "Интервью с Ольгой",
+      "showTitle": true,
+      "doctorId": "romanovskaya-tatyana",
+      "poster": {
+        "src": "assets/img/web/case8-interview.webp",
+        "width": 600,
+        "height": 600,
+        "framing": {
+          "x": 0.145,
+          "y": 0.179,
+          "w": 0.709,
+          "h": 0.78
+        }
+      },
+      "video": null,
+      "figmaNodeId": "1610:406"
+    },
+    {
+      "id": "case-5",
+      "type": "video",
+      "title": "1,5 месяца после операции",
+      "caption": "Интервью с Аэлитой",
+      "showTitle": true,
+      "doctorId": "temirkhanov-amir",
+      "poster": {
+        "src": "assets/img/web/case5-interview.webp",
+        "width": 361,
+        "height": 600,
+        "framing": {
+          "x": 0.156,
+          "y": 0.269,
+          "w": 0.689,
+          "h": 0.461
+        }
+      },
+      "video": null,
+      "figmaNodeId": "1610:332"
+    }
+  ]
+}

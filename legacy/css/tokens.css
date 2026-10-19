@@ -1,0 +1,68 @@
+/* Design tokens — RR Clinic (Figma: i0lxHphgDIACH19ZkD95WY, styles "RR Clinic/*") */
+:root {
+  /* Palette */
+  --c-white: #ffffff;
+  --c-neutral-100: #f1efed;
+  --c-neutral-200: #e3e0de;
+  --c-neutral-900: #2e2c2c;
+  --c-taupe-50: #f6f3f0;
+  --c-taupe-400: #baab9b;
+  --c-gold-950: #291d10;
+  --c-brown-overlay: #402e21;
+  --c-gold-400: #d7a561;
+  --c-gold-600: #b98743;
+  --c-case-shade: rgba(45, 32, 16, 0.4);
+  --c-panel: rgba(41, 29, 16, 0.96);
+  --c-cta-top: #ddb37b;
+  --c-cta-bottom: #c19457;
+  --c-outline: rgba(186, 171, 155, 0.9);
+  --shadow-card-lift: 0 18px 40px rgba(20, 13, 6, 0.45);
+
+  /* Glass surfaces */
+  --glass-light: rgba(255, 255, 255, 0.2);
+  --glass-warm: rgba(241, 239, 237, 0.1);
+  --glass-blur: 12px;
+
+  /* Typography (Futura PT is a paid font — Jost is the metric-close fallback until the client provides webfont files) */
+  --font-display: "Manrope", system-ui, sans-serif;
+  --font-text: "Futura PT", "Jost", "Century Gothic", system-ui, sans-serif;
+
+  /* Radii */
+  --r-sm: 6px;
+  --r-md: 14px;
+  --r-pill: 99px;
+
+  /* Layout */
+  --design-width: 1440px;
+  --hero-height: 720px;
+  --nav-pad-x: 101px;
+
+  /* Motion */
+  --ease-out: cubic-bezier(0.22, 1, 0.36, 1);
+  --ease-in-out: cubic-bezier(0.65, 0, 0.35, 1);
+  --ease-lift: var(--ease-out);
+  --ease-carousel: cubic-bezier(0.33, 0, 0.2, 1);
+  --dur-fast: 200ms;
+  --dur-med: 400ms;
+  --dur-slow: 800ms;
+
+  /* Hero layer order (bottom → top). Mirrors Figma frame 1610:268 */
+  --z-bg: 0;          /* columns photo */
+  --z-light: 1;       /* light shimmer canvas */
+  --z-carousel: 2;    /* cases row + grid lines */
+  --z-statue: 3;      /* marble statue */
+  --z-shade: 4;       /* vignette, bottom overlay, glow */
+  --z-particles: 5;   /* particles canvas */
+  --z-content: 6;     /* title, subtitle, CTAs */
+  --z-overlay: 7;     /* hovered card / doctor card — must sit ABOVE content */
+  --z-nav: 50;
+  --z-menu: 60;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  :root {
+    --dur-fast: 0ms;
+    --dur-med: 0ms;
+    --dur-slow: 0ms;
+  }
+}

@@ -1,0 +1,824 @@
+/* Hero content + CTAs + surgeon menu — owner FE-3.
+   Figma 1610:432 (content column), 1620:4669 (chips), 1610:458 / 1614:3961 (CTAs), menu §7.2 (PROPOSED visuals). */
+
+/* ======================================================================
+   Load reveal (§9.5). The inline script in the NAVBAR region adds html.js-reveal before the hero
+   is parsed; js/hero.js removes it in the same frame it starts the WAAPI animations (fill: backwards),
+   so there is no flash. Without JS nothing is hidden. If JS breaks, the failsafe shows everything at 4 s.
+   ====================================================================== */
+@media (prefers-reduced-motion: no-preference) {
+  html.js-reveal [data-reveal] {
+    opacity: 0;
+    animation: hero-reveal-failsafe 1ms linear 4s forwards;
+  }
+}
+
+@keyframes hero-reveal-failsafe {
+  to {
+    opacity: 1;
+  }
+}
+
+/* ======================================================================
+   Content column — bottom-anchored: CTAs end at y=642 of the 720 frame (78 px above the bottom)
+   ====================================================================== */
+.hero__content-layer > .hero-content {
+  pointer-events: none; /* only chips + CTAs catch the pointer, cards under the text stay hoverable (§5.4) */
+}
+
+.hero-content {
+  /* Futura PT → Jost fallback: Jost is ~12% wider, so these sizes reproduce the Figma line widths.
+     Restore 14px / 18px when the Futura PT webfont is delivered. */
+  --fs-chip: 13px;
+  --fs-sub: 16px;
+  position: absolute;
+  left: 0;
+  right: 0;
+  bottom: 78px;
+  margin: 0 auto;
+  width: 760px;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  text-align: center;
+  color: var(--c-white);
+}
+
+/* ---------- Chips row (y 362–410) ---------- */
+.hero-chips {
+  position: relative;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  gap: 0;
+  height: 48px;
+}
+
+.hero-chip {
+  pointer-events: auto;
+  display: inline-flex;
+  align-items: center;
+  height: 48px;
+  border-radius: var(--r-md);
+  background: var(--glass-light);
+  -webkit-backdrop-filter: blur(var(--glass-blur));
+  backdrop-filter: blur(var(--glass-blur));
+  font-family: var(--font-text);
+  font-size: var(--fs-chip);
+  line-height: 14px;
+  font-weight: 500;
+  letter-spacing: -0.02em;
+  white-space: nowrap;
+}
+
+.hero-chip + .hero-chip {
+  margin-left: -2px;
+}
+
+.hero-chip--location {
+  gap: 8px;
+  padding: 0 13px 0 12px; /* icon box 16 at x 12, label at x 36 (Figma 1620:4643) */
+}
+
+.hero-chip--location img {
+  width: 12px;
+  height: 13.33px;
+  margin: 0 2px;
+}
+
+.hero-chip--rating {
+  gap: 6px;
+  padding: 0 12px 0 11px;
+}
+
+.hero-rating__logo {
+  width: 26px;
+  height: 26px;
+  border-radius: 6px;
+}
+
+.hero-rating {
+  display: flex;
+  flex-direction: column;
+  align-items: flex-start;
+  gap: 3px;
+}
+
+.hero-rating__row {
+  display: flex;
+  align-items: baseline;
+  gap: 3px;
+}
+
+.hero-rating__value {
+  font-family: var(--font-display);
+  font-size: 14px;
+  line-height: 14px;
+  font-weight: 500;
+}
+
+.hero-rating__count {
+  font-size: 9px;
+  line-height: 9px;
+  opacity: 0.8;
+}
+
+.hero-rating__stars {
+  display: flex;
+  gap: 0.9px;
+}
+
+.hero-rating__stars img {
+  width: 7.3px;
+  height: 7.3px;
+}
+
+/* "Selected surgeon" filter chip (inserted by js/surgeon-menu.js) */
+.hero-chip--filter {
+  /* sits to the right of the centered pair so the Figma chips never shift */
+  position: absolute;
+  left: calc(100% + 8px);
+  top: 0;
+  gap: 8px;
+  margin-left: 0 !important;
+  padding: 0 10px 0 16px;
+  color: var(--c-white);
+  background: rgba(41, 29, 16, 0.45);
+  box-shadow: inset 0 0 0 1px rgba(215, 165, 97, 0.55);
+  cursor: pointer;
+  transition: background-color var(--dur-fast) var(--ease-out), box-shadow var(--dur-fast) var(--ease-out);
+}
+
+.hero-chip--filter:hover {
+  background: rgba(41, 29, 16, 0.65);
+  box-shadow: inset 0 0 0 1px var(--c-gold-400);
+}
+
+.hero-chip--filter .hero-chip__x {
+  display: grid;
+  place-items: center;
+  width: 24px;
+  height: 24px;
+  border-radius: 50%;
+  background: rgba(255, 255, 255, 0.14);
+  font-size: 16px;
+  line-height: 1;
+}
+
+.hero-chip--filter[hidden] {
+  display: none;
+}
+
+/* ---------- H1 (y 412–500): Manrope 400 40/44 ---------- */
+.hero-title {
+  margin-top: 0;
+  font-family: var(--font-display);
+  font-weight: 400;
+  /* MEASURED on the 1440 render: cap height 31 px, line pitch 48 px, line 1 = 692 px wide
+     → Manrope 44/48 (1.1), tracking -2%. (Spec text says 40/44 — that is the v1 frame before the ×1.1 rescale.) */
+  font-size: 44px;
+  line-height: 48px;
+  letter-spacing: -0.02em;
+  white-space: nowrap;
+}
+
+.hero-title__line {
+  display: block;
+  overflow: hidden;
+  /* room for descenders inside the mask without changing the 44 px line box */
+  padding: 0 8px 8px;
+  margin: 0 -8px -8px;
+}
+
+.hero-title__text {
+  display: block;
+}
+
+/* ---------- Subtitle (y 512–558): Futura PT Book 18 ---------- */
+.hero-subtitle {
+  margin-top: 8px; /* collapses with the title mask's -8 px → glyphs land on the Figma pixels */
+  max-width: 700px;
+  font-family: var(--font-text);
+  font-weight: 400;
+  font-size: var(--fs-sub);
+  line-height: 24px;
+  letter-spacing: -0.01em;
+  color: var(--c-white);
+}
+
+/* ======================================================================
+   CTAs (§8) — 60 tall, gap 12, y 582–642
+   ====================================================================== */
+.hero-ctas {
+  display: flex;
+  gap: 12px;
+  margin-top: 19px; /* Figma 24 with Futura metrics; 19 lands the Jost glyphs on the same pixels */
+}
+
+.cta {
+  --cta-ease: cubic-bezier(0.22, 1, 0.36, 1);
+  position: relative;
+  isolation: isolate;
+  overflow: hidden;
+  pointer-events: auto;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 8px;
+  height: 60px;
+  border-radius: 30px;
+  /* Label widths in the render (131 / ~183 px) match Manrope 16 — not Futura 18 */
+  font-family: var(--font-display);
+  font-weight: 400;
+  font-size: 16px;
+  line-height: 24px;
+  color: var(--c-white);
+  white-space: nowrap;
+  -webkit-tap-highlight-color: transparent;
+  transition:
+    transform 260ms var(--cta-ease),
+    box-shadow 260ms var(--cta-ease),
+    filter 260ms var(--cta-ease),
+    background-color 260ms var(--cta-ease),
+    border-color 260ms var(--cta-ease);
+}
+
+.cta__label,
+.cta__icon {
+  position: relative;
+  z-index: 2;
+}
+
+.cta__label {
+  transition: transform 260ms var(--cta-ease);
+}
+
+.cta__icon {
+  flex: none;
+  width: 20px;
+  height: 20px;
+  transition: transform 220ms var(--cta-ease), opacity 220ms var(--cta-ease);
+}
+
+.cta:active {
+  transform: scale(0.98);
+  transition-duration: 120ms;
+}
+
+.cta:focus-visible {
+  outline: 2px solid var(--c-white);
+  outline-offset: 3px;
+}
+
+/* Static diagonal shine vectors (Figma 1610:462), overlay-blended onto the gold */
+.cta__shine {
+  position: absolute;
+  inset: 0;
+  z-index: 0;
+  pointer-events: none;
+}
+
+.cta__shine img {
+  position: absolute;
+  max-width: none;
+  mix-blend-mode: overlay;
+}
+
+/* Moving glint: a soft diagonal light band that sweeps left → right */
+.cta__glint {
+  position: absolute;
+  top: -20px;
+  bottom: -20px;
+  left: 0;
+  z-index: 1;
+  width: 84px;
+  pointer-events: none;
+  background: linear-gradient(90deg,
+      rgba(255, 246, 220, 0) 0%,
+      rgba(255, 246, 220, 0.75) 45%,
+      rgba(255, 255, 255, 0.95) 50%,
+      rgba(255, 246, 220, 0.75) 55%,
+      rgba(255, 246, 220, 0) 100%);
+  mix-blend-mode: overlay;
+  opacity: 0.55;
+  transform: translateX(-160px) skewX(-24deg);
+}
+
+@keyframes cta-glint-idle {
+  0% {
+    transform: translateX(-160px) skewX(-24deg);
+    animation-timing-function: cubic-bezier(0.45, 0, 0.2, 1);
+  }
+  20%,
+  100% {
+    transform: translateX(340px) skewX(-24deg);
+  }
+}
+
+@keyframes cta-glint-once {
+  from {
+    transform: translateX(-160px) skewX(-24deg);
+  }
+  to {
+    transform: translateX(340px) skewX(-24deg);
+  }
+}
+
+/* Primary "Подобрать специалиста" 284×60 */
+.cta--primary {
+  width: 284px;
+  background: linear-gradient(180deg, #ddb37b 0%, #d2a160 35%, #c19457 100%);
+  box-shadow: 0 0 0 rgba(215, 165, 97, 0);
+}
+
+.cta--primary .cta__glint {
+  animation: cta-glint-idle 6s linear 2.6s infinite;
+}
+
+.cta--primary:hover {
+  transform: translateY(-1px);
+  filter: brightness(1.06);
+  box-shadow: 0 10px 28px rgba(215, 165, 97, 0.35);
+}
+
+.cta--primary:hover .cta__glint,
+.cta--primary:focus-visible .cta__glint {
+  animation: cta-glint-once 900ms cubic-bezier(0.45, 0, 0.2, 1) 1 both;
+}
+
+.cta--primary:hover .cta__icon,
+.cta--primary:focus-visible .cta__icon {
+  transform: translate(2px, 2px);
+}
+
+.cta--primary:active {
+  transform: scale(0.98);
+}
+
+.cta--primary[aria-expanded="true"] {
+  filter: brightness(1.06);
+}
+
+/* Secondary "Смотреть работы" 224×60, outline Taupe/400 */
+.cta--secondary {
+  width: 224px;
+  background: rgba(255, 255, 255, 0);
+  box-shadow: inset 0 0 0 1px rgba(186, 171, 155, 0.9);
+}
+
+.cta--secondary .cta__icon {
+  position: absolute;
+  right: 26px;
+  top: 20px;
+  opacity: 0;
+  transform: translateX(-10px);
+}
+
+.cta--secondary .cta__glint {
+  opacity: 0.25;
+}
+
+.cta--secondary:hover,
+.cta--secondary:focus-visible {
+  background: rgba(255, 255, 255, 0.08);
+  box-shadow: inset 0 0 0 1px rgba(255, 255, 255, 0.9);
+}
+
+.cta--secondary:hover .cta__label,
+.cta--secondary:focus-visible .cta__label {
+  transform: translateX(-12px);
+}
+
+.cta--secondary:hover .cta__icon,
+.cta--secondary:focus-visible .cta__icon {
+  opacity: 1;
+  transform: none;
+}
+
+.cta--secondary:hover .cta__glint {
+  animation: cta-glint-once 900ms cubic-bezier(0.45, 0, 0.2, 1) 1 both;
+}
+
+.cta--secondary:active {
+  transform: scale(0.98);
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .cta,
+  .cta__label,
+  .cta__icon {
+    transition-property: filter, background-color, box-shadow, opacity;
+  }
+
+  .cta__glint,
+  .cta--primary .cta__glint,
+  .cta:hover .cta__glint {
+    animation: none !important;
+    display: none;
+  }
+
+  .cta--primary:hover,
+  .cta:active {
+    transform: none;
+  }
+
+  .cta--primary:hover .cta__icon,
+  .cta--secondary:hover .cta__label,
+  .cta--secondary .cta__icon {
+    transform: none;
+  }
+}
+
+/* ======================================================================
+   Surgeon menu (§7.2) — native <dialog> built by js/surgeon-menu.js
+   ====================================================================== */
+.smenu {
+  position: fixed;
+  inset: 0;
+  z-index: var(--z-menu);
+  width: 100%;
+  height: 100%;
+  max-width: none;
+  max-height: none;
+  margin: 0;
+  padding: 0;
+  border: 0;
+  overflow-y: auto;
+  overscroll-behavior: contain;
+  color: var(--c-white);
+  background: rgba(41, 29, 16, 0.72);
+  -webkit-backdrop-filter: blur(24px) saturate(120%);
+  backdrop-filter: blur(24px) saturate(120%);
+  font-family: var(--font-text);
+}
+
+.smenu::backdrop {
+  background: transparent;
+}
+
+.smenu:not([open]) {
+  display: none;
+}
+
+.smenu__frame {
+  box-sizing: border-box;
+  width: min(1280px, 100% - 80px);
+  min-height: 100%;
+  margin: 0 auto;
+  padding: 24px 0 28px;
+  display: grid;
+  grid-template-rows: auto 1fr auto;
+  gap: 32px;
+}
+
+.smenu__head {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  height: 60px;
+}
+
+.smenu__brand {
+  display: flex;
+  align-items: center;
+  gap: 20px;
+}
+
+.smenu__brand img {
+  width: 35px;
+  height: 32px;
+}
+
+.smenu__title {
+  font-family: var(--font-display);
+  font-size: 14px;
+  line-height: 20px;
+  font-weight: 500;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+  color: rgba(227, 224, 222, 0.7);
+}
+
+.smenu__close {
+  display: grid;
+  place-items: center;
+  width: 48px;
+  height: 48px;
+  border-radius: 50%;
+  background: var(--glass-light);
+  box-shadow: inset 0 0 0 1px rgba(255, 255, 255, 0.14);
+  transition: background-color var(--dur-fast) var(--ease-out), transform var(--dur-fast) var(--ease-out);
+}
+
+.smenu__close:hover {
+  background: rgba(255, 255, 255, 0.3);
+  transform: rotate(90deg);
+}
+
+.smenu__close svg {
+  width: 18px;
+  height: 18px;
+}
+
+.smenu__body {
+  display: grid;
+  grid-template-columns: 340px 1fr;
+  gap: 80px;
+  align-items: start;
+}
+
+.smenu__eyebrow {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  min-height: 36px;
+  margin-bottom: 16px;
+  font-size: 13px;
+  line-height: 16px;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+  color: rgba(227, 224, 222, 0.6);
+}
+
+.smenu__sections a {
+  display: block;
+  padding: 4px 0;
+  font-family: var(--font-display);
+  font-size: 24px;
+  line-height: 32px;
+  color: rgba(255, 255, 255, 0.7);
+  transition: color 240ms var(--ease-out), transform 240ms var(--ease-out);
+}
+
+.smenu__sections a:hover,
+.smenu__sections a:focus-visible {
+  color: var(--c-white);
+  transform: translateX(12px);
+}
+
+.smenu__reset {
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+  height: 36px;
+  padding: 0 14px;
+  border-radius: var(--r-pill);
+  font-size: 13px;
+  letter-spacing: 0.02em;
+  text-transform: none;
+  color: var(--c-white);
+  background: rgba(255, 255, 255, 0.1);
+  box-shadow: inset 0 0 0 1px rgba(215, 165, 97, 0.6);
+  transition: background-color var(--dur-fast) var(--ease-out);
+}
+
+.smenu__reset:hover {
+  background: rgba(255, 255, 255, 0.18);
+}
+
+.smenu__reset[hidden] {
+  display: none;
+}
+
+.smenu__list {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 12px;
+}
+
+.smenu-doc {
+  position: relative;
+  display: grid;
+  grid-template-columns: 64px 1fr auto;
+  align-items: center;
+  gap: 16px;
+  min-height: 88px;
+  padding: 12px 14px 12px 12px;
+  border-radius: var(--r-md);
+  background: rgba(255, 255, 255, 0.06);
+  box-shadow: inset 0 0 0 1px rgba(255, 255, 255, 0.08);
+  cursor: pointer;
+  outline: none;
+  transition:
+    background-color 240ms var(--ease-out),
+    box-shadow 240ms var(--ease-out),
+    transform 240ms var(--ease-out);
+}
+
+.smenu-doc:hover {
+  background: rgba(255, 255, 255, 0.11);
+}
+
+.smenu-doc:focus-visible {
+  box-shadow: inset 0 0 0 1px rgba(255, 255, 255, 0.5), 0 0 0 2px var(--c-gold-400);
+}
+
+.smenu-doc[aria-selected="true"] {
+  background: rgba(215, 165, 97, 0.14);
+  box-shadow: inset 0 0 0 1px var(--c-gold-400);
+}
+
+.smenu-doc[aria-selected="true"]:focus-visible {
+  box-shadow: inset 0 0 0 1px var(--c-gold-400), 0 0 0 2px var(--c-white);
+}
+
+.smenu-doc__avatar {
+  position: relative;
+  width: 64px;
+  height: 64px;
+  border-radius: 50%;
+  overflow: hidden;
+  background: linear-gradient(145deg, #e9dccb 0%, #baab9b 55%, #8c7660 100%);
+  box-shadow: inset 0 0 0 1px rgba(255, 255, 255, 0.25);
+  display: grid;
+  place-items: center;
+}
+
+.smenu-doc__avatar img {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  transition: transform 600ms var(--ease-out);
+}
+
+.smenu-doc:hover .smenu-doc__avatar img {
+  transform: scale(1.06);
+}
+
+.smenu-doc__mono {
+  font-family: var(--font-display);
+  font-size: 22px;
+  line-height: 1;
+  font-weight: 500;
+  letter-spacing: 0.02em;
+  color: var(--c-gold-950);
+}
+
+.smenu-doc__text {
+  min-width: 0;
+}
+
+.smenu-doc__name {
+  display: block;
+  font-family: var(--font-display);
+  font-size: 18px;
+  line-height: 22px;
+  color: var(--c-white);
+}
+
+.smenu-doc__spec {
+  display: -webkit-box;
+  margin-top: 4px;
+  overflow: hidden;
+  -webkit-line-clamp: 2;
+  -webkit-box-orient: vertical;
+  font-size: 14px;
+  line-height: 18px;
+  color: rgba(227, 224, 222, 0.7);
+}
+
+.smenu-doc__meta {
+  display: flex;
+  flex-direction: column;
+  align-items: flex-end;
+  gap: 8px;
+  align-self: stretch;
+  justify-content: space-between;
+}
+
+.smenu-doc__count {
+  font-size: 12px;
+  line-height: 14px;
+  color: var(--c-gold-400);
+  white-space: nowrap;
+}
+
+.smenu-doc__badge {
+  display: none;
+  height: 22px;
+  padding: 0 10px;
+  border-radius: var(--r-pill);
+  align-items: center;
+  font-size: 12px;
+  color: var(--c-gold-950);
+  background: var(--c-gold-400);
+}
+
+.smenu-doc[aria-selected="true"] .smenu-doc__badge {
+  display: inline-flex;
+}
+
+.smenu-doc__arrow {
+  display: grid;
+  place-items: center;
+  width: 32px;
+  height: 32px;
+  border-radius: 50%;
+  background: var(--glass-light);
+  transition: background-color 240ms var(--ease-out), transform 240ms var(--ease-out);
+}
+
+.smenu-doc__arrow img {
+  width: 16px;
+  height: 16px;
+}
+
+.smenu-doc:hover .smenu-doc__arrow,
+.smenu-doc:focus-visible .smenu-doc__arrow {
+  background: var(--c-gold-400);
+  transform: translate(1px, 1px);
+}
+
+.smenu-doc[aria-selected="true"] .smenu-doc__arrow {
+  display: none;
+}
+
+/* Help bar "Помощь с выбором" */
+.smenu__help {
+  display: flex;
+  align-items: center;
+  gap: 16px;
+  min-height: 90px;
+  padding: 0 20px 0 32px;
+  border-radius: var(--r-md);
+  background: var(--glass-light);
+  -webkit-backdrop-filter: blur(var(--glass-blur));
+  backdrop-filter: blur(var(--glass-blur));
+}
+
+.smenu__help-text {
+  flex: 1;
+  font-family: var(--font-display);
+  font-size: 20px;
+  line-height: 26px;
+}
+
+.smenu__help-text span {
+  display: block;
+  font-family: var(--font-text);
+  font-size: 14px;
+  line-height: 18px;
+  color: rgba(227, 224, 222, 0.7);
+}
+
+.smenu__help .cta {
+  width: auto;
+  height: 52px;
+  padding: 0 28px;
+  font-size: 16px;
+}
+
+.smenu__wa {
+  display: inline-flex;
+  align-items: center;
+  gap: 10px;
+  height: 50px;
+  padding: 0 22px 0 8px;
+  border-radius: var(--r-pill);
+  background: var(--c-neutral-100);
+  color: var(--c-neutral-900);
+  font-size: 16px;
+  font-weight: 500;
+  transition: background-color var(--dur-fast) var(--ease-out);
+}
+
+.smenu__wa:hover {
+  background: var(--c-white);
+}
+
+.smenu__wa-icon {
+  display: grid;
+  place-items: center;
+  width: 36px;
+  height: 36px;
+  border-radius: 50%;
+  background: var(--c-white);
+}
+
+.smenu__wa-icon img {
+  width: 16px;
+  height: 16px;
+}
+
+.smenu :focus-visible {
+  outline: 2px solid var(--c-gold-400);
+  outline-offset: 3px;
+}
+
+.smenu .smenu-doc:focus-visible {
+  outline: none;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .smenu *,
+  .smenu *::before,
+  .smenu *::after {
+    transition-duration: 0ms !important;
+  }
+
+  .smenu__close:hover,
+  .smenu__sections a:hover,
+  .smenu__sections a:focus-visible {
+    transform: none;
+  }
+}

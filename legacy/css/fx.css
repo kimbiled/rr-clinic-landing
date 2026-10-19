@@ -1,0 +1,21 @@
+/* FE-1 · Background FX (js/fx/**): light shimmer + particles.
+   Geometry and z-order come from base.css (.hero__light / .hero__particles, tokens --z-light / --z-particles).
+   Both canvases fade in once their first frame is drawn (design-spec §9.5: "particles + light fade in"). */
+
+[data-fx-light],
+[data-fx-particles] {
+  opacity: 0;
+  transition: opacity 1500ms var(--ease-out, ease-out) 200ms;
+}
+
+[data-fx-light].is-fx-visible,
+[data-fx-particles].is-fx-visible {
+  opacity: 1;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  [data-fx-light],
+  [data-fx-particles] {
+    transition: none;
+  }
+}
