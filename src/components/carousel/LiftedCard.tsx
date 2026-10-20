@@ -7,14 +7,13 @@ import type { Case, Doctor } from '../../data/types';
 import { CaseMedia } from './CaseCard';
 import { useCarousel } from './CarouselContext';
 import { liftMediaKey, type LiftView } from './controller';
-import { DoctorPanel, panelHeight } from './DoctorPanel';
+import { DoctorPanel } from './DoctorPanel';
 import { GEOM, T, cardKey } from './geometry';
 
 interface Props {
   view: LiftView;
   item: Case;
   doctor: Doctor | undefined;
-  doctorCases: readonly Case[];
   reducedMotion: boolean;
 }
 
@@ -58,7 +57,7 @@ function useLayers(mediaCaseId: string, reducedMotion: boolean): Layer[] {
   return layers;
 }
 
-export function LiftedCard({ view, item, doctor, doctorCases, reducedMotion }: Props) {
+export function LiftedCard({ view, item, doctor, reducedMotion }: Props) {
   const ctrl = useCarousel();
   const { id, k, phase, focus, mediaCaseId } = view;
   const attach = useCallback(
@@ -69,7 +68,6 @@ export function LiftedCard({ view, item, doctor, doctorCases, reducedMotion }: P
     [ctrl, id],
   );
   const layers = useLayers(mediaCaseId, reducedMotion);
-  const panelH = panelHeight(doctor, doctorCases);
   const mediaItem = ctrl.caseById.get(mediaCaseId) ?? item;
 
   return (
@@ -82,10 +80,12 @@ export function LiftedCard({ view, item, doctor, doctorCases, reducedMotion }: P
       data-case={item.id}
       aria-hidden="true"
       className="cc-lift absolute left-0 top-0 h-[220px] w-[200px] select-none will-change-transform data-[phase=leaving]:pointer-events-none data-[phase=pending]:pointer-events-none data-[phase=pending]:invisible"
-      style={{ '--panel-h': `${panelH}px`, '--shadow-s': String(GEOM.H / (GEOM.H + panelH)) } as CSSProperties}
+      style={{ '--panel-h': `${GEOM.PANEL_H}px`, '--shadow-s': String(GEOM.H / (GEOM.H + GEOM.PANEL_H)) } as CSSProperties}
     >
       <div className="cc-lift__body relative h-[220px] w-[200px]">
         <div className="cc-lift__shadow" aria-hidden="true" />
+        {/* Figma hover card: glass frame (10 px around the photo) carrying the lit contour + info. */}
+        <div className="cc-lift__frame" aria-hidden="true" />
         <div className="cc-lift__media relative h-[220px] w-[200px] overflow-hidden bg-[#4a3624]">
           {layers.map((layer) => {
             const c = ctrl.caseById.get(layer.caseId) ?? item;
@@ -116,7 +116,7 @@ export function LiftedCard({ view, item, doctor, doctorCases, reducedMotion }: P
             </div>
           </div>
         </div>
-        <DoctorPanel item={mediaItem} doctor={doctor} doctorCases={doctorCases} />
+        <DoctorPanel item={mediaItem} doctor={doctor} />
         <div className="cc-lift__ring" aria-hidden="true" />
       </div>
     </div>

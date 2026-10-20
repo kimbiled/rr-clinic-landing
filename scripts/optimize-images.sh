@@ -125,9 +125,9 @@ fit_long "$SRC/avatar-savelyev.png" avatar-savelyev "$CARD_MAX"
 
 echo "Wide (2x display, cap $WIDE_CAP, no upscale):"
 fit_wide "$SRC/bg-columns.png" bg-columns 1440
-# The statue source is only 1024 px wide and is shown upscaled: lossy artefacts read as blur, so
-# spend bytes here (q98 ≈ 60 KB). A sharper statue needs a larger source, not a higher q.
-QUALITY=98 fit_wide "$SRC/statue.png" statue 1290
+# statue-v2 = Figma "rr-statue-cool-marble-v2" (embedded 1678×937 PNG). The hero centrepiece is
+# shown upscaled on retina, so lossy artefacts read as blur: spend bytes here (q95 ≈ 95 KB).
+QUALITY=95 fit_wide "$SRC/statue-v2.png" statue 1290
 
 echo "UI sprite (dimensions kept for background-position):"
 if (( HAS_CWEBP )); then

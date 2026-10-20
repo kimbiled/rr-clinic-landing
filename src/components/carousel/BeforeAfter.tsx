@@ -52,7 +52,8 @@ export function BeforeAfter({ item, baKey, eager, interactive = false }: Props) 
         className={
           clip
             ? 'absolute max-w-none object-cover'
-            : `absolute inset-0 size-full max-w-none object-cover ${side === 'before' ? 'object-right' : 'object-left'}`
+            : // Half-card sources: fixed half size, centred in their pane — exact fit at 50 %, never zoom.
+              'absolute top-0 left-1/2 h-full w-[100px] max-w-none -translate-x-1/2 object-cover'
         }
         style={clip ? framingStyle(img.framing, side === 'before' ? { x: 0, w: 0.5 } : { x: 0.5, w: 0.5 }) : undefined}
       />
@@ -68,8 +69,9 @@ export function BeforeAfter({ item, baKey, eager, interactive = false }: Props) 
       }`}
       style={{ '--pos': '50%' } as CSSProperties}
     >
-      <div className="cc-ba__pane cc-ba__pane--after absolute inset-0 overflow-hidden">{image(after, 'after')}</div>
-      <div className="cc-ba__pane cc-ba__pane--before absolute inset-0 overflow-hidden">{image(before, 'before')}</div>
+      {/* Split panes are sized by carousel.css from --pos; a utility inset-0 would override that. */}
+      <div className={`cc-ba__pane cc-ba__pane--after absolute overflow-hidden ${clip ? 'inset-0' : ''}`}>{image(after, 'after')}</div>
+      <div className={`cc-ba__pane cc-ba__pane--before absolute overflow-hidden ${clip ? 'inset-0' : ''}`}>{image(before, 'before')}</div>
       <div className="cc-shade-bottom" aria-hidden="true" />
       <span aria-hidden="true" className="pointer-events-none absolute left-4 top-4 text-[12px]/[12px] uppercase tracking-[0.02em] text-white/85">
         До

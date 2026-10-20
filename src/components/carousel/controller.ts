@@ -244,8 +244,8 @@ export class CarouselController {
   }
 
   /**
-   * Pointer hit test with the statue no-hover zone: a card behind the statue head, or the pointer
-   * over the head, never lifts a card (no stop, no panel over the statue). Lifts already sit above
+   * Pointer hit test with no-hover zones: a card behind the statue head, the pointer over the head,
+   * or a card cut by the screen edge never lifts (no stop, no panel over the statue). Lifts already sit above
    * the statue, so they stay hoverable. Keyboard focus is not gated.
    */
   private pointerCard(target: EventTarget | null, clientX: number): number | null {
@@ -254,7 +254,10 @@ export class CarouselController {
     const mid = this.motion.width / 2;
     const stageX = (clientX - this.mount.getBoundingClientRect().left) / this.scale;
     if (Math.abs(stageX - mid) < GEOM.STATUE_POINTER) return null;
-    if (Math.abs(this.motion.leftOf(k) + GEOM.W / 2 - mid) < GEOM.STATUE_CARD) return null;
+    const left = this.motion.leftOf(k);
+    if (Math.abs(left + GEOM.W / 2 - mid) < GEOM.STATUE_CARD) return null;
+    // Cards cut by the screen edge are only half visible: not selectable either.
+    if (left < 0 || left + GEOM.W > this.motion.width) return null;
     return k;
   }
 

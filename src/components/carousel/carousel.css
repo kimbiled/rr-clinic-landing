@@ -84,14 +84,21 @@
     clip-path: inset(0 0 0 var(--pos));
   }
 
-  /* half-crop sources (no framing): each side fills its own pane, anchored at the divider */
+  /* half-crop sources (no framing): each pane ends at the divider; its half-size image stays centred
+     in it (BeforeAfter.tsx), so dragging moves the photos instead of zooming them */
+  .cc-ba--split .cc-ba__pane {
+    top: 0;
+    bottom: 0;
+  }
+
   .cc-ba--split .cc-ba__pane--before {
-    right: auto;
+    left: 0;
     width: var(--pos);
   }
 
   .cc-ba--split .cc-ba__pane--after {
     left: var(--pos);
+    right: 0;
   }
 
   .cc-ba__line {
@@ -184,16 +191,16 @@
     transition: transform 320ms var(--ease-lift, cubic-bezier(0.22, 1, 0.36, 1));
   }
 
-  /* Shadow around card + panel, clipped so nothing spills below the panel's first 82 px:
+  /* Shadow around the glass frame, clipped at its bottom edge so nothing spills below:
      the drop shadow never greys the H1 (QA m-4). */
   .cc-lift__shadow {
     position: absolute;
-    left: 0;
-    top: 0;
-    width: 100%;
-    height: calc(220px + var(--panel-h, 82px));
+    left: -10px;
+    top: -10px;
+    width: 220px;
+    height: calc(230px + var(--panel-h, 92px));
     box-shadow: var(--shadow-card-lift, 0 18px 40px rgb(20 13 6 / 0.45));
-    clip-path: polygon(-64px -64px, calc(100% + 64px) -64px, calc(100% + 64px) 302px, 100% 302px, 100% 100%, 0 100%, 0 302px, -64px 302px);
+    clip-path: inset(-64px -64px 0 -64px);
     opacity: 0;
     transform: scaleY(var(--shadow-s, 0.73));
     transform-origin: 50% 0;
@@ -212,16 +219,41 @@
   }
 
   .cc-lift[data-phase='on'] .cc-lift__media {
-    box-shadow: 0 0 0 1px rgb(215 165 97 / 0.95), 0 0 14px 1px rgb(215 165 97 / 0.45), 0 0 36px rgb(215 165 97 / 0.2);
+    box-shadow: 0 0 0 1px rgb(255 255 255 / 0);
     transition: box-shadow 320ms var(--ease-lift, cubic-bezier(0.22, 1, 0.36, 1));
+  }
+
+  /* Figma hover card: a glass frame 10 px around the photo (220 wide = strip pitch) that also
+     holds the surgeon + title. Its edge is the card contour, lit gold while hovered. */
+  .cc-lift__frame {
+    position: absolute;
+    left: -10px;
+    top: -10px;
+    width: 220px;
+    height: calc(230px + var(--panel-h, 92px));
+    background: rgb(51 38 26 / 0.55);
+    -webkit-backdrop-filter: blur(var(--glass-blur, 12px));
+    backdrop-filter: blur(var(--glass-blur, 12px));
+    box-shadow:
+      0 0 0 1px rgb(255 242 217 / 0.7),
+      0 0 16px rgb(215 165 97 / 0.35),
+      inset 0 4px 10px rgb(255 255 255 / 0.08);
+    opacity: 0;
+    pointer-events: none;
+    transition: opacity 220ms ease-in;
+  }
+
+  .cc-lift[data-phase='on'] .cc-lift__frame {
+    opacity: 1;
+    transition: opacity 320ms var(--ease-lift, cubic-bezier(0.22, 1, 0.36, 1));
   }
 
   .cc-lift__ring {
     position: absolute;
-    left: 0;
-    top: 0;
-    width: 100%;
-    height: calc(220px + var(--panel-h, 82px));
+    left: -10px;
+    top: -10px;
+    width: 220px;
+    height: calc(230px + var(--panel-h, 92px));
     pointer-events: none;
   }
 
@@ -300,6 +332,7 @@
     .cc-card,
     .cc-lift__body,
     .cc-lift__media,
+    .cc-lift__frame,
     .cc-lift__shadow,
     .cc-lift__layer,
     .cc-lift__dim,

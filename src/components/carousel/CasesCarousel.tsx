@@ -134,7 +134,6 @@ export function CasesCarousel() {
                 view={view}
                 item={item}
                 doctor={doctors.get(item.doctorId)}
-                doctorCases={casesByDoctor.get(item.doctorId) ?? []}
                 reducedMotion={reducedMotion}
               />,
               overlayEl,

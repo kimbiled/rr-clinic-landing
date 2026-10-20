@@ -11,8 +11,7 @@ export const GEOM = {
   TOP: 124, // strip top inside the 720 frame
   LIFT: 16, // hover rise (FIGMA note)
   DESIGN_W: 1440,
-  PANEL_H: 82, // Figma 1715:4160
-  PANEL_H_THUMBS: 130, // §5.3 with the "his cases" row
+  PANEL_H: 92, // hover card info: 12 + avatar row 22 + 10 + two title lines 34 + 14
   // No-hover zone around the statue head (stage px from the stage centre): the pointer there
   // never picks a card, and a card whose centre is this close is mostly hidden by the statue.
   STATUE_POINTER: 150,

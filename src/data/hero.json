@@ -100,8 +100,8 @@
     },
     "statue": {
       "src": "assets/img/web/statue.webp",
-      "width": 1024,
-      "height": 572,
+      "width": 1678,
+      "height": 937,
       "alt": ""
     }
   },
@@ -418,13 +418,7 @@
       "poster": {
         "src": "assets/img/web/case8-interview.webp",
         "width": 600,
-        "height": 600,
-        "framing": {
-          "x": 0.145,
-          "y": 0.179,
-          "w": 0.709,
-          "h": 0.78
-        }
+        "height": 600
       },
       "video": null,
       "figmaNodeId": "1610:406"

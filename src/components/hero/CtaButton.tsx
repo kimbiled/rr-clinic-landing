@@ -18,8 +18,8 @@ type CtaButtonProps = CommonProps &
   );
 
 const BASE =
-  'rr-cta relative isolate inline-flex h-[60px] items-center justify-center gap-2 overflow-hidden rounded-[30px] ' +
-  'font-display text-base leading-6 font-normal whitespace-nowrap text-white select-none cursor-pointer';
+  'rr-cta relative isolate inline-flex h-[60px] items-center justify-center gap-1 overflow-hidden rounded-[99px] px-6 py-5 ' +
+  'font-display text-base leading-6 font-medium whitespace-nowrap text-white select-none cursor-pointer';
 
 const SIZE = {
   primary: 'w-[284px]',

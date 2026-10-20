@@ -125,9 +125,14 @@
   }
 
   /* Primary "Подобрать специалиста" */
+  /* Figma: linear #B98743 → #D7A561 + faint white radial, inner shadow 0 4 10 #FFF 20 % */
   .rr-cta--primary {
-    background: linear-gradient(180deg, var(--color-cta-top, #ddb37b) 0%, #d2a160 35%, var(--color-cta-bottom, #c19457) 100%);
-    box-shadow: 0 0 0 rgb(215 165 97 / 0);
+    background:
+      radial-gradient(circle at 50% 0%, rgb(255 255 255 / 0.01), rgb(255 255 255 / 0) 70%),
+      linear-gradient(90deg, #b98743 0%, #d7a561 100%);
+    box-shadow:
+      inset 0 4px 10px rgb(255 255 255 / 0.2),
+      0 0 0 rgb(215 165 97 / 0);
   }
 
   /* Idle shimmer: one 1.2 s sweep every 6 s, enabled ~2.4 s after the reveal starts (spec §8.1, §9.5) */
@@ -138,7 +143,9 @@
   .rr-cta--primary:hover {
     transform: translateY(-1px);
     filter: brightness(1.06);
-    box-shadow: 0 10px 28px rgb(215 165 97 / 0.35);
+    box-shadow:
+      inset 0 4px 10px rgb(255 255 255 / 0.2),
+      0 10px 28px rgb(215 165 97 / 0.35);
   }
 
   .rr-cta--primary:hover .rr-cta__glint,
@@ -161,9 +168,12 @@
   }
 
   /* Secondary "Смотреть работы": outline Taupe/400, hidden arrow (Figma 1614:3963) slides in on hover */
+  /* Figma: fill #33261A 25 %, border 1 px #FFF2D9 65 %, inner shadow 0 4 10 #FFF 20 % */
   .rr-cta--secondary {
-    background-color: rgb(255 255 255 / 0);
-    box-shadow: inset 0 0 0 1px var(--color-outline, rgb(186 171 155 / 0.9));
+    background-color: rgb(51 38 26 / 0.25);
+    box-shadow:
+      inset 0 0 0 1px rgb(255 242 217 / 0.65),
+      inset 0 4px 10px rgb(255 255 255 / 0.2);
   }
 
   .rr-cta--secondary .rr-cta__icon {
@@ -180,8 +190,10 @@
 
   .rr-cta--secondary:hover,
   .rr-cta--secondary:focus-visible {
-    background-color: rgb(255 255 255 / 0.08);
-    box-shadow: inset 0 0 0 1px rgb(255 255 255 / 0.9);
+    background-color: rgb(51 38 26 / 0.4);
+    box-shadow:
+      inset 0 0 0 1px rgb(255 242 217 / 0.95),
+      inset 0 4px 10px rgb(255 255 255 / 0.2);
   }
 
   .rr-cta--secondary:hover .rr-cta__label,
