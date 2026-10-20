@@ -14,7 +14,10 @@ export const GEOM = {
   // No-hover zone around the statue head (stage px from the stage centre): the pointer there
   // never picks a card, and a card whose centre is this close is mostly hidden by the statue.
   STATUE_POINTER: 150,
-  STATUE_CARD: 190,
+  // A lifted card (photo + FRAME each side) may not overlap the centre band: the hero chips row
+  // ([data-cc-keepout], measured live) or, without it, ±KEEP_OUT around the stage centre.
+  KEEP_OUT: 170,
+  FRAME: 10,
 } as const;
 
 export const SPEED = 40; // px/s, FIGMA annotation 1716:4724 — positive = left → right

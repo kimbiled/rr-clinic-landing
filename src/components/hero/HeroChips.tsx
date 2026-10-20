@@ -72,6 +72,7 @@ export function HeroChips({ resetFocusRef }: { resetFocusRef: RefObject<HTMLElem
 
   return (
     <div
+      data-cc-keepout="" /* lifted case cards never overlap this row (carousel controller) */
       className="rr-chips relative flex h-12 items-center justify-center"
       style={{ transform: `translateX(${ROW_OFFSET - shift}px)` } as CSSProperties}
     >

@@ -252,13 +252,25 @@ export class CarouselController {
     const k = this.cardOf(target);
     if (k === null || !this.mount || (target as Element).closest('[data-cc-lift]')) return k;
     const mid = this.motion.width / 2;
-    const stageX = (clientX - this.mount.getBoundingClientRect().left) / this.scale;
+    const mountLeft = this.mount.getBoundingClientRect().left;
+    const stageX = (clientX - mountLeft) / this.scale;
     if (Math.abs(stageX - mid) < GEOM.STATUE_POINTER) return null;
     const left = this.motion.leftOf(k);
-    if (Math.abs(left + GEOM.W / 2 - mid) < GEOM.STATUE_CARD) return null;
+    const [a, b] = this.keepOut(mountLeft);
+    if (left - GEOM.FRAME < b && left + GEOM.W + GEOM.FRAME > a) return null;
     // Cards cut by the screen edge are only half visible: not selectable either.
     if (left < 0 || left + GEOM.W > this.motion.width) return null;
     return k;
+  }
+
+  /** Centre band (stage px) a lifted card's frame must stay clear of: the hero chips row. */
+  private keepOut(mountLeft: number): [number, number] {
+    const band = document.querySelector('[data-cc-keepout]')?.getBoundingClientRect();
+    if (band && band.width > 0) {
+      return [(band.left - mountLeft) / this.scale, (band.right - mountLeft) / this.scale];
+    }
+    const mid = this.motion.width / 2;
+    return [mid - GEOM.KEEP_OUT, mid + GEOM.KEEP_OUT];
   }
 
   // ---------- pointer ----------
