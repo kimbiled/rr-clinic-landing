@@ -10,7 +10,7 @@
 // divider while dragging) is written imperatively here and in StripMotion.
 import type { FocusedCase } from '../hero/HeroContext';
 import type { Case } from '../../data/types';
-import { GEOM, POS_MAX, POS_MIN, T, cardKey, clamp } from './geometry';
+import { GEOM, POS_MAX, POS_MIN, T, baSlidable, cardKey, clamp } from './geometry';
 import { StripMotion } from './motion';
 
 type Reason = 'pointer' | 'focus';
@@ -332,7 +332,7 @@ export class CarouselController {
     this.pointerInside = true;
     const lift = this.activate(k, 'pointer', true);
     const media = this.caseById.get(lift.mediaCaseId);
-    if (media?.type !== 'beforeAfter' || !this.mount) {
+    if (!media || !baSlidable(media) || !this.mount) {
       this.updateMotion();
       return false;
     }
@@ -430,7 +430,7 @@ export class CarouselController {
     if (!(e.target instanceof HTMLElement) || !('ccCard' in e.target.dataset)) return false;
     const k = Number(e.target.dataset.ccK);
     const item = this.cases[k % this.cases.length];
-    if (item?.type !== 'beforeAfter') return false;
+    if (!item || !baSlidable(item)) return false;
     const key = cardKey(k);
     const cur = this.getPos(key);
     const step = e.shiftKey ? 10 : 5;
@@ -613,7 +613,7 @@ export class CarouselController {
     lift.commitOnAttach = false;
     const media = this.caseById.get(lift.mediaCaseId);
     const dragging = this.drag?.k === lift.k;
-    if (media?.type === 'beforeAfter' && !this.hinted && !this.rm && !dragging && lift.el) {
+    if (media && baSlidable(media) && !this.hinted && !this.rm && !dragging && lift.el) {
       this.hinted = true;
       try {
         sessionStorage.setItem(HINT_KEY, '1');

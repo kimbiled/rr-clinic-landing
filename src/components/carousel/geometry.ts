@@ -26,11 +26,11 @@ export const POS_MIN = 4; // §6 clamp — the 22 px knob stays inside the card 
 export const POS_MAX = 96;
 
 export const T = {
-  decel: 400, // hover: 40 → 0
-  accel: 700, // resume: 0 → 40
-  resumeDelay: 250,
+  decel: 600, // hover: 40 → 0
+  accel: 1100, // resume: 0 → 40
+  resumeDelay: 340, // = leave: the strip only moves once the lifted card has settled back
   intent: 80, // ignore pass-through hovers shorter than this
-  leave: 360, // panel 220 + card down 280 from +80
+  leave: 340, // all leave transitions run 320 ms together (carousel.css)
   focusScroll: 520,
   swap: 200,
   video: 120,
@@ -116,6 +116,17 @@ export function pluralRu(n: number, one: string, few: string, many: string): str
   if (m10 === 1 && m100 !== 11) return one;
   if (m10 >= 2 && m10 <= 4 && (m100 < 12 || m100 > 14)) return few;
   return many;
+}
+
+/**
+ * A before/after case can only be slid when both sides are full photos placed by `framing` (or cut
+ * from a `pair`). Half-card crops (case-4/7 from Figma) have nothing beyond their half: any divider
+ * move would open an empty gap, so those render as a static 50/50 split like the Figma frame.
+ */
+export function baSlidable(item: Case): boolean {
+  if (item.type !== 'beforeAfter') return false;
+  const side = (img: ImageAsset | null | undefined) => (img ? Boolean(img.framing) : Boolean(item.pair));
+  return side(item.before) && side(item.after);
 }
 
 export function thumbImage(item: Case): ImageAsset | null {

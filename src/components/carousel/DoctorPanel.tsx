@@ -35,7 +35,7 @@ export function DoctorPanel({ item, doctor }: Props) {
             <span className="truncate">{doctorName(doctor)}</span>
           </div>
         )}
-        <p className="m-0 line-clamp-2 text-[14px]/[17px] font-medium">{item.title}</p>
+        <p className="m-0 line-clamp-2 text-[14px]/[17px] font-normal text-white/95">{item.title}</p>
       </div>
     </div>
   );

@@ -4,7 +4,7 @@ import { useCallback, type CSSProperties } from 'react';
 import { asset } from '../../data/hero';
 import type { BeforeAfterCase, ImageAsset } from '../../data/types';
 import { useCarousel } from './CarouselContext';
-import { framingStyle, fromPair } from './geometry';
+import { baSlidable, framingStyle, fromPair } from './geometry';
 
 const ARROW_LEFT = 'M5.37931 6.2069L4.13793 4.96552L5.37931 3.72414'; // assets/icons/arrow-left.svg
 const ARROW_RIGHT = 'M4.55172 3.72414L5.7931 4.96552L4.55172 6.2069'; // assets/icons/arrow-right.svg
@@ -37,7 +37,8 @@ export function BeforeAfter({ item, baKey, eager, interactive = false }: Props) 
 
   const before = item.before ?? (item.pair && fromPair(item.pair, 'before'));
   const after = item.after ?? (item.pair && fromPair(item.pair, 'after'));
-  const clip = Boolean(before?.framing && after?.framing);
+  // Full framed photos slide; half-card crops are a static 50/50 split (see baSlidable).
+  const clip = baSlidable(item);
 
   const image = (img: ImageAsset | undefined, side: 'before' | 'after') =>
     img ? (
@@ -52,8 +53,7 @@ export function BeforeAfter({ item, baKey, eager, interactive = false }: Props) 
         className={
           clip
             ? 'absolute max-w-none object-cover'
-            : // Half-card sources: fixed half size, centred in their pane — exact fit at 50 %, never zoom.
-              'absolute top-0 left-1/2 h-full w-[100px] max-w-none -translate-x-1/2 object-cover'
+            : 'absolute inset-0 size-full max-w-none object-cover'
         }
         style={clip ? framingStyle(img.framing, side === 'before' ? { x: 0, w: 0.5 } : { x: 0.5, w: 0.5 }) : undefined}
       />
@@ -63,13 +63,13 @@ export function BeforeAfter({ item, baKey, eager, interactive = false }: Props) 
     <div
       ref={register}
       data-ba=""
-      data-interactive={interactive ? '' : undefined}
+      data-interactive={interactive && clip ? '' : undefined}
       className={`cc-ba absolute inset-0 overflow-hidden bg-[#4a3624] font-text text-white ${clip ? 'cc-ba--clip' : 'cc-ba--split'} ${
-        interactive ? 'cursor-ew-resize touch-none' : ''
+        interactive && clip ? 'cursor-ew-resize touch-none' : ''
       }`}
       style={{ '--pos': '50%' } as CSSProperties}
     >
-      {/* Split panes are sized by carousel.css from --pos; a utility inset-0 would override that. */}
+      {/* Split panes are fixed halves (carousel.css); a utility inset-0 would override that. */}
       <div className={`cc-ba__pane cc-ba__pane--after absolute overflow-hidden ${clip ? 'inset-0' : ''}`}>{image(after, 'after')}</div>
       <div className={`cc-ba__pane cc-ba__pane--before absolute overflow-hidden ${clip ? 'inset-0' : ''}`}>{image(before, 'before')}</div>
       <div className="cc-shade-bottom" aria-hidden="true" />
@@ -80,11 +80,13 @@ export function BeforeAfter({ item, baKey, eager, interactive = false }: Props) 
         После
       </span>
       <span aria-hidden="true" className="cc-ba__line" />
-      {/* Visual only — the focusable card carries role="slider" (N2-6). */}
-      <span data-ba-knob="" aria-hidden="true" className="cc-ba__knob">
-        <Arrow d={ARROW_LEFT} side="left" />
-        <Arrow d={ARROW_RIGHT} side="right" />
-      </span>
+      {/* Visual only — the focusable card carries role="slider" (N2-6). No knob on a static split. */}
+      {clip && (
+        <span data-ba-knob="" aria-hidden="true" className="cc-ba__knob">
+          <Arrow d={ARROW_LEFT} side="left" />
+          <Arrow d={ARROW_RIGHT} side="right" />
+        </span>
+      )}
       {item.showTitle && (
         <p className="pointer-events-none absolute bottom-4 left-4 m-0 line-clamp-2 w-[108px] text-[12px]/[12px] font-medium text-white">{item.title}</p>
       )}

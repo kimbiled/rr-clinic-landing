@@ -3,7 +3,7 @@
 import { memo, useId } from 'react';
 import type { Case, Doctor } from '../../data/types';
 import { BeforeAfter } from './BeforeAfter';
-import { GEOM, cardKey, doctorName } from './geometry';
+import { GEOM, baSlidable, cardKey, doctorName } from './geometry';
 import { PosterOnly, VideoCase } from './VideoCase';
 
 interface MediaProps {
@@ -40,7 +40,7 @@ interface CardProps {
 export const CaseCard = memo(function CaseCard({ item, doctor, k, primary, lifted, dim, match }: CardProps) {
   const hintId = useId();
   const name = doctorName(doctor);
-  const isBa = item.type === 'beforeAfter';
+  const isBa = baSlidable(item); // a static 50/50 split is not a slider
   const hints = [name && `Хирург: ${name}.`, isBa && 'Стрелки влево и вправо сдвигают границу «до/после».']
     .filter(Boolean)
     .join(' ');

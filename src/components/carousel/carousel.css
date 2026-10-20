@@ -84,21 +84,23 @@
     clip-path: inset(0 0 0 var(--pos));
   }
 
-  /* half-crop sources (no framing): each pane ends at the divider; its half-size image stays centred
-     in it (BeforeAfter.tsx), so dragging moves the photos instead of zooming them */
+  /* half-card crops (no framing): a static 50/50 split, each photo filling its own half */
   .cc-ba--split .cc-ba__pane {
     top: 0;
     bottom: 0;
+    width: 50%;
   }
 
   .cc-ba--split .cc-ba__pane--before {
     left: 0;
-    width: var(--pos);
   }
 
   .cc-ba--split .cc-ba__pane--after {
-    left: var(--pos);
-    right: 0;
+    left: 50%;
+  }
+
+  .cc-ba--split .cc-ba__line {
+    left: 50%;
   }
 
   .cc-ba__line {
@@ -180,19 +182,32 @@
     transform: scale(0.8);
   }
 
-  /* ---------- lift (§5, §9.4) ---------- */
+  /* ---------- lift (§5, §9.4) ----------
+     One choreography: every part enters on --lift-in and leaves on --lift-out together (T.leave),
+     animating only opacity / transform on their own layers — nothing scales, clips or repaints
+     per frame, and the strip waits for the leave to finish before it moves (T.resumeDelay). */
+  .cc-lift {
+    --lift-in: 380ms cubic-bezier(0.22, 1, 0.36, 1);
+    --lift-out: 320ms cubic-bezier(0.4, 0, 0.2, 1);
+  }
+
   .cc-lift__body {
-    /* leave: card down 280 ms from +80 ms */
-    transition: transform 280ms var(--ease-out, cubic-bezier(0.22, 1, 0.36, 1)) 80ms;
+    transition: transform var(--lift-out);
   }
 
   .cc-lift[data-phase='on'] .cc-lift__body {
     transform: translateY(-16px);
-    transition: transform 320ms var(--ease-lift, cubic-bezier(0.22, 1, 0.36, 1));
+    transition: transform var(--lift-in);
+  }
+
+  .cc-lift__shadow,
+  .cc-lift__frame,
+  .cc-lift__dim {
+    will-change: opacity;
   }
 
   /* Shadow around the glass frame, clipped at its bottom edge so nothing spills below:
-     the drop shadow never greys the H1 (QA m-4). */
+     the drop shadow never greys the H1 (QA m-4). Fades only — no scale. */
   .cc-lift__shadow {
     position: absolute;
     left: -10px;
@@ -202,50 +217,47 @@
     box-shadow: var(--shadow-card-lift, 0 18px 40px rgb(20 13 6 / 0.45));
     clip-path: inset(-64px -64px 0 -64px);
     opacity: 0;
-    transform: scaleY(var(--shadow-s, 0.73));
-    transform-origin: 50% 0;
     pointer-events: none;
-    transition: opacity 220ms ease-in, transform 220ms ease-in;
+    transition: opacity var(--lift-out);
   }
 
   .cc-lift[data-phase='on'] .cc-lift__shadow {
     opacity: 1;
-    transform: none;
-    transition: opacity 320ms var(--ease-lift, cubic-bezier(0.22, 1, 0.36, 1)), transform 380ms var(--ease-lift, cubic-bezier(0.22, 1, 0.36, 1)) 60ms;
+    transition: opacity var(--lift-in);
   }
 
   .cc-lift__media {
-    transition: box-shadow 280ms var(--ease-out, cubic-bezier(0.22, 1, 0.36, 1)) 80ms;
+    transition: box-shadow var(--lift-out);
   }
 
   .cc-lift[data-phase='on'] .cc-lift__media {
     box-shadow: 0 0 0 1px rgb(255 255 255 / 0);
-    transition: box-shadow 320ms var(--ease-lift, cubic-bezier(0.22, 1, 0.36, 1));
+    transition: box-shadow var(--lift-in);
   }
 
-  /* Figma hover card: a glass frame 10 px around the photo (220 wide = strip pitch) that also
-     holds the surgeon + title. Its edge is the card contour, lit gold while hovered. */
+  /* Figma hover card: a light glass frame 10 px around the photo (220 wide = strip pitch) holding
+     the surgeon + title. Its edge is the card contour, lit while hovered. */
   .cc-lift__frame {
     position: absolute;
     left: -10px;
     top: -10px;
     width: 220px;
     height: calc(230px + var(--panel-h, 92px));
-    background: rgb(51 38 26 / 0.55);
+    background: rgb(51 38 26 / 0.3);
     -webkit-backdrop-filter: blur(var(--glass-blur, 12px));
     backdrop-filter: blur(var(--glass-blur, 12px));
     box-shadow:
-      0 0 0 1px rgb(255 242 217 / 0.7),
-      0 0 16px rgb(215 165 97 / 0.35),
+      0 0 0 1px rgb(255 242 217 / 0.6),
+      0 0 16px rgb(215 165 97 / 0.3),
       inset 0 4px 10px rgb(255 255 255 / 0.08);
     opacity: 0;
     pointer-events: none;
-    transition: opacity 220ms ease-in;
+    transition: opacity var(--lift-out);
   }
 
   .cc-lift[data-phase='on'] .cc-lift__frame {
     opacity: 1;
-    transition: opacity 320ms var(--ease-lift, cubic-bezier(0.22, 1, 0.36, 1));
+    transition: opacity var(--lift-in);
   }
 
   .cc-lift__ring {
@@ -278,7 +290,7 @@
     inset: 0;
     overflow: hidden;
     pointer-events: none;
-    transition: opacity 280ms var(--ease-out, cubic-bezier(0.22, 1, 0.36, 1)) 80ms;
+    transition: opacity var(--lift-out);
   }
 
   /* full-stage copy of .hero__shade, offset so the card's slot lines up with the strip card's */
@@ -293,38 +305,24 @@
 
   .cc-lift[data-phase='on'] .cc-lift__dim {
     opacity: 0;
-    transition: opacity 320ms var(--ease-lift, cubic-bezier(0.22, 1, 0.36, 1));
+    transition: opacity var(--lift-in);
   }
 
-  /* ---------- doctor panel (§5.1, §5.3) ---------- */
-  .cc-panel {
-    clip-path: inset(0 0 100% 0);
-    transition: clip-path 220ms cubic-bezier(0.4, 0, 1, 1);
-  }
-
-  .cc-lift[data-phase='on'] .cc-panel {
-    clip-path: inset(0 0 0 0);
-    transition: clip-path 380ms var(--ease-lift, cubic-bezier(0.22, 1, 0.36, 1)) 60ms;
-  }
-
+  /* ---------- doctor panel: rows fade up with the frame, short stagger in, together out ---------- */
   .cc-panel__inner > * {
     opacity: 0;
-    transform: translateY(8px);
-    transition: opacity 160ms ease-in, transform 160ms ease-in;
+    transform: translateY(6px);
+    transition: opacity 200ms cubic-bezier(0.4, 0, 0.2, 1), transform 200ms cubic-bezier(0.4, 0, 0.2, 1);
   }
 
   .cc-lift[data-phase='on'] .cc-panel__inner > * {
     opacity: 1;
     transform: none;
-    transition: opacity 260ms var(--ease-lift, cubic-bezier(0.22, 1, 0.36, 1)) 60ms, transform 260ms var(--ease-lift, cubic-bezier(0.22, 1, 0.36, 1)) 60ms;
+    transition: opacity var(--lift-in) 60ms, transform var(--lift-in) 60ms;
   }
 
   .cc-lift[data-phase='on'] .cc-panel__inner > :nth-child(2) {
-    transition-delay: 120ms;
-  }
-
-  .cc-lift[data-phase='on'] .cc-panel__inner > :nth-child(3) {
-    transition-delay: 180ms;
+    transition-delay: 110ms;
   }
 
   /* ---------- reduced motion (§9.7): static strip, instant lift + panel ---------- */
@@ -336,7 +334,6 @@
     .cc-lift__shadow,
     .cc-lift__layer,
     .cc-lift__dim,
-    .cc-panel,
     .cc-panel__inner > *,
     .cc-vid__video,
     .cc-vid__play,
