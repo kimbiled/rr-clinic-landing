@@ -328,14 +328,26 @@
       "showTitle": false,
       "doctorId": "kodzoeva-leyla",
       "before": {
-        "src": "assets/img/web/case4-before.webp",
-        "width": 273,
-        "height": 600
+        "src": "assets/img/web/case4-pair-full.webp",
+        "width": 1300,
+        "height": 856,
+        "framing": {
+          "x": 0,
+          "y": 0.0104,
+          "w": 0.2349,
+          "h": 0.7847
+        }
       },
       "after": {
-        "src": "assets/img/web/case4-after.webp",
-        "width": 273,
-        "height": 600
+        "src": "assets/img/web/case4-pair-full.webp",
+        "width": 1300,
+        "height": 856,
+        "framing": {
+          "x": 0.7522,
+          "y": 0.0003,
+          "w": 0.2474,
+          "h": 0.8267
+        }
       },
       "figmaNodeId": "1610:315",
       "behindStatue": true
@@ -397,14 +409,26 @@
       "doctorId": "savelyev-evgeniy",
       "featured": true,
       "before": {
-        "src": "assets/img/web/case7-before.webp",
-        "width": 273,
-        "height": 600
+        "src": "assets/img/web/case7-before-full.webp",
+        "width": 640,
+        "height": 1144,
+        "framing": {
+          "x": 0.0012,
+          "y": 0.1063,
+          "w": 0.4945,
+          "h": 0.6088
+        }
       },
       "after": {
-        "src": "assets/img/web/case7-after.webp",
-        "width": 273,
-        "height": 600
+        "src": "assets/img/web/case7-after-full.webp",
+        "width": 640,
+        "height": 1144,
+        "framing": {
+          "x": 0.5082,
+          "y": 0.1394,
+          "w": 0.4641,
+          "h": 0.5714
+        }
       },
       "figmaNodeId": "1610:381"
     },

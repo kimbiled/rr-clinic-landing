@@ -1,9 +1,9 @@
-// Info under the lifted card (Figma hover card): avatar + surgeon, then the case title. It sits on
-// the lift's glass frame (carousel.css .cc-lift__frame), so the panel itself has no fill.
-// Fixed height (GEOM.PANEL_H) — the frame and shadow are sized from it.
+// Info under the lifted card (Figma hover card): avatar + surgeon, then the case title. It sits in
+// the lift's flow under the photo; the transparent frame (carousel.css .cc-lift__frame) hugs it,
+// so a one-line title leaves no empty band.
 import { asset } from '../../data/hero';
 import type { Case, Doctor } from '../../data/types';
-import { GEOM, doctorName, initials } from './geometry';
+import { doctorName, initials } from './geometry';
 
 interface Props {
   /** Case currently shown by the lift. */
@@ -17,10 +17,9 @@ export function DoctorPanel({ item, doctor }: Props) {
   return (
     <div
       data-cc-panel=""
-      className="cc-panel absolute left-0 top-[220px] w-[200px] overflow-hidden font-text text-white"
-      style={{ height: GEOM.PANEL_H }}
+      className="cc-panel relative w-[200px] font-text text-white"
     >
-      <div className="cc-panel__inner flex flex-col gap-2.5 pt-3">
+      <div className="cc-panel__inner flex flex-col gap-2 pt-2.5">
         {doctor && (
           <div className="flex h-[22px] min-w-0 items-center gap-2 text-[11px]/[14px] font-normal text-white/85">
             {avatar ? (

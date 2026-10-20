@@ -14,9 +14,8 @@
 #
 # Sizing rules (see docs/data-schema.md):
 #   - card images (render ~166x182 CSS px, hover up to ~2x): long side <= 600
-#   - case4/case7 were exported by Figma as "fill" crops with a non-native
-#     aspect; they are resampled to the card-half slot aspect (82.76:182.07)
-#     so they render correctly with object-fit: cover.
+#   - case4/case7: full photos from the Figma SVG exports (see the block
+#     below); hero.json `framing` places each side on its card half.
 #   - case3/case6 face pairs: one side-by-side image -> split into
 #     -before (left half) and -after (right half); the pair is also kept.
 #   - background / statue: 2x display width capped at 2560, never upscaled.
@@ -105,11 +104,20 @@ for f in case1-before case1-after case2-interview case5-interview case8-intervie
   fit_long "$SRC/$f.png" "$f" "$CARD_MAX"
 done
 
-echo "Cards resampled to slot aspect (Figma 'fill' crops):"
-# slot = 82.76 x 182.07 CSS px  ->  273 x 600
-for f in case4-before case4-after case7-before case7-after; do
-  encode "$SRC/$f.png" "$f" 273 600
-done
+echo "Full before/after photos (case4 pair, case7 before/after):"
+# Embedded PNGs of the Figma exports case{4,7}-{before,after}-figma.svg (transparent background,
+# flattened onto the Figma card fill). Full photos let the slider reveal real image, no gaps;
+# the per-side crop lives in hero.json `framing`. Long side sized so a card half stays >= 2x.
+if (( HAS_CWEBP )); then
+  cwebp -quiet -q "$QUALITY" -m 6 -sharp_yuv -metadata none -blend_alpha 0xA99784 -resize 1300 0 \
+    "$SRC/case4-pair-full.png" -o "$OUT/case4-pair-full.webp" && echo "  case4-pair-full.webp"
+  for f in case7-before-full case7-after-full; do
+    cwebp -quiet -q "$QUALITY" -m 6 -sharp_yuv -metadata none -blend_alpha 0xD1AE95 -resize 640 0 \
+      "$SRC/$f.png" -o "$OUT/$f.webp" && echo "  $f.webp"
+  done
+else
+  echo "  ! case4/case7 full photos need cwebp (alpha flattened onto the Figma fill)" >&2
+fi
 
 echo "Face pairs (split + full pair):"
 split_pair "$SRC/case3-face-pair.png" case3

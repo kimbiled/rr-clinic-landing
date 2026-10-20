@@ -2,13 +2,13 @@
 // Its translate3d is written by StripMotion every frame (same model as the strip → no drift);
 // the rise (−16 px), shadow, dim hand-over and panel reveal are CSS transitions keyed off
 // data-phase = pending | on | leaving (carousel.css).
-import { useCallback, useEffect, useState, type CSSProperties } from 'react';
+import { useCallback, useEffect, useState } from 'react';
 import type { Case, Doctor } from '../../data/types';
 import { CaseMedia } from './CaseCard';
 import { useCarousel } from './CarouselContext';
 import { liftMediaKey, type LiftView } from './controller';
 import { DoctorPanel } from './DoctorPanel';
-import { GEOM, T, cardKey } from './geometry';
+import { T, cardKey } from './geometry';
 
 interface Props {
   view: LiftView;
@@ -80,9 +80,8 @@ export function LiftedCard({ view, item, doctor, reducedMotion }: Props) {
       data-case={item.id}
       aria-hidden="true"
       className="cc-lift absolute left-0 top-0 h-[220px] w-[200px] select-none will-change-transform data-[phase=leaving]:pointer-events-none data-[phase=pending]:pointer-events-none data-[phase=pending]:invisible"
-      style={{ '--panel-h': `${GEOM.PANEL_H}px`, '--shadow-s': String(GEOM.H / (GEOM.H + GEOM.PANEL_H)) } as CSSProperties}
     >
-      <div className="cc-lift__body relative h-[220px] w-[200px]">
+      <div className="cc-lift__body relative w-[200px]">
         <div className="cc-lift__shadow" aria-hidden="true" />
         {/* Figma hover card: glass frame (10 px around the photo) carrying the lit contour + info. */}
         <div className="cc-lift__frame" aria-hidden="true" />

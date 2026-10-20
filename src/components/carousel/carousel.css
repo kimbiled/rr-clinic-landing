@@ -210,12 +210,11 @@
      the drop shadow never greys the H1 (QA m-4). Fades only — no scale. */
   .cc-lift__shadow {
     position: absolute;
-    left: -10px;
-    top: -10px;
-    width: 220px;
-    height: calc(230px + var(--panel-h, 92px));
+    left: 0;
+    top: 0;
+    width: 200px;
+    height: 220px; /* the photo only: a transparent frame must not show a shadow box */
     box-shadow: var(--shadow-card-lift, 0 18px 40px rgb(20 13 6 / 0.45));
-    clip-path: inset(-64px -64px 0 -64px);
     opacity: 0;
     pointer-events: none;
     transition: opacity var(--lift-out);
@@ -235,21 +234,15 @@
     transition: box-shadow var(--lift-in);
   }
 
-  /* Figma hover card: a light glass frame 10 px around the photo (220 wide = strip pitch) holding
+  /* Figma hover card: a transparent frame 10 px around the photo (220 wide = strip pitch) holding
      the surgeon + title. Its edge is the card contour, lit while hovered. */
   .cc-lift__frame {
     position: absolute;
-    left: -10px;
-    top: -10px;
-    width: 220px;
-    height: calc(230px + var(--panel-h, 92px));
-    background: rgb(51 38 26 / 0.3);
-    -webkit-backdrop-filter: blur(var(--glass-blur, 12px));
-    backdrop-filter: blur(var(--glass-blur, 12px));
+    inset: -10px; /* hugs photo + info, 10 px all round */
+    /* transparent like the Figma card: only the lit contour, no glass fill */
     box-shadow:
       0 0 0 1px rgb(255 242 217 / 0.6),
-      0 0 16px rgb(215 165 97 / 0.3),
-      inset 0 4px 10px rgb(255 255 255 / 0.08);
+      0 0 16px rgb(215 165 97 / 0.3);
     opacity: 0;
     pointer-events: none;
     transition: opacity var(--lift-out);
@@ -262,10 +255,7 @@
 
   .cc-lift__ring {
     position: absolute;
-    left: -10px;
-    top: -10px;
-    width: 220px;
-    height: calc(230px + var(--panel-h, 92px));
+    inset: -10px;
     pointer-events: none;
   }
 
