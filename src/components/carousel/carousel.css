@@ -14,17 +14,14 @@
 }
 
 @layer components {
-  /* ---------- static grid (§4.4): 35 % behind the statue ---------- */
-  .cc-grid {
-    -webkit-mask-image: linear-gradient(90deg, #000 calc(50% - 330px), rgb(0 0 0 / 0.35) calc(50% - 210px), rgb(0 0 0 / 0.35) calc(50% + 210px), #000 calc(50% + 330px));
-    mask-image: linear-gradient(90deg, #000 calc(50% - 330px), rgb(0 0 0 / 0.35) calc(50% - 210px), rgb(0 0 0 / 0.35) calc(50% + 210px), #000 calc(50% + 330px));
-  }
-
-  .cc-grid__v {
-    background: linear-gradient(180deg, rgb(255 255 255 / 0) 0, rgb(255 255 255 / 0.12) 32px, rgb(255 255 255 / 0.12) calc(100% - 32px), rgb(255 255 255 / 0) 100%);
-  }
-
   /* ---------- strip cards ---------- */
+  /* Each card carries its own outer contour (replaces the static measuring grid): it moves with
+     the card and lights up on the lifted copy. Same hairline on the lift at rest → seamless swap. */
+  .cc-card,
+  .cc-lift__media {
+    box-shadow: 0 0 0 1px var(--cc-contour, rgb(255 255 255 / 0.18));
+  }
+
   .cc-card {
     transition: opacity 400ms var(--ease-out, cubic-bezier(0.22, 1, 0.36, 1)), filter 400ms var(--ease-out, cubic-bezier(0.22, 1, 0.36, 1));
   }
@@ -210,6 +207,15 @@
     transition: opacity 320ms var(--ease-lift, cubic-bezier(0.22, 1, 0.36, 1)), transform 380ms var(--ease-lift, cubic-bezier(0.22, 1, 0.36, 1)) 60ms;
   }
 
+  .cc-lift__media {
+    transition: box-shadow 280ms var(--ease-out, cubic-bezier(0.22, 1, 0.36, 1)) 80ms;
+  }
+
+  .cc-lift[data-phase='on'] .cc-lift__media {
+    box-shadow: 0 0 0 1px rgb(215 165 97 / 0.95), 0 0 14px 1px rgb(215 165 97 / 0.45), 0 0 36px rgb(215 165 97 / 0.2);
+    transition: box-shadow 320ms var(--ease-lift, cubic-bezier(0.22, 1, 0.36, 1));
+  }
+
   .cc-lift__ring {
     position: absolute;
     left: 0;
@@ -293,6 +299,7 @@
   @media (prefers-reduced-motion: reduce) {
     .cc-card,
     .cc-lift__body,
+    .cc-lift__media,
     .cc-lift__shadow,
     .cc-lift__layer,
     .cc-lift__dim,

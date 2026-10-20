@@ -13,6 +13,10 @@ export const GEOM = {
   DESIGN_W: 1440,
   PANEL_H: 82, // Figma 1715:4160
   PANEL_H_THUMBS: 130, // §5.3 with the "his cases" row
+  // No-hover zone around the statue head (stage px from the stage centre): the pointer there
+  // never picks a card, and a card whose centre is this close is mostly hidden by the statue.
+  STATUE_POINTER: 150,
+  STATUE_CARD: 190,
 } as const;
 
 export const SPEED = 40; // px/s, FIGMA annotation 1716:4724 — positive = left → right

@@ -243,10 +243,25 @@ export class CarouselController {
     return Number.isFinite(k) ? k : null;
   }
 
+  /**
+   * Pointer hit test with the statue no-hover zone: a card behind the statue head, or the pointer
+   * over the head, never lifts a card (no stop, no panel over the statue). Lifts already sit above
+   * the statue, so they stay hoverable. Keyboard focus is not gated.
+   */
+  private pointerCard(target: EventTarget | null, clientX: number): number | null {
+    const k = this.cardOf(target);
+    if (k === null || !this.mount || (target as Element).closest('[data-cc-lift]')) return k;
+    const mid = this.motion.width / 2;
+    const stageX = (clientX - this.mount.getBoundingClientRect().left) / this.scale;
+    if (Math.abs(stageX - mid) < GEOM.STATUE_POINTER) return null;
+    if (Math.abs(this.motion.leftOf(k) + GEOM.W / 2 - mid) < GEOM.STATUE_CARD) return null;
+    return k;
+  }
+
   // ---------- pointer ----------
 
-  onOver(target: EventTarget | null) {
-    const k = this.cardOf(target);
+  onOver(target: EventTarget | null, clientX: number) {
+    const k = this.pointerCard(target, clientX);
     if (k === null) return;
     if (!this.pointerInside) {
       this.pointerInside = true;
@@ -286,10 +301,10 @@ export class CarouselController {
     this.intent.k = null;
   }
 
-  onOut(target: EventTarget | null, related: EventTarget | null) {
+  onOut(target: EventTarget | null, related: EventTarget | null, clientX: number) {
     if (this.drag) return; // pointer is captured; drag end decides
     const from = this.cardOf(target);
-    const to = this.cardOf(related);
+    const to = this.pointerCard(related, clientX);
     if (from === to) return;
     if (from !== null) {
       if (this.pointerK === from) this.pointerK = null;
@@ -307,7 +322,7 @@ export class CarouselController {
   onDown(e: { button: number; target: EventTarget | null; pointerId: number; clientX: number }): boolean {
     if (e.button !== 0 || !(e.target instanceof Element)) return false;
     if (e.target.closest('[data-cc-panel]')) return false; // panel: links/thumbs, no drag
-    const k = this.cardOf(e.target);
+    const k = this.pointerCard(e.target, e.clientX);
     if (k === null) return false;
     this.cancelIntent();
     this.pointerK = k;
@@ -333,7 +348,9 @@ export class CarouselController {
     return true;
   }
 
-  onMove(e: { pointerId: number; clientX: number }) {
+  onMove(e: { pointerId: number; clientX: number; target: EventTarget | null }) {
+    // A card can leave the statue zone under a pointer that is already on it: pick it up on move.
+    if (!this.drag && this.pointerK === null) this.onOver(e.target, e.clientX);
     if (!this.drag || e.pointerId !== this.drag.pointerId) return;
     this.dragTo(e.clientX);
   }
@@ -359,7 +376,7 @@ export class CarouselController {
     }
     // Released outside the lifted card → behave like a normal pointer leave.
     const under = e.type === 'pointerup' ? document.elementFromPoint(e.clientX, e.clientY) : null;
-    const to = this.cardOf(under);
+    const to = this.pointerCard(under, e.clientX);
     if (to !== drag.k) {
       if (this.pointerK === drag.k) this.pointerK = null;
       this.release(drag.k, 'pointer');

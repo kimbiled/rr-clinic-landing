@@ -125,7 +125,9 @@ fit_long "$SRC/avatar-savelyev.png" avatar-savelyev "$CARD_MAX"
 
 echo "Wide (2x display, cap $WIDE_CAP, no upscale):"
 fit_wide "$SRC/bg-columns.png" bg-columns 1440
-fit_wide "$SRC/statue.png" statue 1290
+# The statue source is only 1024 px wide and is shown upscaled: lossy artefacts read as blur, so
+# spend bytes here (q98 ≈ 60 KB). A sharper statue needs a larger source, not a higher q.
+QUALITY=98 fit_wide "$SRC/statue.png" statue 1290
 
 echo "UI sprite (dimensions kept for background-position):"
 if (( HAS_CWEBP )); then

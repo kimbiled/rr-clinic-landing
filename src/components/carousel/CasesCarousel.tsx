@@ -17,7 +17,6 @@ import { createPortal } from 'react-dom';
 import { getCasesByDoctor, getDoctor } from '../../data/hero';
 import { useHero } from '../hero/HeroContext';
 import { CarouselContext } from './CarouselContext';
-import { CarouselGrid } from './CarouselGrid';
 import { CaseCard } from './CaseCard';
 import { CarouselController } from './controller';
 import { LiftedCard } from './LiftedCard';
@@ -87,8 +86,8 @@ export function CasesCarousel() {
   }
 
   const handlers = {
-    onPointerOver: (e: PointerEvent) => ctrl.onOver(e.target),
-    onPointerOut: (e: PointerEvent) => ctrl.onOut(e.target, e.relatedTarget),
+    onPointerOver: (e: PointerEvent) => ctrl.onOver(e.target, e.clientX),
+    onPointerOut: (e: PointerEvent) => ctrl.onOut(e.target, e.relatedTarget, e.clientX),
     onPointerDown: (e: PointerEvent) => {
       if (ctrl.onDown(e)) e.preventDefault();
     },
@@ -119,7 +118,6 @@ export function CasesCarousel() {
         className="cc-root pointer-events-none absolute inset-0 overflow-clip"
         {...handlers}
       >
-        <CarouselGrid width={stage.width} />
         <div
           ref={trackRef}
           className="absolute left-0 h-[220px] will-change-transform"
