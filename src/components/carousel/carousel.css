@@ -22,14 +22,15 @@
     box-shadow: 0 0 0 1px var(--cc-contour, rgb(255 255 255 / 0.18));
   }
 
+  /* Only `filter` animates: opacity must switch instantly, or a card handed back by its lift
+     would fade in from 0 over the dark hero (the black blink after un-hover). */
   .cc-card {
-    transition: opacity 400ms var(--ease-out, cubic-bezier(0.22, 1, 0.36, 1)), filter 400ms var(--ease-out, cubic-bezier(0.22, 1, 0.36, 1));
+    transition: filter 400ms var(--ease-out, cubic-bezier(0.22, 1, 0.36, 1));
   }
 
   /* selected surgeon: other doctors' cases recede, theirs get a gold hairline */
   .cc-card[data-dim] {
-    opacity: 0.35;
-    filter: saturate(0.15);
+    filter: saturate(0.15) opacity(0.35);
   }
 
   .cc-card[data-match]::after {
