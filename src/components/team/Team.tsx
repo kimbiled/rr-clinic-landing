@@ -82,7 +82,7 @@ export function Team() {
       <section id="doctors" aria-labelledby="team-title" className="team-section relative overflow-hidden bg-white text-neutral-900">
         <div className="relative mx-auto max-w-[1440px] px-(--team-pad) pt-16">
           <div ref={headRef} className={`team-reveal ${headIn ? 'is-in' : ''}`}>
-            <p className="font-text text-[14px] leading-[18px] tracking-[0.14em] text-[#a09486] uppercase">Команда</p>
+            <p className="font-text text-[18px] leading-none tracking-[0.1em] text-[#a4a09d] uppercase">Команда</p>
             <h2 id="team-title" className="mt-[22px] font-display text-[40px] leading-[44px] font-normal tracking-[-0.025em] text-[#1b1919]">
               Наша <span className="text-[#9bb4ae]">команда</span>
             </h2>

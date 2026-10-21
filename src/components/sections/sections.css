@@ -18,25 +18,21 @@
   /* Small spaced caps above each heading ("О КЛИНИКЕ", "АВТОРСКИЕ ПРОГРАММЫ") */
   .rr-eyebrow {
     font-family: var(--font-text);
-    font-size: 14px;
-    line-height: 18px;
-    letter-spacing: 0.14em;
+    font-size: 18px;
+    line-height: 1;
+    letter-spacing: 0.1em;
     text-transform: uppercase;
-    color: #a09486;
+    color: #a4a09d; /* RR Clinic/Neutral/400 */
   }
 
-  /* ---- About: arches pattern (a continuous ∩∪ line, very light), fading out towards the bottom ---- */
+  /* ---- About: arches pattern (Figma "Vector" 1440×434, faded towards the centre by its own gradients) ---- */
   .rr-about__pattern {
-    background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='80' height='240' fill='none' stroke='%23f3efea' stroke-width='1.2'%3E%3Cpath d='M0 220a20 20 0 0 0 20-20V60a20 20 0 0 1 40 0v140a20 20 0 0 0 20 20'/%3E%3C/svg%3E");
-    background-size: 80px 240px;
-    background-position: calc(50% + 40px) -40px;
-    -webkit-mask-image: linear-gradient(180deg, #000 0%, #000 55%, transparent 100%);
-    mask-image: linear-gradient(180deg, #000 0%, #000 55%, transparent 100%);
+    background: url('/assets/img/web/about-arches.svg') center / 1440px 434px no-repeat;
   }
 
   /* ---- About: numbered slides. The active one is centred; neighbours fade out towards the edges ---- */
   .rr-about__slider {
-    --slide-w: 640px;
+    --slide-w: 646px;
     --slide-gap: 40px;
     overflow: hidden;
     overflow: clip; /* never scrollable: focus, find-in-page or a click can't shift the track off-centre */

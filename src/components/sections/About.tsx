@@ -51,7 +51,7 @@ export function About() {
 
         <h2
           id="about-title"
-          className="mt-[34px] font-display text-[40px] leading-[43px] font-normal tracking-[-0.025em] text-[#1b1919]"
+          className="mt-[30px] font-display text-[40px] leading-[1.1] font-normal tracking-[-0.02em] text-neutral-900"
           {...revealItem(1)}
         >
           {about.title[0]}
@@ -86,8 +86,8 @@ export function About() {
                 <span className="rr-about__num block font-text text-[16px] leading-5 font-medium tabular-nums" aria-hidden="true">
                   {String(i + 1).padStart(2, '0')}
                 </span>
-                <p className="mt-[9px] font-text text-[17px] leading-[23px] font-normal tracking-[-0.01em] text-[#585656]">
-                  <RichText value={slide} strongClassName="font-medium text-[#1b1919]" />
+                <p className="mt-[9px] font-text text-[18px] leading-[1.2] font-normal text-[#625f5e]">
+                  <RichText value={slide} strongClassName="font-medium text-neutral-900" />
                 </p>
               </li>
             ))}
