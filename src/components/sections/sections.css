@@ -27,7 +27,13 @@
 
   /* ---- About: arches pattern (Figma "Vector" 1440×434, faded towards the centre by its own gradients) ---- */
   .rr-about__pattern {
-    background: url('/assets/img/web/about-arches.svg') center / 1440px 434px no-repeat;
+    /* scales with the viewport (never below the 1440 design), aspect kept */
+    background: url('/assets/img/web/about-arches.svg') top center / max(100%, 1440px) auto no-repeat;
+  }
+
+  /* White veil from the CTA row down: mutes the arches below the buttons, before the trust card */
+  .rr-about__veil {
+    background: rgb(255 255 255 / 0.6);
   }
 
   /* ---- About: numbered slides. The active one is centred; neighbours fade out towards the edges ---- */

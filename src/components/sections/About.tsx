@@ -43,6 +43,8 @@ export function About() {
       {...revealScope(inView)}
     >
       <span className="rr-about__pattern pointer-events-none absolute inset-0" aria-hidden="true" />
+      {/* from the buttons' centre line (60 px padding + 29 px half-button) to the section's end */}
+      <span className="rr-about__veil pointer-events-none absolute inset-x-0 bottom-0 h-[89px]" aria-hidden="true" />
 
       <div className="relative mx-auto max-w-[1440px] pt-10 pb-[60px] text-center">
         <p className="rr-eyebrow" {...revealItem(0)}>

@@ -15,7 +15,7 @@ import { antdTheme } from '../../theme/antdTheme';
 import './team.css';
 
 /** Sage green of the design's team block (selected tab, accent word). */
-const SAGE = '#567e75';
+const SAGE = '#497f75'; // RR Clinic/Green/500
 
 /** Light-surface antd theme for this white section (the global theme is dark for the hero). */
 const lightTheme: ThemeConfig = {
@@ -30,8 +30,9 @@ const lightTheme: ThemeConfig = {
   },
   components: {
     Segmented: {
-      controlHeight: 44, // 44 + 2×4 track padding + 1 px border → the design's 54 px capsule
-      trackPadding: 4,
+      // antd: tab height = controlHeight − 2×trackPadding → 40 px tabs; + 2×8 + 2×1 border = Figma's 58 px capsule
+      controlHeight: 56,
+      trackPadding: 8,
       trackBg: '#ffffff',
       itemColor: '#2f4a44',
       itemHoverColor: '#1f3631',
@@ -39,7 +40,7 @@ const lightTheme: ThemeConfig = {
       itemActiveBg: 'rgba(86, 126, 117, 0.14)',
       itemSelectedBg: SAGE,
       itemSelectedColor: '#ffffff',
-      fontSize: 15,
+      fontSize: 16,
       motionDurationSlow: '0.35s',
     },
   },
@@ -83,10 +84,10 @@ export function Team() {
         <div className="relative mx-auto max-w-[1440px] px-(--team-pad) pt-16">
           <div ref={headRef} className={`team-reveal ${headIn ? 'is-in' : ''}`}>
             <p className="font-text text-[18px] leading-none tracking-[0.1em] text-[#a4a09d] uppercase">Команда</p>
-            <h2 id="team-title" className="mt-[22px] font-display text-[40px] leading-[44px] font-normal tracking-[-0.025em] text-[#1b1919]">
+            <h2 id="team-title" className="mt-[22px] font-display text-[40px] leading-[48px] font-normal text-[#1b1919]">
               Наша <span className="text-[#9bb4ae]">команда</span>
             </h2>
-            <p className="mt-4 max-w-[540px] font-text text-[16px] leading-5 tracking-[-0.01em] text-[#585656]">
+            <p className="mt-4 max-w-[800px] font-text text-[18px] leading-[1.1] text-[#625f5e]">
               Квалифицированные специалисты, которые сопровождают вас от первой консультации до полного восстановления
             </p>
           </div>

@@ -14,7 +14,7 @@
   /* ---------- Capsule tabs: antd Segmented restyled to Figma "Вкладки / капсула" ---------- */
   .team-tabs.ant-segmented {
     position: relative;
-    border: 1px solid #e3e0de;
+    border: 1px solid #c5d7d2; /* RR Clinic/Green/200 */
     background: #fff;
   }
 
@@ -28,7 +28,7 @@
   }
 
   .team-tabs .ant-segmented-item-label {
-    padding: 0 22px;
+    padding: 0 20px; /* Figma tab: 40 px tall, 10/20 padding, Futura Medium 16 */
     font-family: var(--font-text);
     font-size: 16px;
     font-weight: 500;
@@ -111,7 +111,7 @@
 
   .team-card:hover .team-card__more,
   .team-card__more:focus-visible {
-    background-color: #567e75;
+    background-color: #497f75;
     color: #fff;
   }
 
@@ -152,8 +152,8 @@
   }
 
   .team-nav-btn:hover:not([aria-disabled='true']) {
-    background-color: #567e75;
-    box-shadow: inset 0 0 0 1px #567e75;
+    background-color: #497f75;
+    box-shadow: inset 0 0 0 1px #497f75;
     color: #fff;
   }
 

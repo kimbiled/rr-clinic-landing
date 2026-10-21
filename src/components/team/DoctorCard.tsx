@@ -73,13 +73,13 @@ export function DoctorCard({ doctor, index, onMore }: DoctorCardProps) {
         </svg>
       </a>
 
-      <div className="team-card__plate pointer-events-none absolute inset-x-[14px] bottom-[14px] rounded-[16px] px-4 pt-3.5 pb-4">
-        <h3 id={nameId} className="font-display text-[17px] leading-5 font-normal tracking-[-0.02em] text-[#1b1919]">
+      <div className="team-card__plate pointer-events-none absolute inset-x-[14px] bottom-[14px] rounded-[16px] px-6 pt-3.5 pb-4">
+        <h3 id={nameId} className="font-display text-[16px] leading-[1.2] font-medium tracking-[-0.02em] text-[#132d2d]">
           {doctor.lastName}
           <br />
           {given}
         </h3>
-        <p className="mt-2 line-clamp-3 font-text text-[13px] leading-4 text-[#7c7876]">{text.note ?? doctor.specialty}</p>
+        <p className="mt-2 line-clamp-3 font-text text-[14px] leading-[1.1] text-[#625f5e]">{text.note ?? doctor.specialty}</p>
       </div>
     </li>
   );
