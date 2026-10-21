@@ -1,5 +1,5 @@
 import { heroData } from '../../data/hero';
-import type { Doctor } from '../../data/types';
+import type { Doctor, ImageAsset } from '../../data/types';
 
 export type TeamTabId = 'surgeons' | 'brigade' | 'nurses';
 
@@ -18,9 +18,34 @@ const SURGEON_ORDER = [
   'romanovskaya-tatyana',
   'musa-baurzhan',
   'temirkhanov-amir',
-  'kodzoeva-leyla',
   'chatinyan-garik',
+  'kodzoeva-leyla',
 ];
+
+/**
+ * Team-card copy from the design: the card shows "Фамилия / Имя Отчество" and a short note, which
+ * differ from the hero data (no patronymics there). Missing entries fall back to the doctor data.
+ */
+/**
+ * Team-card cut-outs (Figma exports, transparent background — see scripts/optimize-images.sh). Kept here,
+ * not in hero.json `photo`, so the hero avatars (which fall back to `photo`) stay as they are.
+ */
+const cutout = (id: string, width: number): ImageAsset => ({ src: `assets/img/web/doctor-${id}.webp`, width, height: 750 });
+export const TEAM_PHOTOS: Record<string, ImageAsset> = {
+  'kurmanbaev-rustam': cutout('kurmanbaev-rustam', 539),
+  'romanovskaya-tatyana': cutout('romanovskaya-tatyana', 565),
+  'musa-baurzhan': cutout('musa-baurzhan', 601),
+  'temirkhanov-amir': cutout('temirkhanov-amir', 563),
+  'chatinyan-garik': cutout('chatinyan-garik', 563),
+};
+
+export const CARD_TEXT: Record<string, { patronymic?: string; note?: string }> = {
+  'kurmanbaev-rustam': { patronymic: 'Амангельдыевич', note: 'Абдоминопластика с ушиванием диастаза' },
+  'romanovskaya-tatyana': { patronymic: 'Владимировна' },
+  'musa-baurzhan': { patronymic: 'Жаннатович' },
+  'temirkhanov-amir': { patronymic: 'Багдатович' },
+  'chatinyan-garik': { note: 'Открытая и закрытая ринопластика' },
+};
 
 function orderedSurgeons(doctors: Doctor[]): Doctor[] {
   const byId = new Map(doctors.map((d) => [d.id, d]));
@@ -34,11 +59,11 @@ export const TEAM_TABS: TeamTab[] = [
   {
     id: 'surgeons',
     label: 'Пластические хирурги',
-    widthClass: 'w-[190px]',
+    widthClass: '',
     subtitle: 'Волшебники, которые воплощают мечты в реальность',
     members: orderedSurgeons(heroData.doctors),
   },
   // No data yet — rendered as an empty state inside the same layout.
-  { id: 'brigade', label: 'Операционная бригада', widthClass: 'w-[200px]', subtitle: null, members: [] },
-  { id: 'nurses', label: 'Палатные медсестры', widthClass: 'w-[179px]', subtitle: null, members: [] },
+  { id: 'brigade', label: 'Операционная бригада', widthClass: '', subtitle: null, members: [] },
+  { id: 'nurses', label: 'Палатные медсестры', widthClass: '', subtitle: null, members: [] },
 ];

@@ -1,6 +1,6 @@
-/* Sections below the hero (Stats, About, Trust) — owner FE-A.
-   Layout lives in Tailwind utilities; this file holds the shared side padding, the hairline dividers
-   and the light-background variants of the hero CtaButton. */
+/* Sections below the hero (About, Trust, Programs) — owner FE-A.
+   Layout lives in Tailwind utilities; this file holds the shared side padding, the decorative pattern,
+   the about slider, the program cards and the light-background variants of the hero CtaButton. */
 
 /* Same order as styles/index.css: whichever stylesheet loads first fixes the layer order. */
 @layer theme, base, antd, components, utilities;
@@ -11,19 +11,141 @@
     --sec-pad: min(100px, calc(100vw * 100 / 1440));
   }
 
-  /* About: hairline dividers (Neutral/100, 2 px), fading at their ends as in the design. */
-  .rr-about__vline {
-    background: linear-gradient(
-      180deg,
-      rgb(241 239 237 / 0) 0,
-      var(--color-neutral-100) 70px,
-      var(--color-neutral-100) calc(100% - 120px),
-      rgb(241 239 237 / 0) 100%
-    );
+  .rr-section :focus-visible {
+    outline-color: #8f6526; /* the global gold ring is ~2:1 on white */
   }
 
-  .rr-about__hline {
-    background: linear-gradient(90deg, var(--color-neutral-100) 50%, rgb(241 239 237 / 0) 100%);
+  /* Small spaced caps above each heading ("О КЛИНИКЕ", "АВТОРСКИЕ ПРОГРАММЫ") */
+  .rr-eyebrow {
+    font-family: var(--font-text);
+    font-size: 14px;
+    line-height: 18px;
+    letter-spacing: 0.14em;
+    text-transform: uppercase;
+    color: #a09486;
+  }
+
+  /* ---- About: arches pattern (a continuous ∩∪ line, very light), fading out towards the bottom ---- */
+  .rr-about__pattern {
+    background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='80' height='240' fill='none' stroke='%23f3efea' stroke-width='1.2'%3E%3Cpath d='M0 220a20 20 0 0 0 20-20V60a20 20 0 0 1 40 0v140a20 20 0 0 0 20 20'/%3E%3C/svg%3E");
+    background-size: 80px 240px;
+    background-position: calc(50% + 40px) -40px;
+    -webkit-mask-image: linear-gradient(180deg, #000 0%, #000 55%, transparent 100%);
+    mask-image: linear-gradient(180deg, #000 0%, #000 55%, transparent 100%);
+  }
+
+  /* ---- About: numbered slides. The active one is centred; neighbours fade out towards the edges ---- */
+  .rr-about__slider {
+    --slide-w: 640px;
+    --slide-gap: 40px;
+    overflow: hidden;
+    overflow: clip; /* never scrollable: focus, find-in-page or a click can't shift the track off-centre */
+    -webkit-mask-image: linear-gradient(90deg, transparent 0, #000 calc(50% - 400px), #000 calc(50% + 400px), transparent 100%);
+    mask-image: linear-gradient(90deg, transparent 0, #000 calc(50% - 400px), #000 calc(50% + 400px), transparent 100%);
+  }
+
+  .rr-about__track {
+    display: flex;
+    gap: var(--slide-gap);
+    width: max-content;
+    margin-left: calc(50% - var(--slide-w) / 2);
+    transform: translateX(calc(var(--slide, 0) * -1 * (var(--slide-w) + var(--slide-gap))));
+    transition: transform 800ms var(--ease-out);
+  }
+
+  .rr-about__slide {
+    flex: none;
+    width: var(--slide-w);
+    opacity: 0.32;
+    cursor: pointer;
+    transition: opacity 600ms var(--ease-out);
+  }
+
+  .rr-about__slide:not([data-active]):hover {
+    opacity: 0.55;
+  }
+
+  .rr-about__slide[data-active] {
+    opacity: 1;
+    cursor: auto;
+  }
+
+  /* Step number: grey on the side slides, gold on the active one */
+  .rr-about__num {
+    color: #9e9a97;
+    transition: color 600ms var(--ease-out);
+  }
+
+  .rr-about__slide[data-active] .rr-about__num {
+    color: #c3914d;
+  }
+
+  /* Light outline pill ("Лицензии") */
+  .rr-pill-light {
+    background: #f6f3f0;
+    box-shadow: inset 0 0 0 1px #e6dfd7;
+    transition:
+      background-color 220ms var(--ease-out),
+      box-shadow 220ms var(--ease-out),
+      transform 220ms var(--ease-out);
+  }
+
+  .rr-pill-light:hover,
+  .rr-pill-light:focus-visible {
+    background: #efe9e2;
+    box-shadow: inset 0 0 0 1px #cbbfb2;
+  }
+
+  .rr-pill-light:active {
+    transform: scale(0.98);
+  }
+
+  /* ---- Trust card ---- */
+  .rr-trust__chip {
+    background: rgb(255 255 255 / 0.2);
+    -webkit-backdrop-filter: blur(12px);
+    backdrop-filter: blur(12px);
+    box-shadow: inset 0 0 0 1px rgb(255 255 255 / 0.22);
+  }
+
+  .rr-trust__rating {
+    transition: opacity 200ms var(--ease-out);
+  }
+
+  .rr-trust__rating:hover {
+    opacity: 0.7;
+  }
+
+  /* ---- Programs: one open card (wider, deeper tone) — the first, or the hovered one ---- */
+  .rr-programs > .rr-program[data-rv-item] {
+    flex: 400 1 0;
+    min-width: 0;
+    background-color: #f5f2ef;
+    transition:
+      opacity 700ms var(--ease-out),
+      translate 700ms var(--ease-out),
+      flex-grow 700ms var(--ease-out),
+      background-color 500ms var(--ease-out);
+    transition-delay: calc(var(--rv-i, 0) * 90ms), calc(var(--rv-i, 0) * 90ms), 0s, 0s;
+  }
+
+  .rr-programs > .rr-program[data-rv-item]:first-child,
+  .rr-programs:has(> .rr-program:hover) > .rr-program[data-rv-item]:hover {
+    flex-grow: 511;
+    background-color: #d7d0c8;
+  }
+
+  .rr-programs:has(> .rr-program:hover) > .rr-program[data-rv-item]:first-child:not(:hover) {
+    flex-grow: 400;
+    background-color: #f5f2ef;
+  }
+
+  .rr-program__img {
+    transition: transform 900ms var(--ease-out);
+  }
+
+  .rr-program:hover .rr-program__img {
+    transform: scale(1.03);
   }
 
   /* ---- CtaButton on light backgrounds ---------------------------------------------------- */
@@ -33,28 +155,8 @@
     display: none;
   }
 
-  .rr-cta[data-flat]:focus-visible,
-  .rr-cta.rr-cta--light:focus-visible {
+  .rr-cta[data-flat]:focus-visible {
     outline-color: var(--color-gold-600);
-  }
-
-  /* Outline pill, grey label/border; darkens on hover. */
-  .rr-cta.rr-cta--light {
-    box-shadow: inset 0 0 0 1.5px #96918e;
-  }
-
-  .rr-cta.rr-cta--light:hover,
-  .rr-cta.rr-cta--light:focus-visible {
-    background-color: var(--color-taupe-50);
-    box-shadow: inset 0 0 0 1.5px var(--color-neutral-900);
-  }
-
-  .rr-cta.rr-cta--light .rr-cta__icon {
-    filter: brightness(0.18);
-  }
-
-  .rr-cta.rr-cta--light .rr-cta__glint {
-    opacity: 0;
   }
 
   /* Arrow hidden at rest, slides in on hover while the label shifts left (like the hero secondary). */
@@ -78,6 +180,15 @@
   }
 
   @media (prefers-reduced-motion: reduce) {
+    .rr-about__track,
+    .rr-about__slide,
+    .rr-about__num,
+    .rr-pill-light,
+    .rr-program__img,
+    .rr-programs > .rr-program[data-rv-item] {
+      transition: none;
+    }
+
     .rr-cta[data-arrow='hover'] .rr-cta__icon,
     .rr-cta[data-arrow='hover']:hover .rr-cta__label,
     .rr-cta[data-arrow='hover']:focus-visible .rr-cta__label {

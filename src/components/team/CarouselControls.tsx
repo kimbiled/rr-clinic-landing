@@ -9,28 +9,21 @@ interface CarouselControlsProps {
 function Arrow({ dir }: { dir: 'left' | 'right' }) {
   return (
     <svg
-      width="18"
-      height="18"
-      viewBox="0 0 18 18"
+      width="16"
+      height="16"
+      viewBox="0 0 16 16"
       fill="none"
       aria-hidden="true"
       className={dir === 'left' ? '-scale-x-100' : undefined}
     >
-      <path
-        d="M1 9h16M10 2l7 7-7 7"
-        stroke="currentColor"
-        strokeWidth="1.75"
-        strokeLinecap="round"
-        strokeLinejoin="round"
-      />
+      <path d="M2 8h12M9 3l5 5-5 5" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round" />
     </svg>
   );
 }
 
 /**
- * Figma "Carousel controls" 190×52: ← (48) · 66 px rule · → (44).
- * Enabled = filled gold disc (44 inside a 48 hit box); disabled = 48 outline ring with a gold arrow,
- * which is how the design shows "prev" at the start of the row. Edge buttons use aria-disabled, not disabled.
+ * Design 2026-10: two 46 px outline circles (← →) at the right end of the tabs row.
+ * Edge buttons use aria-disabled, not disabled.
  */
 export function CarouselControls({ prevDisabled, nextDisabled, onPrev, onNext, label }: CarouselControlsProps) {
   // R3-4b: `disabled` on the focused button would drop focus to <body>; aria-disabled keeps it focusable
@@ -40,11 +33,10 @@ export function CarouselControls({ prevDisabled, nextDisabled, onPrev, onNext, l
   };
 
   return (
-    <div className="team-controls relative left-px mx-auto mt-8 flex h-[52px] w-[192px] items-center" role="group" aria-label={`Навигация: ${label}`}>
+    <div className="flex items-center gap-[18px]" role="group" aria-label={`Навигация: ${label}`}>
       <button type="button" className="team-nav-btn" onClick={guard(prevDisabled, onPrev)} aria-disabled={prevDisabled} aria-label="Предыдущий врач">
         <Arrow dir="left" />
       </button>
-      <span aria-hidden="true" className="mr-3.5 ml-4 h-0.5 w-[66px] rounded-full bg-[#e1b976]" />
       <button type="button" className="team-nav-btn" onClick={guard(nextDisabled, onNext)} aria-disabled={nextDisabled} aria-label="Следующий врач">
         <Arrow dir="right" />
       </button>

@@ -14,6 +14,7 @@
 #
 # Sizing rules (see docs/data-schema.md):
 #   - card images (render ~166x182 CSS px, hover up to ~2x): long side <= 600
+#     (interview posters: larger, see their block)
 #   - case4/case7: full photos from the Figma SVG exports (see the block
 #     below); hero.json `framing` places each side on its card half.
 #   - case3/case6 face pairs: one side-by-side image -> split into
@@ -100,9 +101,15 @@ split_pair() {
 echo "RR Clinic image pipeline (cwebp=$HAS_CWEBP, q=$QUALITY) -> $OUT"
 
 echo "Cards (long side <= $CARD_MAX):"
-for f in case1-before case1-after case2-interview case5-interview case8-interview; do
+for f in case1-before case1-after; do
   fit_long "$SRC/$f.png" "$f" "$CARD_MAX"
 done
+
+echo "Interview posters (sharp on the lifted card at stage scale >1 on retina):"
+# Their framing zooms in (case2 shows 62 % of the width, case5 69 %), so 600 px left them soft.
+fit_long "$SRC/case2-interview.png" case2-interview 1024
+fit_long "$SRC/case8-interview.png" case8-interview 1024
+encode "$SRC/case5-interview.png" case5-interview 900 0
 
 echo "Full before/after photos (case4 pair, case7 before/after):"
 # Embedded PNGs of the Figma exports case{4,7}-{before,after}-figma.svg (transparent background,
@@ -131,8 +138,17 @@ echo "Avatar:"
 encode "$SRC/avatar-savelyev.png" avatar-savelyev-face 192 192 "301 304 1093 1093"
 fit_long "$SRC/avatar-savelyev.png" avatar-savelyev "$CARD_MAX"
 
+echo "Team cut-outs (alpha kept; 296x375 card -> 750 px tall @2x):"
+# Embedded PNGs of the Figma exports doctor-<id>-figma.svg (transparent background).
+for id in kurmanbaev-rustam romanovskaya-tatyana musa-baurzhan temirkhanov-amir chatinyan-garik; do
+  encode "$SRC/doctor-$id.png" "doctor-$id" 0 750
+done
+
 echo "Wide (2x display, cap $WIDE_CAP, no upscale):"
 fit_wide "$SRC/bg-columns.png" bg-columns 1440
+# trust-card = Figma "Main content container" (trust-card-figma.svg) rendered at 2x: all its layers
+# (columns, founders, statue, grid, glows) flattened into one 2480x1120 photo.
+QUALITY=85 fit_wide "$SRC/trust-card.png" trust-card 1240
 # statue-v2 = Figma "rr-statue-cool-marble-v2" (embedded 1678×937 PNG). The hero centrepiece is
 # shown upscaled on retina, so lossy artefacts read as blur: spend bytes here (q95 ≈ 95 KB).
 QUALITY=95 fit_wide "$SRC/statue-v2.png" statue 1290

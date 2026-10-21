@@ -1,24 +1,8 @@
 /* "04 / Наша команда" (owner: FE-B). Lives in @layer components: above antd, below utilities. */
 @layer components {
-  /* ---------- Decorative hairlines (Figma group 1440×733 @ y=139) ---------- */
-  .team__hline {
-    position: absolute;
-    left: 0;
-    top: 257px;
-    width: 100%;
-    height: 1px;
-    background: linear-gradient(90deg, rgb(225 185 118 / 0), rgb(225 185 118 / 0.5) 50%, rgb(225 185 118 / 0));
-    pointer-events: none;
-  }
-
-  .team__vline {
-    position: absolute;
-    left: 99px;
-    top: 139px;
-    width: 2px;
-    height: 733px;
-    background: linear-gradient(180deg, rgb(225 185 118 / 0), rgb(225 185 118 / 0.25) 50%, rgb(225 185 118 / 0));
-    pointer-events: none;
+  /* 80 px side inset at 1440 (design 2026-10), shrinking proportionally below. */
+  .team-section {
+    --team-pad: min(80px, calc(100vw * 80 / 1440));
   }
 
   /* ---------- Focus ring on this light section (R3-4c) ----------
@@ -30,7 +14,7 @@
   /* ---------- Capsule tabs: antd Segmented restyled to Figma "Вкладки / капсула" ---------- */
   .team-tabs.ant-segmented {
     position: relative;
-    border: 1px solid #f1ddbb;
+    border: 1px solid #e3e0de;
     background: #fff;
   }
 
@@ -44,7 +28,7 @@
   }
 
   .team-tabs .ant-segmented-item-label {
-    padding: 0;
+    padding: 0 22px;
     font-family: var(--font-text);
     font-size: 16px;
     font-weight: 500;
@@ -58,15 +42,15 @@
 
   /* R3-4a: the focus lands on the hidden radio input, so ring the visible item around it (WCAG 2.4.7). */
   .team-tabs .ant-segmented-item:has(.ant-segmented-item-input:focus-visible) {
-    outline: 2px solid #8f6526;
+    outline: 2px solid #2f4a44;
     outline-offset: 2px;
   }
 
   /* ---------- Doctor row (full-bleed scroller, content inset matches the 1440 grid) ---------- */
   .team-scroller {
-    --team-inset: max(132px, calc((100% - 1440px) / 2 + 132px));
-    padding-inline: var(--team-inset) 132px;
-    scroll-padding-inline: var(--team-inset) 132px;
+    --team-inset: max(var(--team-pad), calc((100% - 1440px) / 2 + var(--team-pad)));
+    padding-inline: var(--team-inset) var(--team-pad);
+    scroll-padding-inline: var(--team-inset) var(--team-pad);
     scroll-snap-type: x mandatory;
     scrollbar-width: none;
     cursor: grab;
@@ -78,7 +62,7 @@
 
   .team-scroller:focus-visible {
     outline-offset: -2px;
-    border-radius: 24px;
+    border-radius: 20px;
   }
 
   .team-scroller.is-dragging {
@@ -93,57 +77,84 @@
 
   .team-card__img {
     transition: transform 700ms var(--ease-out);
+    transform-origin: 50% 100%;
   }
 
   .team-card:hover .team-card__img {
     transform: scale(1.035);
   }
 
-  .team-card__more {
-    transition: color 200ms var(--ease-out);
+  /* Frosted name plate (white glass over the scrubs) */
+  .team-card__plate {
+    background: linear-gradient(100deg, rgb(255 255 255 / 0.78), rgb(255 255 255 / 0.55));
+    -webkit-backdrop-filter: blur(14px);
+    backdrop-filter: blur(14px);
+    box-shadow: inset 0 0 0 1px rgb(255 255 255 / 0.6);
   }
 
-  .team-card__more:hover {
-    color: #1f4d47;
+  /* ↗ link: stretched over the card, turns sage on hover */
+  .team-card__more {
+    background-color: #fff;
+    color: #7c7876;
+    transition:
+      background-color 250ms var(--ease-out),
+      color 250ms var(--ease-out);
+  }
+
+  .team-card__more::after {
+    content: '';
+    position: absolute;
+    inset: -20px -20px auto auto;
+    width: 296px;
+    height: 375px;
+  }
+
+  .team-card:hover .team-card__more,
+  .team-card__more:focus-visible {
+    background-color: #567e75;
+    color: #fff;
   }
 
   .team-card__arrow {
     transition: transform 300ms var(--ease-out);
   }
 
-  .team-card__more:hover .team-card__arrow,
+  .team-card:hover .team-card__arrow,
   .team-card__more:focus-visible .team-card__arrow {
-    transform: translateX(4px);
+    transform: translate(1px, -1px);
   }
 
   /* ---------- Empty tab ---------- */
   .team-empty {
-    --team-inset: max(132px, calc((100% - 1440px) / 2 + 132px));
+    --team-inset: max(var(--team-pad), calc((100% - 1440px) / 2 + var(--team-pad)));
     padding-left: var(--team-inset);
   }
 
-  /* ---------- Prev / next (enabled = gold disc 44, disabled = 48 outline ring) ---------- */
+  /* ---------- Prev / next: 46 px outline circles ---------- */
   .team-nav-btn {
     display: inline-flex;
     flex: none;
     align-items: center;
     justify-content: center;
-    width: 48px;
-    height: 48px;
-    border: 2px solid transparent;
+    width: 46px;
+    height: 46px;
     border-radius: 999px;
-    background: #e1b976 padding-box;
-    color: #fff;
+    background: #fff;
+    box-shadow: inset 0 0 0 1px #e3e0de;
+    color: #2e2c2c;
     cursor: pointer;
     transition:
       background-color 250ms var(--ease-out),
-      border-color 250ms var(--ease-out),
+      box-shadow 250ms var(--ease-out),
       color 250ms var(--ease-out),
+      opacity 250ms var(--ease-out),
       transform 250ms var(--ease-out);
   }
 
   .team-nav-btn:hover:not([aria-disabled='true']) {
-    background-color: #d7a561;
+    background-color: #567e75;
+    box-shadow: inset 0 0 0 1px #567e75;
+    color: #fff;
   }
 
   .team-nav-btn:active:not([aria-disabled='true']) {
@@ -152,9 +163,7 @@
 
   /* aria-disabled (not `disabled`) keeps a focused button focusable at the row's edge (R3-4b). */
   .team-nav-btn[aria-disabled='true'] {
-    border-color: #e1b976;
-    background-color: transparent;
-    color: #e1b976;
+    opacity: 0.4;
     cursor: default;
   }
 
@@ -194,6 +203,7 @@
     .team-reveal > *,
     .team-carousel .team-card,
     .team-card__img,
+    .team-card__more,
     .team-card__arrow {
       opacity: 1;
       transform: none;

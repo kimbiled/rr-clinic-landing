@@ -5,16 +5,16 @@ import { Navbar } from './components/nav/Navbar';
 import { loadSurgeonMenu } from './components/surgeon-menu/menuTrigger';
 import { SurgeonMenuFallback } from './components/surgeon-menu/SurgeonMenuFallback';
 import { About } from './components/sections/About';
-import { StatsBand } from './components/sections/StatsBand';
 import { Contacts } from './components/sections/Contacts';
 import { Trust } from './components/sections/Trust';
+import { Programs } from './components/sections/Programs';
 
 // Team is below the fold and is the only section using antd (Segmented). It is code-split AND only
 // requested when the visitor scrolls within ~800 px of it (R3-1), so antd never competes with the
-// first screen. The placeholder keeps the #doctors anchor and the section height (Figma 1011), so
+// first screen. The placeholder keeps the #doctors anchor and the section height (design 2026-10: 717), so
 // nothing shifts when it arrives and nav "Врачи" still lands in the right place.
 const Team = lazy(() => import('./components/team/Team').then((m) => ({ default: m.Team })));
-const TEAM_HEIGHT = 1011;
+const TEAM_HEIGHT = 717;
 
 function TeamPlaceholder({ sectionRef }: { sectionRef?: Ref<HTMLElement> }) {
   return <section ref={sectionRef} id="doctors" aria-label="Наша команда" style={{ minHeight: TEAM_HEIGHT, background: '#fff' }} />;
@@ -74,10 +74,10 @@ export default function App() {
       <Navbar />
       <main>
         <Hero />
-        <StatsBand />
         <About />
         <Trust />
         <DeferredTeam />
+        <Programs />
         {/* "Смотреть работы" target — the cases section is the next design to come. */}
         <section id="cases" className="page-placeholder" aria-label="Кейсы до и после">
           <p>Здесь будет блок кейсов «до/после» — следующий в очереди дизайна.</p>

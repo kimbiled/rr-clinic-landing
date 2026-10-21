@@ -1,21 +1,22 @@
-import { useCallback, useEffect, useRef, useState, type ReactNode } from 'react';
+import { useCallback, useEffect, useRef, useState, type ReactNode, type RefObject } from 'react';
 import type { Doctor } from '../../data/types';
 import { DoctorCard } from './DoctorCard';
-import { CarouselControls } from './CarouselControls';
-
-interface TeamCarouselProps {
-  doctors: Doctor[];
-  label: string;
-  inView: boolean;
-  reducedMotion: boolean;
-  onMore?: (doctor: Doctor) => boolean;
-  /** Rendered instead of the cards (empty tabs); controls stay, disabled, so the layout keeps its height. */
-  empty?: ReactNode;
-}
 
 const DRAG_THRESHOLD = 5;
 
-export function TeamCarousel({ doctors, label, inView, reducedMotion, onMore, empty }: TeamCarouselProps) {
+export interface TeamScroller {
+  scrollerRef: RefObject<HTMLDivElement | null>;
+  listRef: RefObject<HTMLUListElement | null>;
+  edges: { start: boolean; end: boolean };
+  goTo: (dir: -1 | 1 | 0) => void;
+  isEmpty: boolean;
+}
+
+/**
+ * Scroll state of the doctor row: snap-to-card stepping, edge flags for the ←/→ buttons (which live in
+ * the section header, away from the row) and mouse drag-to-scroll.
+ */
+export function useTeamScroller(doctors: Doctor[], reducedMotion: boolean): TeamScroller {
   const scrollerRef = useRef<HTMLDivElement>(null);
   const listRef = useRef<HTMLUListElement>(null);
   const [edges, setEdges] = useState({ start: true, end: true });
@@ -134,6 +135,22 @@ export function TeamCarousel({ doctors, label, inView, reducedMotion, onMore, em
     };
   }, [goTo, isEmpty]);
 
+  return { scrollerRef, listRef, edges, goTo, isEmpty };
+}
+
+interface TeamCarouselProps {
+  scroller: TeamScroller;
+  doctors: Doctor[];
+  label: string;
+  inView: boolean;
+  onMore?: (doctor: Doctor) => boolean;
+  /** Rendered instead of the cards (empty tabs), in the same footprint. */
+  empty?: ReactNode;
+}
+
+export function TeamCarousel({ scroller, doctors, label, inView, onMore, empty }: TeamCarouselProps) {
+  const { scrollerRef, listRef, goTo, isEmpty } = scroller;
+
   return (
     <div className={`team-carousel ${inView ? 'is-in' : ''}`}>
       {isEmpty ? (
@@ -163,14 +180,6 @@ export function TeamCarousel({ doctors, label, inView, reducedMotion, onMore, em
           </ul>
         </div>
       )}
-
-      <CarouselControls
-        prevDisabled={isEmpty || edges.start}
-        nextDisabled={isEmpty || edges.end}
-        onPrev={() => goTo(-1)}
-        onNext={() => goTo(1)}
-        label={label}
-      />
     </div>
   );
 }
