@@ -260,8 +260,8 @@
       "doctorId": "tulepbergenova-tomiris",
       "poster": {
         "src": "assets/img/web/case2-interview.webp",
-        "width": 600,
-        "height": 600,
+        "width": 1024,
+        "height": 1024,
         "framing": {
           "x": 0.19,
           "y": 0.055,
@@ -441,8 +441,8 @@
       "doctorId": "romanovskaya-tatyana",
       "poster": {
         "src": "assets/img/web/case8-interview.webp",
-        "width": 600,
-        "height": 600
+        "width": 1024,
+        "height": 1024
       },
       "video": null,
       "figmaNodeId": "1610:406"
@@ -456,8 +456,8 @@
       "doctorId": "temirkhanov-amir",
       "poster": {
         "src": "assets/img/web/case5-interview.webp",
-        "width": 361,
-        "height": 600,
+        "width": 900,
+        "height": 1500,
         "framing": {
           "x": 0.156,
           "y": 0.269,

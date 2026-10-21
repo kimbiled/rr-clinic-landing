@@ -82,45 +82,49 @@
     mix-blend-mode: overlay;
   }
 
-  /* Moving glint: a soft diagonal light band sweeping left → right */
+  /* Moving glint: a soft diagonal light band sweeping left → right. Wide, gently ramped and blurred
+     so no band edge reads as a shape; taller than the button and parked fully outside it at both
+     ends (−240 / +400 clear the 284 px button plus the skew), so nothing shows at the end. */
   .rr-cta__glint {
     position: absolute;
-    top: -20px;
-    bottom: -20px;
+    top: -40px;
+    bottom: -40px;
     left: 0;
     z-index: 1;
-    width: 84px;
+    width: 150px;
     pointer-events: none;
     background: linear-gradient(
       90deg,
       rgb(255 246 220 / 0) 0%,
-      rgb(255 246 220 / 0.75) 45%,
-      rgb(255 255 255 / 0.95) 50%,
-      rgb(255 246 220 / 0.75) 55%,
+      rgb(255 246 220 / 0.22) 30%,
+      rgb(255 252 240 / 0.7) 50%,
+      rgb(255 246 220 / 0.22) 70%,
       rgb(255 246 220 / 0) 100%
     );
+    filter: blur(8px);
     mix-blend-mode: overlay;
-    opacity: 0.55;
-    transform: translateX(-160px) skewX(-24deg);
+    opacity: 0.6;
+    will-change: transform;
+    transform: translateX(-240px) skewX(-20deg);
   }
 
   @keyframes rr-cta-glint-idle {
     0% {
-      transform: translateX(-160px) skewX(-24deg);
+      transform: translateX(-240px) skewX(-20deg);
       animation-timing-function: cubic-bezier(0.45, 0, 0.2, 1);
     }
     20%,
     100% {
-      transform: translateX(340px) skewX(-24deg);
+      transform: translateX(400px) skewX(-20deg);
     }
   }
 
   @keyframes rr-cta-glint-once {
     from {
-      transform: translateX(-160px) skewX(-24deg);
+      transform: translateX(-240px) skewX(-20deg);
     }
     to {
-      transform: translateX(340px) skewX(-24deg);
+      transform: translateX(400px) skewX(-20deg);
     }
   }
 

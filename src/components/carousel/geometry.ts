@@ -17,6 +17,7 @@ export const GEOM = {
   // A lifted card (photo + FRAME each side) may not overlap the centre band: the hero chips row
   // ([data-cc-keepout], measured live) or, without it, ±KEEP_OUT around the stage centre.
   KEEP_OUT: 170,
+  KEEP_OUT_SLACK: 30, // the frame may overlap the band's outer ends by this much (wider hover area)
   FRAME: 10,
 } as const;
 

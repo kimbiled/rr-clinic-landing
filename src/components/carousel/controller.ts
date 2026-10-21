@@ -265,12 +265,13 @@ export class CarouselController {
 
   /** Centre band (stage px) a lifted card's frame must stay clear of: the hero chips row. */
   private keepOut(mountLeft: number): [number, number] {
+    const s = GEOM.KEEP_OUT_SLACK;
     const band = document.querySelector('[data-cc-keepout]')?.getBoundingClientRect();
     if (band && band.width > 0) {
-      return [(band.left - mountLeft) / this.scale, (band.right - mountLeft) / this.scale];
+      return [(band.left - mountLeft) / this.scale + s, (band.right - mountLeft) / this.scale - s];
     }
     const mid = this.motion.width / 2;
-    return [mid - GEOM.KEEP_OUT, mid + GEOM.KEEP_OUT];
+    return [mid - GEOM.KEEP_OUT + s, mid + GEOM.KEEP_OUT - s];
   }
 
   // ---------- pointer ----------
