@@ -82,18 +82,20 @@
 
   /* Light outline pill ("Лицензии") */
   .rr-pill-light {
-    background: #f6f3f0;
-    box-shadow: inset 0 0 0 1px #e6dfd7;
+    background: #f5f2ef;
+    box-shadow: inset 0 0 0 1px #c7bdb2;
     transition:
       background-color 220ms var(--ease-out),
       box-shadow 220ms var(--ease-out),
+      color 220ms var(--ease-out),
       transform 220ms var(--ease-out);
   }
 
   .rr-pill-light:hover,
   .rr-pill-light:focus-visible {
     background: #efe9e2;
-    box-shadow: inset 0 0 0 1px #cbbfb2;
+    box-shadow: inset 0 0 0 1px #a99d90;
+    color: #2e2c2c;
   }
 
   .rr-pill-light:active {
@@ -101,6 +103,11 @@
   }
 
   /* ---- Trust card ---- */
+  /* Figma "Vertical trim: Cap height": the box hugs cap height → baseline, so gaps match the design */
+  .rr-trim-cap {
+    text-box: trim-both cap alphabetic;
+  }
+
   .rr-trust__chip {
     background: rgb(255 255 255 / 0.2);
     -webkit-backdrop-filter: blur(12px);
@@ -150,9 +157,18 @@
 
   /* ---- CtaButton on light backgrounds ---------------------------------------------------- */
 
-  /* Flat gold fill, no shine vectors (the glint sweep stays). */
+  /* Flat gold fill, no shine vectors (the glint sweep stays)… */
   .rr-cta[data-flat] .rr-cta__shine {
     display: none;
+  }
+
+  /* …and no inner top glow: the design's light-section CTA is a plain gold pill */
+  .rr-cta.rr-cta--primary[data-flat] {
+    box-shadow: 0 0 0 rgb(215 165 97 / 0);
+  }
+
+  .rr-cta.rr-cta--primary[data-flat]:hover {
+    box-shadow: 0 10px 28px rgb(215 165 97 / 0.35);
   }
 
   .rr-cta[data-flat]:focus-visible {

@@ -94,7 +94,7 @@ export function About() {
           </ol>
         </div>
 
-        <div className="mt-[44px] flex justify-center gap-[14px]" {...revealItem(3)}>
+        <div className="mt-[44px] flex justify-center gap-4" {...revealItem(3)}>
           {about.ctas.map((cta) =>
             cta.variant === 'primary' ? (
               <CtaButton
@@ -102,7 +102,7 @@ export function About() {
                 variant="primary"
                 href={cta.href}
                 label={cta.label}
-                className="rr-about__cta h-[50px]! w-[283px] rounded-pill! bg-none bg-[#d3b47b] font-text! text-[16px]! font-medium! tracking-[-0.01em]!"
+                className="rr-about__cta h-[58px]! w-[292px] rounded-pill! bg-none bg-[#d3b47b] font-display! text-[16px]! leading-6! font-normal! tracking-[-0.01em]!"
                 data-arrow="hover"
                 data-flat=""
               />
@@ -110,7 +110,7 @@ export function About() {
               <a
                 key={cta.label}
                 href={cta.href}
-                className="rr-pill-light inline-flex h-[50px] w-[172px] items-center justify-center rounded-pill font-text text-[16px] font-medium tracking-[-0.01em] text-neutral-900 underline decoration-1 underline-offset-[3px]"
+                className="rr-pill-light inline-flex h-[58px] w-[178px] items-center justify-center rounded-pill font-display text-[16px] leading-6 font-normal tracking-[-0.01em] text-[#504943] underline decoration-1 underline-offset-[4px]"
               >
                 {cta.label}
               </a>
