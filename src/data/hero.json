@@ -442,7 +442,13 @@
       "poster": {
         "src": "assets/img/web/case8-interview.webp",
         "width": 1024,
-        "height": 1024
+        "height": 1024,
+        "framing": {
+          "x": 0.1454,
+          "y": 0.1789,
+          "w": 0.7092,
+          "h": 0.7801
+        }
       },
       "video": null,
       "figmaNodeId": "1610:406"
