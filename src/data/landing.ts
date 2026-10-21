@@ -7,7 +7,9 @@
  * `accent` = gold text, `strong` = darker/medium text. A "\n" inside a string is a forced line break
  * (used where the design breaks a line on purpose, not because of the box width).
  */
-export type RichText = ReadonlyArray<string | { text: string; tone: 'accent' | 'strong' }>;
+export type RichText = ReadonlyArray<
+  string | { text: string; tone: 'accent' | 'strong' }
+>;
 
 export interface SectionCta {
   label: string;
@@ -119,8 +121,20 @@ export const programs: ProgramsContent = {
   title: 'Комплексные решения RR Clinic',
   text: 'Продуманные программы для тех, кто хочет максимальный результат с минимальным количеством восстановлений',
   items: [
-    { title: 'Mommy Makeover', text: 'Восстановление после родов', image: null },
-    { title: 'Симультанные операции', text: 'Два результата одновременно', image: null },
-    { title: 'Голливудский\nфейслифтинг', text: 'Подтяжка лица без рубцов', image: null },
+    {
+      title: 'Mommy Makeover',
+      text: 'Восстановление после родов',
+      image: null,
+    },
+    {
+      title: 'Симультанные операции',
+      text: 'Два результата одновременно',
+      image: null,
+    },
+    {
+      title: 'Голливудский\nфейслифтинг',
+      text: 'Подтяжка лица без рубцов',
+      image: null,
+    },
   ],
 };
