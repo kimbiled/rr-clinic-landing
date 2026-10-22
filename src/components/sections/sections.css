@@ -1,6 +1,6 @@
-/* Sections below the hero (About, Trust, Programs) — owner FE-A.
-   Layout lives in Tailwind utilities; this file holds the shared side padding, the decorative pattern,
-   the about slider, the program cards and the light-background variants of the hero CtaButton. */
+/* Sections below the hero (Trust, Programs) — owner FE-A.
+   Layout lives in Tailwind utilities; this file holds the shared side padding, the trust map, the programs
+   frame + carousel and the light-background variants of the hero CtaButton. */
 
 /* Same order as styles/index.css: whichever stylesheet loads first fixes the layer order. */
 @layer theme, base, antd, components, utilities;
@@ -23,63 +23,6 @@
     letter-spacing: 0.1em;
     text-transform: uppercase;
     color: #a4a09d; /* RR Clinic/Neutral/400 */
-  }
-
-  /* ---- About: arches pattern (Figma "Vector" 1440×434, faded towards the centre by its own gradients) ---- */
-  .rr-about__pattern {
-    /* scales with the viewport (never below the 1440 design), aspect kept */
-    background: url('/assets/img/web/about-arches.svg') top center / max(100%, 1440px) auto no-repeat;
-  }
-
-  /* White veil from the CTA row down: mutes the arches below the buttons, before the trust card */
-  .rr-about__veil {
-    background: rgb(255 255 255 / 0.6);
-  }
-
-  /* ---- About: numbered slides. The active one is centred; neighbours fade out towards the edges ---- */
-  .rr-about__slider {
-    --slide-w: 646px;
-    --slide-gap: 40px;
-    overflow: hidden;
-    overflow: clip; /* never scrollable: focus, find-in-page or a click can't shift the track off-centre */
-    -webkit-mask-image: linear-gradient(90deg, transparent 0, #000 calc(50% - 400px), #000 calc(50% + 400px), transparent 100%);
-    mask-image: linear-gradient(90deg, transparent 0, #000 calc(50% - 400px), #000 calc(50% + 400px), transparent 100%);
-  }
-
-  .rr-about__track {
-    display: flex;
-    gap: var(--slide-gap);
-    width: max-content;
-    margin-left: calc(50% - var(--slide-w) / 2);
-    transform: translateX(calc(var(--slide, 0) * -1 * (var(--slide-w) + var(--slide-gap))));
-    transition: transform 800ms var(--ease-out);
-  }
-
-  .rr-about__slide {
-    flex: none;
-    width: var(--slide-w);
-    opacity: 0.32;
-    cursor: pointer;
-    transition: opacity 600ms var(--ease-out);
-  }
-
-  .rr-about__slide:not([data-active]):hover {
-    opacity: 0.55;
-  }
-
-  .rr-about__slide[data-active] {
-    opacity: 1;
-    cursor: auto;
-  }
-
-  /* Step number: grey on the side slides, gold on the active one */
-  .rr-about__num {
-    color: #9e9a97;
-    transition: color 600ms var(--ease-out);
-  }
-
-  .rr-about__slide[data-active] .rr-about__num {
-    color: #c3914d;
   }
 
   /* Light outline pill ("Лицензии") */
@@ -117,44 +60,294 @@
     box-shadow: inset 0 0 0 1px rgb(255 255 255 / 0.22);
   }
 
-  .rr-trust__rating {
-    transition: opacity 200ms var(--ease-out);
+  /* ---- Trust map: patients' countries tinted, Kazakhstan dark; hover deepens the country + lifts its pin ---- */
+  .rr-map__country {
+    fill: #c6dcd4;
+    stroke: #fff;
+    stroke-width: 0.5;
+    stroke-linejoin: round;
+    cursor: pointer;
+    transition: fill 250ms var(--ease-out);
   }
 
-  .rr-trust__rating:hover {
-    opacity: 0.7;
+  .rr-map__country[data-country='kazakhstan'] {
+    fill: #5e8b7b;
   }
 
-  /* ---- Programs: one open card (wider, deeper tone) — the first, or the hovered one ---- */
-  .rr-programs > .rr-program[data-rv-item] {
-    flex: 400 1 0;
-    min-width: 0;
-    background-color: #f5f2ef;
+  .rr-map__country[data-active] {
+    fill: #8db6a8;
+  }
+
+  .rr-map__country[data-country='kazakhstan'][data-active] {
+    fill: #44705f;
+  }
+
+  /* Pin: anchored at the dot; the label sits above it with a small tail */
+  .rr-map__pin {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    translate: -50% calc(-100% + 2.5px);
+    cursor: pointer;
+    transition: opacity 250ms var(--ease-out);
+  }
+
+  .rr-map__pin[data-hover-only]:not([data-active]) {
+    opacity: 0;
+    pointer-events: none;
+  }
+
+  .rr-map__label {
+    position: relative;
+    padding: 5px 10px;
+    border-radius: 99px;
+    background: #fff;
+    box-shadow: 0 2px 8px rgb(46 44 44 / 0.1);
+    font-family: var(--font-text);
+    font-size: 13px;
+    line-height: 14px;
+    color: #2e2c2c;
+    white-space: nowrap;
+    transform-origin: 50% 100%;
     transition:
-      opacity 700ms var(--ease-out),
-      translate 700ms var(--ease-out),
-      flex-grow 700ms var(--ease-out),
-      background-color 500ms var(--ease-out);
-    transition-delay: calc(var(--rv-i, 0) * 90ms), calc(var(--rv-i, 0) * 90ms), 0s, 0s;
+      transform 250ms var(--ease-out),
+      background-color 250ms var(--ease-out),
+      color 250ms var(--ease-out);
   }
 
-  .rr-programs > .rr-program[data-rv-item]:first-child,
-  .rr-programs:has(> .rr-program:hover) > .rr-program[data-rv-item]:hover {
-    flex-grow: 511;
-    background-color: #d7d0c8;
+  .rr-map__label::after {
+    content: '';
+    position: absolute;
+    left: 50%;
+    top: 100%;
+    border: 4px solid transparent;
+    border-top-color: #fff;
+    translate: -50% -1px;
+    transition: border-color 250ms var(--ease-out);
   }
 
-  .rr-programs:has(> .rr-program:hover) > .rr-program[data-rv-item]:first-child:not(:hover) {
-    flex-grow: 400;
-    background-color: #f5f2ef;
+  .rr-map__dot {
+    margin-top: 7px;
+    width: 5px;
+    height: 5px;
+    border-radius: 50%;
+    background: #5e8b7b;
+    box-shadow: 0 0 0 0 rgb(94 139 123 / 0.4);
+    transition: box-shadow 250ms var(--ease-out);
   }
 
-  .rr-program__img {
-    transition: transform 900ms var(--ease-out);
+  .rr-map__pin[data-active] .rr-map__label {
+    transform: scale(1.08);
+    background: #5e8b7b;
+    color: #fff;
   }
 
-  .rr-program:hover .rr-program__img {
+  .rr-map__pin[data-active] .rr-map__label::after {
+    border-top-color: #5e8b7b;
+  }
+
+  .rr-map__pin[data-active] .rr-map__dot {
+    box-shadow: 0 0 0 5px rgb(94 139 123 / 0.25);
+  }
+
+  @media (prefers-reduced-motion: reduce) {
+    .rr-map__country,
+    .rr-map__pin,
+    .rr-map__label,
+    .rr-map__dot {
+      transition: none;
+    }
+  }
+
+  /* ---- Programs: gold grid frame (rules fade towards the edges, verticals fade out below the card) ---- */
+  .rr-programs {
+    --prog-line: #efdfc0;
+  }
+
+  .rr-programs__rule {
+    height: 1px;
+    background: linear-gradient(
+      90deg,
+      rgb(239 223 192 / 0.25),
+      var(--prog-line) 25%,
+      var(--prog-line) 75%,
+      rgb(239 223 192 / 0.25)
+    );
+  }
+
+  .rr-programs__frame::before,
+  .rr-programs__frame::after {
+    content: '';
+    position: absolute;
+    top: 0;
+    bottom: 0;
+    width: 1px;
+    background: linear-gradient(180deg, transparent, var(--prog-line) 6%, var(--prog-line) 55%, transparent 98%);
+    pointer-events: none;
+  }
+
+  .rr-programs__frame::before {
+    left: 0;
+  }
+
+  .rr-programs__frame::after {
+    right: 0;
+  }
+
+  /* "Есть другой запрос?": beige card with the Figma arches pattern (373×130, already at 5 % ink) */
+  .rr-request {
+    background: url('/assets/img/web/programs-request-bg.svg') center / 100% 100% no-repeat, #f1e7d8;
+  }
+
+  .rr-request__link {
+    transition: color 200ms var(--ease-out);
+  }
+
+  .rr-request__link:hover {
+    color: #6f5534;
+  }
+
+  /* ---- Programs carousel: slides cross-fade, the text rises in slightly after the photo ---- */
+  .rr-prog__slide {
+    isolation: isolate;
+    opacity: 0;
+    transition: opacity 800ms var(--ease-out);
+  }
+
+  .rr-prog__slide[data-active] {
+    opacity: 1;
+  }
+
+  .rr-prog__img {
     transform: scale(1.03);
+    transition: transform 1600ms var(--ease-out);
+  }
+
+  .rr-prog__slide[data-active] .rr-prog__img {
+    transform: none;
+  }
+
+  .rr-prog__text,
+  .rr-prog__ctas {
+    opacity: 0;
+    translate: 0 12px;
+    transition:
+      opacity 600ms var(--ease-out),
+      translate 600ms var(--ease-out);
+  }
+
+  .rr-prog__slide[data-active] .rr-prog__text,
+  .rr-prog__slide[data-active] .rr-prog__ctas {
+    opacity: 1;
+    translate: none;
+    transition-delay: 200ms;
+  }
+
+  .rr-prog__slide[data-active] .rr-prog__ctas {
+    transition-delay: 300ms;
+  }
+
+  .rr-prog__consult {
+    background: rgb(255 255 255 / 0.88);
+    transition:
+      background-color 220ms var(--ease-out),
+      transform 220ms var(--ease-out);
+  }
+
+  .rr-prog__consult:hover {
+    background: #fff;
+  }
+
+  .rr-prog__consult:active {
+    transform: scale(0.98);
+  }
+
+  .rr-prog__surgeon > span {
+    display: inline-block;
+    transition: transform 220ms var(--ease-out);
+  }
+
+  .rr-prog__surgeon:hover > span {
+    transform: translateX(4px);
+  }
+
+  .rr-prog__btn {
+    cursor: pointer;
+    -webkit-backdrop-filter: blur(8px);
+    backdrop-filter: blur(8px);
+    transition:
+      background-color 200ms var(--ease-out),
+      transform 200ms var(--ease-out);
+  }
+
+  .rr-prog__btn:active {
+    transform: scale(0.94);
+  }
+
+  .rr-prog__play {
+    background: rgb(62 52 46 / 0.55);
+  }
+
+  .rr-prog__play:hover {
+    background: rgb(62 52 46 / 0.75);
+  }
+
+  .rr-prog__arrow {
+    background: rgb(255 255 255 / 0.45);
+  }
+
+  .rr-prog__arrow:hover {
+    background: rgb(255 255 255 / 0.75);
+  }
+
+  .rr-prog :focus-visible {
+    outline-color: #fff;
+  }
+
+  /* Autoplay progress: the ring draws itself over one slide period */
+  .rr-prog__ring {
+    fill: none;
+    stroke: #fff;
+    stroke-width: 1.5;
+    stroke-linecap: round;
+    stroke-dasharray: 1;
+    stroke-dashoffset: 1;
+  }
+
+  /* Runs once per slide (the element is re-keyed on slide change); hover / pause freezes it in place */
+  .rr-prog__ring {
+    animation: rr-prog-ring var(--slide-ms, 7000ms) linear forwards paused;
+  }
+
+  .rr-prog__ring[data-running] {
+    animation-play-state: running;
+  }
+
+  @keyframes rr-prog-ring {
+    to {
+      stroke-dashoffset: 0;
+    }
+  }
+
+  .rr-prog__dot {
+    cursor: pointer;
+    background: #d4cdc8;
+    transition: background-color 300ms var(--ease-out);
+  }
+
+  /* 20 px hit area around the 5 px dot */
+  .rr-prog__dot::before {
+    content: '';
+    position: absolute;
+    inset: -8px;
+  }
+
+  .rr-prog__dot:hover {
+    background: #a99f97;
+  }
+
+  .rr-prog__dot[data-active] {
+    background: #7d736a;
   }
 
   /* ---- CtaButton on light backgrounds ---------------------------------------------------- */
@@ -198,12 +391,11 @@
   }
 
   @media (prefers-reduced-motion: reduce) {
-    .rr-about__track,
-    .rr-about__slide,
-    .rr-about__num,
     .rr-pill-light,
-    .rr-program__img,
-    .rr-programs > .rr-program[data-rv-item] {
+    .rr-prog__slide,
+    .rr-prog__img,
+    .rr-prog__text,
+    .rr-prog__ctas {
       transition: none;
     }
 

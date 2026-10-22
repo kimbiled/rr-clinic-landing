@@ -1,0 +1,123 @@
+/* Phone hero (design 2026-10-22, "01_Hero" 393 px). Layout is Tailwind in MobileHero / MobileCases; this file
+   holds the image placement, gradients, glass and motion. */
+
+@layer theme, base, antd, components, utilities;
+
+@layer components {
+  /* Statue at 0.426 of the 1678×937 source: head 167 px wide, centred 11 px left of the page middle */
+  .m-hero__statue {
+    left: calc(50% - 369px);
+  }
+
+  /* Columns stay visible at the top; from the chest down the picture sinks into the brown band */
+  .m-hero__shade {
+    background: linear-gradient(
+      180deg,
+      rgb(41 29 16 / 0.3) 0,
+      rgb(41 29 16 / 0) 110px,
+      rgb(68 56 46 / 0) 290px,
+      rgb(68 56 46 / 0.78) 400px,
+      #44382e 470px
+    );
+  }
+
+  /* Rating row band (below the hairline) */
+  .m-hero__band {
+    background: rgb(255 255 255 / 0.06);
+  }
+
+  .m-hero__chip {
+    background: rgb(255 255 255 / 0.16);
+    -webkit-backdrop-filter: blur(12px);
+    backdrop-filter: blur(12px);
+    box-shadow: inset 0 0 0 1px rgb(255 255 255 / 0.08);
+  }
+
+  /* The phone CTA has no arrow */
+  .m-hero__cta .rr-cta__icon {
+    display: none;
+  }
+
+  .m-hero__menu {
+    transition: transform 200ms var(--ease-out);
+  }
+
+  .m-hero__menu:active,
+  .m-hero__rating:active .m-hero__rating-arrow {
+    transform: scale(0.94);
+  }
+
+  .m-hero__rating-arrow {
+    background: rgb(255 255 255 / 0.12);
+    transition: transform 200ms var(--ease-out);
+  }
+
+  /* ---- Before / after card ---- */
+  .m-cases__slide {
+    opacity: 0;
+    transition: opacity 450ms var(--ease-out);
+  }
+
+  .m-cases__slide[data-active] {
+    opacity: 1;
+  }
+
+  .m-cases__shade {
+    background: linear-gradient(0deg, rgb(20 13 6 / 0.45), rgb(20 13 6 / 0));
+  }
+
+  @keyframes m-cases-title-in {
+    from {
+      opacity: 0;
+      transform: translateY(6px);
+    }
+  }
+
+  .m-cases__title {
+    animation: m-cases-title-in 450ms var(--ease-out) both;
+  }
+
+  .m-cases__knob {
+    background: rgb(255 255 255 / 0.18);
+    -webkit-backdrop-filter: blur(6px);
+    backdrop-filter: blur(6px);
+    box-shadow: inset 0 0 0 1px rgb(255 255 255 / 0.9);
+  }
+
+  .m-cases__card :focus-visible {
+    outline-color: #fff;
+  }
+
+  .m-cases__nav {
+    transition:
+      background-color 200ms var(--ease-out),
+      transform 200ms var(--ease-out);
+  }
+
+  .m-cases__nav:active {
+    transform: scale(0.94);
+  }
+
+  .m-cases__nav--prev {
+    color: #c9a463;
+    box-shadow: inset 0 0 0 1px #dbbb7f;
+  }
+
+  .m-cases__nav--next {
+    color: #fff;
+    background: #dbbb7f;
+  }
+
+  @media (prefers-reduced-motion: reduce) {
+    .m-cases__slide,
+    .m-cases__nav,
+    .m-hero__menu,
+    .m-hero__rating-arrow {
+      transition: none;
+    }
+
+    .m-cases__title {
+      animation: none;
+    }
+  }
+}

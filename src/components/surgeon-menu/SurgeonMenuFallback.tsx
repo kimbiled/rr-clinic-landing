@@ -25,13 +25,13 @@ export function SurgeonMenuFallback() {
 
   return createPortal(
     <div
-      className="fixed inset-0 z-(--z-menu) grid cursor-progress place-items-center bg-[rgb(41_29_16/0.72)] backdrop-blur-[24px] backdrop-saturate-[1.2]"
+      className="fixed inset-0 z-(--z-menu) grid cursor-progress place-items-center bg-white"
       onClick={() => setSurgeonMenuOpen(false)}
     >
-      <div role="status" className="flex flex-col items-center gap-4 font-text text-sm text-neutral-200/80">
+      <div role="status" className="flex flex-col items-center gap-4 font-text text-sm text-[#7b7876]">
         <span
           aria-hidden="true"
-          className="size-10 animate-spin rounded-full border-2 border-white/20 border-t-gold-400 motion-reduce:animate-none"
+          className="size-10 animate-spin rounded-full border-2 border-[#dfdddc] border-t-[#bb9358] motion-reduce:animate-none"
         />
         Загрузка…
       </div>

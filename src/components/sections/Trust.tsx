@@ -1,80 +1,19 @@
-import { useId } from 'react';
-import { asset, heroData } from '../../data/hero';
+import { asset } from '../../data/hero';
 import { trust } from '../../data/landing';
+import { CtaButton } from '../hero/CtaButton';
+import { RichText, withBreaks } from './RichText';
 import { revealItem, revealScope, useInView } from './useInView';
+import { WorldMap } from './WorldMap';
 import './sections.css';
 
-/** Five gold stars, the last one filled to the fraction of the rating (4.9 → 90 %). */
-function Stars({ value, max }: { value: number; max: number }) {
-  const clipId = useId();
-  return (
-    <span className="flex gap-0.5" aria-hidden="true">
-      {Array.from({ length: max }, (_, i) => {
-        const fill = Math.max(0, Math.min(1, value - i));
-        return (
-          <svg
-            key={i}
-            width="20"
-            height="20"
-            viewBox="0 0 16 16"
-            className="size-5"
-          >
-            {fill < 1 && (
-              <defs>
-                <clipPath id={`${clipId}-${i}`}>
-                  <rect width={16 * fill} height="16" />
-                </clipPath>
-              </defs>
-            )}
-            <path
-              d="M8 1.2l2.06 4.3 4.72.6-3.47 3.27.9 4.68L8 11.77 3.8 14.05l.9-4.68L1.22 6.1l4.72-.6z"
-              fill="#efe2cc"
-            />
-            <path
-              d="M8 1.2l2.06 4.3 4.72.6-3.47 3.27.9 4.68L8 11.77 3.8 14.05l.9-4.68L1.22 6.1l4.72-.6z"
-              fill="#e1b155"
-              clipPath={fill < 1 ? `url(#${clipId}-${i})` : undefined}
-            />
-          </svg>
-        );
-      })}
-    </span>
-  );
-}
-
 /**
- * "Почему нам доверяют" (design 2026-10): a 1240×560 photo card — the founders in front of the columns —
- * with a white panel on the left holding the headline, the reasons, four key figures and the 2GIS rating.
+ * "Нам доверяют пациенты из 14 стран" (design 2026-10-22): headline, text and four key figures on the left,
+ * the world map with the patients' countries on the right; below, the founders photo card (1240×476)
+ * with a white panel — clinic headline, text and CTAs.
  */
 export function Trust() {
   const { ref, inView } = useInView<HTMLElement>();
-  const { rating } = heroData.clinic;
-  // Design: "2ГИС •4.9" — dot decimal, one Futura Medium 14 run at 60 % ink.
-  const ratingValue = rating.value.toFixed(1);
-  const ratingLabel = `Рейтинг в 2ГИС: ${ratingValue} из ${rating.max ?? 5}`;
-
-  const ratingRow = (
-    <>
-      <img
-        src={asset(rating.logo.src)}
-        width={32}
-        height={32}
-        alt=""
-        className="size-8 rounded-[7px]"
-      />
-      <span
-        className="mr-2.5 ml-2.5 font-text text-[14px] leading-none font-medium tracking-[-0.015em] text-neutral-900/60"
-        aria-hidden="true"
-      >
-        2ГИС •{ratingValue}
-      </span>
-      <Stars value={rating.value} max={rating.max ?? 5} />
-      <span className="sr-only">
-        {ratingLabel}
-        {rating.url && ' (открывается в новой вкладке)'}
-      </span>
-    </>
-  );
+  const { card } = trust;
 
   return (
     <section
@@ -84,53 +23,28 @@ export function Trust() {
       className="rr-section relative bg-white"
       {...revealScope(inView)}
     >
-      <div className="mx-auto max-w-[1440px] px-(--sec-pad)">
-        <div
-          className="rr-trust relative isolate flex min-h-[560px] overflow-hidden rounded-[56px] bg-[#8a7562]"
-          {...revealItem(0)}
-        >
-          <img
-            src={asset(trust.photo.src)}
-            width={trust.photo.width}
-            height={trust.photo.height}
-            alt={trust.photo.alt}
-            loading="lazy"
-            decoding="async"
-            className="absolute inset-0 -z-10 size-full object-cover"
-          />
-
-          {trust.people.map((person) => (
-            <span
-              key={person.name}
-              className="rr-trust__chip absolute inline-flex h-[34px] -translate-x-1/2 items-center gap-2 rounded-pill px-4 font-text text-[14px] leading-4 whitespace-nowrap text-white"
-              style={{ left: person.left, top: person.top }}
-              aria-hidden="true"
-            >
-              <span className="size-1 rounded-full bg-white" />
-              {person.name}
-            </span>
-          ))}
-
-          {/* White panel (488 × 493 @ 34, 32) */}
-          <div className="relative my-8 ml-[34px] flex w-[487px] flex-col rounded-[24px] bg-white px-[38px] pt-8 pb-7 text-left">
+      <div className="mx-auto max-w-[1440px] px-(--sec-pad) pt-6">
+        <div className="flex items-start justify-between gap-10">
+          <div className="pt-[62px]">
             <h2
               id="trust-title"
-              className="font-display text-[36px] leading-[1.15] font-normal tracking-[-0.02em] text-neutral-900"
+              className="font-display text-[32px] leading-[1.1] font-normal tracking-[-0.02em] text-neutral-900"
+              {...revealItem(0)}
             >
               {trust.title[0]}
               <br />
-              <span className="text-[#c3914d]">{trust.title[1]}</span>
+              <span className="text-[#5e8d7e]">{trust.title[1]}</span>
             </h2>
 
-            <p className="mt-4 font-text text-[18px] leading-[1.2] text-[#625f5e]">
-              {trust.text}
+            <p className="mt-[34px] font-text text-[18px] leading-[1.25] text-[#625f5e]" {...revealItem(1)}>
+              {withBreaks(trust.text)}
             </p>
 
-            <dl className="mt-5 grid grid-cols-2 gap-x-5 gap-y-6">
+            <dl className="mt-10 grid grid-cols-[216px_216px] gap-x-5 gap-y-6" {...revealItem(2)}>
               {trust.stats.map((stat) => (
                 <div key={stat.label} className="flex flex-col gap-2.5">
                   <dt className="sr-only">{stat.label}</dt>
-                  <dd className="rr-trim-cap order-first font-display text-[36px] leading-none font-normal tracking-[-0.02em] text-neutral-900">
+                  <dd className="rr-trim-cap order-first font-display text-[36px] leading-none font-light tracking-[-0.02em] text-[#5e8d7e]">
                     {stat.value}
                   </dd>
                   <dd
@@ -142,20 +56,66 @@ export function Trust() {
                 </div>
               ))}
             </dl>
+          </div>
 
-            <div className="mt-auto pt-6">
-              <div className="h-px bg-neutral-200" aria-hidden="true" />
-              {rating.url ? (
-                <a
-                  href={rating.url}
-                  target="_blank"
-                  rel="noopener noreferrer"
-                  className="rr-trust__rating mt-4 inline-flex w-fit items-center rounded-md"
-                >
-                  {ratingRow}
-                </a>
-              ) : (
-                <p className="mt-4 flex items-center">{ratingRow}</p>
+          <WorldMap className="w-[716px] shrink-0" />
+        </div>
+
+        <div
+          className="rr-trust relative isolate mt-4 flex overflow-hidden rounded-[48px] bg-[#8a7562]"
+          {...revealItem(3)}
+        >
+          <img
+            src={asset(card.photo.src)}
+            width={card.photo.width}
+            height={card.photo.height}
+            alt={card.photo.alt}
+            loading="lazy"
+            decoding="async"
+            className="absolute inset-0 -z-10 size-full object-cover object-top"
+          />
+
+          {card.people.map((person) => (
+            <span
+              key={person.name}
+              className="rr-trust__chip absolute inline-flex h-10 -translate-x-1/2 items-center gap-2 rounded-pill px-4 font-text text-[15px] leading-4 whitespace-nowrap text-white"
+              style={{ left: person.left, top: person.top }}
+              aria-hidden="true"
+            >
+              <span className="size-1 rounded-full bg-white" />
+              {person.name}
+            </span>
+          ))}
+
+          {/* White panel (490 × 378 @ 32, 38) */}
+          <div className="relative mt-[38px] mb-[58px] ml-8 flex w-[490px] flex-col rounded-[32px] bg-white px-10 pt-[38px] pb-6 text-left">
+            <h3 className="font-display text-[32px] leading-[1.1] font-normal tracking-[-0.02em] text-neutral-900">
+              <RichText value={card.title} accentClassName="text-[#9b8c7e]" />
+            </h3>
+
+            <p className="mt-4 font-text text-[17px] leading-[23px] text-[#625f5e]">{withBreaks(card.text)}</p>
+
+            <div className="mt-[22px] flex gap-[11px]">
+              {card.ctas.map((cta) =>
+                cta.variant === 'primary' ? (
+                  <CtaButton
+                    key={cta.label}
+                    variant="primary"
+                    href={cta.href}
+                    label={cta.label}
+                    className="h-[55px]! w-[259px] rounded-pill! bg-none bg-[#c8a66b] font-display! text-[15px]! leading-6! font-normal! tracking-[-0.01em]!"
+                    data-arrow="hover"
+                    data-flat=""
+                  />
+                ) : (
+                  <a
+                    key={cta.label}
+                    href={cta.href}
+                    className="rr-pill-light inline-flex h-[55px] w-[141px] items-center justify-center rounded-pill font-display text-[15px] leading-6 font-normal tracking-[-0.01em] text-[#2e2c2c]"
+                  >
+                    {cta.label}
+                  </a>
+                ),
               )}
             </div>
           </div>

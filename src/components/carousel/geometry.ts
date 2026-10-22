@@ -65,7 +65,7 @@ export function framingStyle(framing: Framing | undefined, slot = { x: 0, w: 1 }
 }
 
 /** Shrinks `rect` around its centre to the slot aspect: a uniform "cover" crop, never a stretch. */
-function coverRect(rect: Framing, w: number, h: number, slotAspect: number): Framing {
+export function coverRect(rect: Framing, w: number, h: number, slotAspect: number): Framing {
   const rw = rect.w * w;
   const rh = rect.h * h;
   if (rw / rh > slotAspect) {

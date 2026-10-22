@@ -1,10 +1,11 @@
 import { lazy, Suspense, useEffect, useRef, useState, type Ref } from 'react';
 import { HeroProvider, useHero } from './components/hero/HeroContext';
 import { Hero } from './components/hero/Hero';
+import { MobileHero } from './components/mobile/MobileHero';
+import { useIsMobile } from './hooks/useIsMobile';
 import { Navbar } from './components/nav/Navbar';
 import { loadSurgeonMenu } from './components/surgeon-menu/menuTrigger';
 import { SurgeonMenuFallback } from './components/surgeon-menu/SurgeonMenuFallback';
-import { About } from './components/sections/About';
 import { Contacts } from './components/sections/Contacts';
 import { Trust } from './components/sections/Trust';
 import { Programs } from './components/sections/Programs';
@@ -69,12 +70,14 @@ function DeferredSurgeonMenu() {
 }
 
 export default function App() {
+  // Phones get their own hero (design "01_Hero" 393 px) with the menu button in it, instead of the
+  // 1440 stage and the navbar island. The sections below have no phone design yet.
+  const isMobile = useIsMobile();
   return (
     <HeroProvider>
-      <Navbar />
-      <main>
-        <Hero />
-        <About />
+      {!isMobile && <Navbar />}
+      <main className="max-md:overflow-x-clip">
+        {isMobile ? <MobileHero /> : <Hero />}
         <Trust />
         <DeferredTeam />
         <Programs />

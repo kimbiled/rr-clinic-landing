@@ -1,38 +1,32 @@
-import { Avatar, Button, Modal, Tag } from 'antd';
-import { useEffect, useMemo, useRef, useState, type CSSProperties, type KeyboardEvent, type MouseEvent } from 'react';
+import { Modal } from 'antd';
+import { useEffect, useRef, useState, type CSSProperties, type KeyboardEvent } from 'react';
 import { asset } from '../../data/hero';
-import { CtaButton } from '../hero/CtaButton';
+import { menu, type MenuDoctor } from '../../data/menu';
 import { useHero } from '../hero/HeroContext';
+import { useIsMobile } from '../../hooks/useIsMobile';
 import { AntdProvider } from '../../theme/AntdProvider';
-import {
-  caseCount,
-  caseCountLabel,
-  doctorInitials,
-  doctorName,
-  restoreTriggerFocus,
-  setPageInert,
-  SURGEON_MENU_ID,
-} from './menuTrigger';
+import { restoreTriggerFocus, setPageInert, SURGEON_MENU_ID } from './menuTrigger';
 import './surgeon-menu.css';
 
-// Surgeon selection menu ("Меню выбора хирурга"), design-spec §7.2 (layout PROPOSED from Figma 1565:3926 geometry).
+// Full-screen menu (design 2026-10-22, "Menu"): white page — header (logo, place, phone, close), section links
+// on the left, "Ваш запрос. Ваш хирург" doctor list on the right, help line + WhatsApp CTA at the bottom.
 // antd Modal = portal, top layer z 60, focus trap, Esc, scroll lock; we add: roving-tabindex listbox
-// (arrows / Home / End, Enter/Space selects), close on click outside any surface, focus return to the trigger.
+// (arrows / Home / End, Enter/Space selects) and focus return to the trigger.
 
-const COLS = 2;
 const LABEL_ID = `${SURGEON_MENU_ID}-doctors`;
 
-const CloseIcon = (
-  <svg viewBox="0 0 18 18" width={18} height={18} fill="none" aria-hidden="true">
-    <path d="M3 3l12 12M15 3L3 15" stroke="currentColor" strokeWidth="1.6" strokeLinecap="round" />
+const Arrow = ({ className }: { className?: string }) => (
+  <svg viewBox="0 0 20 12" width={20} height={12} fill="none" aria-hidden="true" className={className}>
+    <path d="M1 6h17M13 1.5 18 6l-5 4.5" stroke="currentColor" strokeWidth="1.3" strokeLinecap="round" strokeLinejoin="round" />
   </svg>
 );
 
 export function SurgeonMenu() {
   const { data, surgeonMenuOpen, setSurgeonMenuOpen, selectedDoctorId, selectDoctor, reducedMotion } = useHero();
-  const { doctors, clinic } = data;
-  const sections = useMemo(() => data.nav.filter((item) => item.id !== 'doctors'), [data.nav]);
-  const counts = useMemo(() => new Map(doctors.map((d) => [d.id, caseCount(d.id)])), [doctors]);
+  const { clinic } = data;
+  const doctors = menu.doctors as MenuDoctor[];
+  // Doctor grid columns (two on desktop, one on phones) — arrow-key navigation follows them.
+  const COLS = useIsMobile() ? 1 : 2;
 
   const optionRefs = useRef<(HTMLLIElement | null)[]>([]);
   const [active, setActive] = useState(0);
@@ -47,7 +41,7 @@ export function SurgeonMenu() {
 
   // On open: rove to the selected doctor (or the first) and focus it. The portal content and antd's focus
   // lock settle over a couple of frames, so try again when the open motion ends (afterOpenChange).
-  const initialIndex = () => Math.max(0, doctors.findIndex((d) => d.id === selectedDoctorId));
+  const initialIndex = () => Math.max(0, doctors.findIndex((d) => d.doctorId && d.doctorId === selectedDoctorId));
   const focusInitial = () => {
     const option = optionRefs.current[initialIndex()];
     const onOption = document.activeElement?.closest('[role="option"]');
@@ -69,8 +63,18 @@ export function SurgeonMenu() {
     optionRefs.current[index]?.focus();
   };
 
-  const choose = (doctorId: string) => {
-    selectDoctor(doctorId);
+  const scrollTo = (id: string) =>
+    document.getElementById(id)?.scrollIntoView({ behavior: reducedMotion ? 'auto' : 'smooth', block: 'start' });
+
+  // A doctor from the data filters the hero cases ("познакомьтесь с его работами"); one not in the data yet
+  // opens the team section.
+  const choose = (doctor: MenuDoctor) => {
+    if (doctor.doctorId) {
+      selectDoctor(doctor.doctorId);
+      scrollTo('hero');
+    } else {
+      scrollTo('doctors');
+    }
     close();
   };
 
@@ -100,7 +104,7 @@ export function SurgeonMenu() {
       case 'Enter':
       case ' ':
         event.preventDefault();
-        choose(doctors[i].id);
+        choose(doctors[i]);
         return;
       default:
         return;
@@ -114,7 +118,6 @@ export function SurgeonMenu() {
     focusOption(0);
   };
 
-  // The content fills the viewport, so "click outside" = a click that lands outside every surface.
   // Tab / Shift+Tab wrap inside the dialog (with #root inert there is nothing else to reach, but focus
   // could still escape to the browser chrome).
   const onTrapKeyDown = (event: KeyboardEvent<HTMLDivElement>) => {
@@ -135,11 +138,6 @@ export function SurgeonMenu() {
     }
   };
 
-  const onBackdropClick = (event: MouseEvent<HTMLDivElement>) => {
-    const target = event.target as Element;
-    if (!target.closest('[data-smenu-surface], .ant-modal-close')) close();
-  };
-
   return (
     <AntdProvider>
       <Modal
@@ -147,76 +145,95 @@ export function SurgeonMenu() {
         onCancel={close}
         afterClose={restoreTriggerFocus}
         afterOpenChange={(opened) => opened && focusInitial()}
-        title={
-          <span className="flex items-center gap-5" data-smenu-surface="">
-            <img src={asset('assets/icons/logo.svg')} width={35} height={32} alt="" className="h-8 w-[35px]" />
-            Подбор хирурга
-          </span>
-        }
+        title={null}
         footer={null}
-        closable={{ 'aria-label': 'Закрыть меню' }}
-        closeIcon={CloseIcon}
+        closable={false}
         width="100%"
         zIndex={60}
         destroyOnHidden
         keyboard
-        mask={{ enabled: true, closable: true }}
+        mask={{ enabled: true, closable: false }}
         focusable={{ trap: true, focusTriggerAfterClose: false }}
         transitionName={reducedMotion ? '' : 'smenu-panel'}
         maskTransitionName={reducedMotion ? '' : 'smenu-fade'}
-        wrapProps={{ id: SURGEON_MENU_ID }}
+        wrapProps={{ id: SURGEON_MENU_ID, 'aria-label': 'Меню' }}
         rootClassName="smenu-root"
-        className="top-0 m-0 max-w-none pb-0 font-text text-white"
+        className="top-0 m-0 max-w-none pb-0 font-text text-[#2e2c2c]"
         classNames={{
-          mask: 'bg-[rgb(41_29_16/0.72)] backdrop-blur-[24px] backdrop-saturate-[1.2]',
+          mask: 'bg-white',
           wrapper: 'overflow-y-auto overscroll-contain',
           container:
-            'mx-auto flex min-h-dvh w-[min(1280px,calc(100%-80px))] flex-col gap-8 rounded-none bg-transparent px-0 pt-6 pb-7 shadow-none',
-          header: 'm-0 flex h-[60px] items-center bg-transparent p-0',
-          title:
-            'font-display text-[14px] leading-5 font-medium tracking-[0.08em] text-neutral-200/70 uppercase',
-          close:
-            'smenu-close top-[30px] end-0 grid size-12 place-items-center rounded-full bg-glass-light text-white ' +
-            'shadow-[inset_0_0_0_1px_rgb(255_255_255/0.14)] hover:bg-white/30 hover:text-white',
-          body: 'flex flex-1 flex-col gap-8 p-0',
+            'mx-auto flex min-h-dvh w-full max-w-[1440px] flex-col rounded-none bg-transparent px-20 pt-[42px] pb-[51px] shadow-none max-md:px-4 max-md:pt-[31px] max-md:pb-8',
+          body: 'flex flex-1 flex-col p-0',
         }}
         modalRender={(node) => (
-          <div className="contents" onClick={onBackdropClick} onKeyDown={onTrapKeyDown}>
+          <div className="contents" onKeyDown={onTrapKeyDown}>
             {node}
           </div>
         )}
       >
-        <div className="grid grid-cols-[340px_1fr] items-start gap-20">
-          <nav aria-label="Разделы клиники" data-smenu-surface="">
-            <div className="mb-4 flex min-h-9 items-center text-[13px] leading-4 tracking-[0.08em] text-neutral-200/60 uppercase">
-              Клиника
-            </div>
-            <ul>
-              {sections.map((item) => (
-                <li key={item.id}>
+        {/* Header: logo · place, phone in the middle, close at the right (all on the 60 px line) */}
+        <div className="relative flex h-[42px] items-center">
+          <span
+            className="smenu-logo block h-[42px] w-[44px]"
+            role="img"
+            aria-label={clinic.name}
+          />
+          <span className="ml-[63px] text-[14px] leading-4 text-[#7b7876] uppercase max-md:hidden">{menu.place}</span>
+          <a
+            href={clinic.phoneHref}
+            className="smenu-hover absolute left-[706px] text-[14px] leading-4 text-[#7b7876] hover:text-[#bb9358] max-md:left-1/2 max-md:-translate-x-1/2"
+          >
+            {clinic.phone}
+          </a>
+          <button
+            type="button"
+            onClick={close}
+            className="smenu-close ml-auto inline-flex h-8 cursor-pointer items-center gap-2 text-[14px] leading-4 text-[#2e2c2c] hover:text-[#bb9358]"
+          >
+            {menu.close}
+            <svg viewBox="0 0 8 8" width={8} height={8} fill="none" aria-hidden="true">
+              <path d="M1 1l6 6M7 1 1 7" stroke="currentColor" strokeWidth="1.2" strokeLinecap="round" />
+            </svg>
+          </button>
+        </div>
+
+        <div className="mt-[77px] grid grid-cols-[420px_1fr] items-start max-md:mt-10 max-md:grid-cols-1 max-md:gap-12">
+          <nav aria-label="Разделы клиники">
+            <p className="text-[14px] leading-4 text-[#7b7876] uppercase">{menu.eyebrow}</p>
+            <ul className="mt-[22px] flex flex-col gap-8 max-md:mt-4 max-md:gap-4">
+              {menu.links.map((link, i) => (
+                <li key={link.href} className="smenu-in" style={{ '--i': i } as CSSProperties}>
                   <a
-                    href={item.href}
+                    href={link.href}
                     onClick={close}
-                    className="smenu-section-link block py-1 font-display text-2xl leading-8 text-white/70 hover:text-white focus-visible:text-white"
+                    className="smenu-link inline-flex items-center gap-3.5 font-display text-[28px] leading-9 font-light tracking-[-0.02em] text-[#2e2c2c] hover:text-[#bb9358] focus-visible:text-[#bb9358] max-md:text-[24px] max-md:leading-8"
                   >
-                    {item.label}
+                    {link.label}
+                    <Arrow className="smenu-arrow" />
                   </a>
                 </li>
               ))}
             </ul>
           </nav>
 
-          <section aria-labelledby={LABEL_ID} data-smenu-surface="">
-            <div className="mb-4 flex min-h-9 items-center justify-between text-[13px] leading-4 tracking-[0.08em] text-neutral-200/60 uppercase">
-              <span id={LABEL_ID}>Врачи · выберите специалиста</span>
+          <section aria-labelledby={LABEL_ID}>
+            <h2
+              id={LABEL_ID}
+              className="font-display text-[32px] leading-10 font-light tracking-[-0.02em] text-[#2e2c2c] max-md:text-[26px] max-md:leading-8"
+            >
+              {menu.title}
+            </h2>
+            <div className="mt-[19px] flex min-h-6 items-center justify-between gap-4">
+              <p className="text-[20px] leading-6 tracking-[0.01em] text-[#7b7876] max-md:text-[16px] max-md:leading-5">{menu.subtitle}</p>
               {selectedDoctorId && (
-                <Button
-                  shape="round"
+                <button
+                  type="button"
                   onClick={onReset}
-                  className="h-9 border-0 bg-white/10 px-3.5 text-[13px] tracking-[0.02em] text-white normal-case shadow-[inset_0_0_0_1px_rgb(215_165_97/0.6)] hover:bg-white/20!"
+                  className="smenu-reset cursor-pointer text-[13px] leading-4 text-[#7b7876] underline decoration-[#c9c4bf] underline-offset-2 hover:text-[#2e2c2c] hover:decoration-[#bb9358]"
                 >
-                  Сбросить <span aria-hidden="true">×</span>
-                </Button>
+                  Сбросить выбор
+                </button>
               )}
             </div>
 
@@ -224,78 +241,35 @@ export function SurgeonMenu() {
               role="listbox"
               aria-labelledby={LABEL_ID}
               aria-orientation="vertical"
-              className="grid grid-cols-2 gap-3"
+              className="mt-[25px] grid grid-cols-2 gap-x-9 max-md:mt-5 max-md:grid-cols-1"
               onKeyDown={onListKeyDown}
             >
               {doctors.map((doctor, i) => {
-                const name = doctorName(doctor);
-                const count = counts.get(doctor.id) ?? 0;
-                const countLabel = caseCountLabel(count);
-                const selected = doctor.id === selectedDoctorId;
-                const image = doctor.avatar ?? doctor.photo;
+                const selected = Boolean(doctor.doctorId) && doctor.doctorId === selectedDoctorId;
                 return (
                   <li
-                    key={doctor.id}
+                    key={doctor.name}
                     ref={(el) => {
                       optionRefs.current[i] = el;
                     }}
                     role="option"
                     tabIndex={i === active ? 0 : -1}
                     aria-selected={selected}
-                    aria-label={`${name}. ${doctor.specialty || doctor.role}. ${countLabel}`}
+                    aria-label={`${doctor.name}. ${doctor.tags.join(', ')}`}
                     onClick={() => {
                       setActive(i);
-                      choose(doctor.id);
+                      choose(doctor);
                     }}
                     onFocus={() => setActive(i)}
-                    className={
-                      'smenu-doc group relative grid min-h-[88px] cursor-pointer grid-cols-[64px_1fr_auto] items-center gap-4 rounded-md py-3 pr-3.5 pl-3 outline-none ' +
-                      'transition-[background-color,box-shadow] duration-200 ' +
-                      (selected
-                        ? 'bg-gold-400/15 shadow-[inset_0_0_0_1px_var(--color-gold-400)] focus-visible:shadow-[inset_0_0_0_1px_var(--color-gold-400),0_0_0_2px_var(--color-white)]'
-                        : 'bg-white/6 shadow-[inset_0_0_0_1px_rgb(255_255_255/0.08)] hover:bg-white/11 focus-visible:shadow-[inset_0_0_0_1px_rgb(255_255_255/0.5),0_0_0_2px_var(--color-gold-400)]')
-                    }
+                    className="smenu-doc smenu-in h-[84px] cursor-pointer max-md:h-[76px] border-t border-[#dfdddc] pt-[7px] outline-none"
                     style={{ '--i': i } as CSSProperties}
                   >
-                    <Avatar
-                      size={64}
-                      src={image ? asset(image.src) : undefined}
-                      alt=""
-                      aria-hidden="true"
-                      className="smenu-doc__avatar overflow-hidden border-0 bg-[linear-gradient(145deg,#e9dccb_0%,#baab9b_55%,#8c7660_100%)] font-display text-[22px] font-medium text-gold-950 shadow-[inset_0_0_0_1px_rgb(255_255_255/0.25)]"
-                    >
-                      {doctorInitials(doctor)}
-                    </Avatar>
-
-                    <span className="min-w-0">
-                      <span className="block font-display text-lg leading-[22px] text-white">{name}</span>
-                      <span className="mt-1 line-clamp-2 text-sm leading-[18px] text-neutral-200/70">
-                        {doctor.specialty || doctor.role}
-                      </span>
+                    <span className="smenu-doc__name inline-flex items-center gap-3 font-display text-[20px] leading-[26px] font-light">
+                      {doctor.name}
+                      <Arrow className="smenu-arrow" />
                     </span>
-
-                    <span className="flex flex-col items-end justify-between gap-2 self-stretch" aria-hidden="true">
-                      <Tag
-                        variant="filled"
-                        className={
-                          'm-0 border-0 bg-transparent p-0 text-xs leading-[14px] whitespace-nowrap ' +
-                          (count ? 'text-gold-400' : 'text-taupe-400')
-                        }
-                      >
-                        {countLabel}
-                      </Tag>
-                      {selected ? (
-                        <Tag
-                          variant="solid"
-                          className="m-0 inline-flex h-[22px] items-center rounded-pill border-0 bg-gold-400 px-2.5 text-xs text-gold-950"
-                        >
-                          Выбран
-                        </Tag>
-                      ) : (
-                        <span className="smenu-doc__arrow grid size-8 place-items-center rounded-full bg-glass-light transition-[background-color,transform] duration-200">
-                          <img src={asset('assets/icons/arrow-down-right.svg')} width={16} height={16} alt="" className="size-4" />
-                        </span>
-                      )}
+                    <span className="mt-[9px] block text-[15px] leading-[18px] text-[#615f5e]">
+                      {doctor.tags.join(' · ')}
                     </span>
                   </li>
                 );
@@ -304,27 +278,20 @@ export function SurgeonMenu() {
           </section>
         </div>
 
-        <div
-          data-smenu-surface=""
-          className="mt-auto flex min-h-[90px] items-center gap-4 rounded-md bg-glass-light py-0 pr-5 pl-8 backdrop-blur-[12px]"
-        >
-          <p className="flex-1 font-display text-xl leading-[26px]">
-            Не знаете, к кому обратиться?
-            <span className="block font-text text-sm leading-[18px] text-neutral-200/70">
-              Поможем выбрать врача под вашу задачу — бесплатно и без обязательств.
-            </span>
+        <div className="mt-auto flex items-end justify-between pt-12 max-md:flex-col max-md:items-stretch max-md:gap-5">
+          <p className="text-[23.5px] leading-[25px] text-[#2e2c2c] max-md:text-[18px] max-md:leading-[22px]">
+            {menu.help[0]}
+            <br />
+            {menu.help[1]}
           </p>
-          <CtaButton variant="primary" label="Помощь с выбором" href={clinic.phoneHref || '#contacts'} className="h-[52px] w-auto px-7" />
           <a
             href={clinic.whatsappHref || '#contacts'}
-            target="_blank"
+            target={clinic.whatsappHref ? '_blank' : undefined}
             rel="noopener noreferrer"
-            className="inline-flex h-[50px] items-center gap-2.5 rounded-pill bg-neutral-100 pr-[22px] pl-2 text-base font-medium text-neutral-900 transition-colors duration-200 hover:bg-white"
+            className="smenu-cta inline-flex h-[50px] w-[238px] max-md:w-full items-center justify-center gap-2.5 rounded-pill bg-[#eae8e8] font-display text-[14.5px] leading-6 text-[#2e2c2c] hover:bg-[#2e2c2c] hover:text-white"
           >
-            <span className="grid size-9 place-items-center rounded-full bg-white">
-              <img src={asset('assets/icons/whatsapp.svg')} width={16} height={16} alt="" className="size-4" />
-            </span>
-            Написать в WhatsApp
+            <img src={asset('assets/icons/whatsapp.svg')} width={22} height={22} alt="" className="size-[22px]" />
+            {menu.consultLabel}
           </a>
         </div>
       </Modal>

@@ -1,4 +1,4 @@
-// Copy + content for the sections below the hero (About, Trust, Programs).
+// Copy + content for the sections below the hero (Trust, Programs).
 // Edit texts here; components in src/components/sections/ only handle layout.
 // Image paths are relative to /public (resolve with `asset()` from ./hero).
 
@@ -24,16 +24,6 @@ export interface LandingImage {
   alt: string;
 }
 
-export interface AboutContent {
-  id: string;
-  eyebrow: string;
-  /** Two lines: dark, then muted. */
-  title: [string, string];
-  /** Numbered slides (01, 02, …): the active one sits in the centre, the next peeks in at the right. */
-  slides: RichText[];
-  ctas: SectionCta[];
-}
-
 export interface TrustStat {
   value: string;
   label: string;
@@ -41,20 +31,32 @@ export interface TrustStat {
 
 export interface TrustContent {
   id: string;
+  /** Two lines: dark, then green. */
   title: [string, string];
+  /** "\n" = forced line break. */
   text: string;
   stats: TrustStat[];
-  /** Full-card photo (founders in front of the columns, statue on the right). */
-  photo: LandingImage;
-  /** Name chips over the photo, positioned in % of the card. */
-  people: { name: string; left: string; top: string }[];
+  /** Founders card under the map. */
+  card: {
+    /** `accent` = muted brand name; "\n" = forced line break. */
+    title: RichText;
+    /** "\n" = forced line break. */
+    text: string;
+    ctas: SectionCta[];
+    /** Full-card photo (founders in front of the columns, statue on the right). */
+    photo: LandingImage;
+    /** Name chips over the photo, positioned in % of the card. */
+    people: { name: string; left: string; top: string }[];
+  };
 }
 
 export interface Program {
+  /** Small line above the title. */
+  kicker: string;
   title: string;
-  text: string;
-  /** null until the client supplies the photo: the card shows its tone only. */
-  image: LandingImage | null;
+  points: string[];
+  /** Full-card photo (1176×356 card; the plain left side carries the text). */
+  image: LandingImage;
 }
 
 export interface ProgramsContent {
@@ -62,57 +64,49 @@ export interface ProgramsContent {
   eyebrow: string;
   title: string;
   text: string;
+  /** "Есть другой запрос?" card at the right of the heading. */
+  request: { title: string; link: { label: string; href: string }; text: string };
+  /** Slide CTAs: WhatsApp consultation (href from the clinic data) + a link to the surgeons. */
+  consultLabel: string;
+  surgeon: { label: string; href: string };
   items: Program[];
 }
 
-export const about: AboutContent = {
-  id: 'about',
-  eyebrow: 'О клинике',
-  title: ['Клиника пластической хирургии', 'и эстетической медицины в Астане'],
-  slides: [
-    [
-      'Клиника основана одними из лучших хирургов — ',
-      { text: 'Рустамом Курманбаевым и Татьяной Романовской', tone: 'strong' },
-      '. Мы создали место, где каждый пациент получает результат мирового уровня, а хирурги имеют условия для идеальной работы.',
-    ],
-    [
-      'Полный цикл ухода: консультация, операция, реабилитация в течение года. ',
-      'Собственный стационар и команда узких специалистов обеспечивают безопасность и качество на каждом этапе.',
-    ],
-    [
-      'RR Clinic — место, где безопасность и комфорт пациента — приоритет. Все необходимые лицензии, инновационные методики и вечная поддержка — наша философия.',
-    ],
-  ],
-  ctas: [
-    // TODO(content): confirm targets with the client — no "about" page / licences viewer exists yet.
-    { label: 'Узнать больше о клинике', href: '#trust', variant: 'primary' },
-    { label: 'Лицензии', href: '#licenses', variant: 'secondary' },
-  ],
-};
-
 export const trust: TrustContent = {
   id: 'trust',
-  title: ['Почему нам доверяют', 'пациенты из 14 стран'],
-  text:
-    'К нам летят из Германии, ОАЭ, США и Израиля — и возвращаются с результатом, который говорит сам за себя. ' +
-    'Лицензия МЗ РК, собственный стационар — безопасность заложена в каждый протокол',
+  title: ['Нам доверяют пациенты', 'из 14 стран'],
+  text: 'К нам летят из Германии, ОАЭ, США и Израиля —\nи возвращаются с результатом, который говорит сам за себя',
   stats: [
     { value: '10', label: 'узких специалистов под одной крышей' },
     { value: '4', label: 'анестезиолога в штате' },
     { value: '1 год', label: 'наблюдения включён после операции' },
     { value: '1000+', label: 'довольных пациентов' },
   ],
-  photo: {
-    // Figma "Main content container" rendered at 2x (scripts/optimize-images.sh → trust-card).
-    src: 'assets/img/web/trust-card.webp',
-    width: 2480,
-    height: 1120,
-    alt: 'Основатели RR Clinic Рустам Курманбаев и Татьяна Романовская',
+  card: {
+    title: [
+      { text: 'RR Clinic', tone: 'accent' },
+      ' — клиника\nпластической хирургии\nи эстетической медицины\nв Астане',
+    ],
+    text:
+      'Рустам Курманбаев и Татьяна Романовская —\nоснователи RR Clinic. Команда профильных врачей\n' +
+      'сопровождает пациента от первой консультации\nдо восстановления после операции.',
+    ctas: [
+      // TODO(content): confirm targets with the client — no "about" page / licences viewer exists yet.
+      { label: 'Узнать больше о клинике', href: '#doctors', variant: 'primary' },
+      { label: 'Лицензии', href: '#licenses', variant: 'secondary' },
+    ],
+    photo: {
+      // Figma "Main content container" rendered at 2x (scripts/optimize-images.sh → trust-card).
+      src: 'assets/img/web/trust-card.webp',
+      width: 2480,
+      height: 1120,
+      alt: 'Основатели RR Clinic Рустам Курманбаев и Татьяна Романовская',
+    },
+    people: [
+      { name: 'Курманбаев Рустам', left: '59.3%', top: '71.6%' },
+      { name: 'Татьяна Романовская', left: '88.1%', top: '77.9%' },
+    ],
   },
-  people: [
-    { name: 'Курманбаев Рустам', left: '56%', top: '63%' },
-    { name: 'Татьяна Романовская', left: '82%', top: '77%' },
-  ],
 };
 
 export const programs: ProgramsContent = {
@@ -120,21 +114,64 @@ export const programs: ProgramsContent = {
   eyebrow: 'Авторские программы',
   title: 'Комплексные решения RR Clinic',
   text: 'Продуманные программы для тех, кто хочет максимальный результат с минимальным количеством восстановлений',
+  request: {
+    title: 'Есть другой запрос?',
+    link: { label: 'Расскажите, что хотите изменить.', href: '#contacts' },
+    text: 'Мы оценим ваш случай и обсудим возможные варианты коррекции',
+  },
+  consultLabel: 'Получить консультацию',
+  surgeon: { label: 'Выбрать хирурга', href: '#doctors' },
   items: [
     {
+      kicker: 'Восстановление после родов',
       title: 'Mommy Makeover',
-      text: 'Восстановление после родов',
-      image: null,
+      points: [
+        'Абдоминопластика — подтяжка живота',
+        'Маммопластика — восстановление груди',
+        'Липомоделирование талии',
+        'Наблюдение команды в течение года',
+        'Реабилитационные процедуры в клинике',
+      ],
+      image: {
+        src: 'assets/img/web/program-mommy-makeover.webp',
+        width: 2349,
+        height: 711,
+        alt: 'Живот после беременности с растяжками, мама держит малыша',
+      },
     },
     {
+      kicker: 'Два результата одновременно',
       title: 'Симультанные операции',
-      text: 'Два результата одновременно',
-      image: null,
+      points: [
+        'Блефаропластика + операция на теле или груди',
+        'Интимная пластика + тело или грудь',
+        'Ринопластика + маммопластика',
+        'Комбинация под ваш индивидуальный запрос',
+        'Наблюдение 1 год после операции',
+      ],
+      image: {
+        src: 'assets/img/web/program-simultaneous.webp',
+        width: 1710,
+        height: 518,
+        alt: 'Хирург во время операции',
+      },
     },
     {
-      title: 'Голливудский\nфейслифтинг',
-      text: 'Подтяжка лица без рубцов',
-      image: null,
+      kicker: 'Комплекс с сопровождением',
+      title: 'Программа для иногородних',
+      points: [
+        'Трансфер аэропорт — клиника — отель',
+        'Размещение в отеле рядом с клиникой',
+        'Закреплённая медсестра на весь период',
+        'Персональный менеджер 24/7',
+        'Удалённые осмотры после возвращения домой',
+      ],
+      image: {
+        src: 'assets/img/web/program-nonresident.webp',
+        width: 2134,
+        height: 647,
+        alt: 'Холл RR Clinic с логотипом на стене',
+      },
     },
   ],
 };

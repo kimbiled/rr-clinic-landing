@@ -1,6 +1,6 @@
-/* Surgeon menu (owner FE-3, spec §7.2): antd Modal restyled into a full-screen dark-glass overlay.
-   Only motion lives here (rc-motion class hooks + the tile stagger); everything else is Tailwind on the
-   antd semantic slots. antd sits in @layer antd, so these component-layer rules win. */
+/* Full-screen menu (owner FE-3, design 2026-10-22 "Menu"): antd Modal restyled into a white page.
+   Motion (rc-motion class hooks + the row stagger), the gold logo and hover states live here; layout is
+   Tailwind on the antd semantic slots. antd sits in @layer antd, so these component-layer rules win. */
 
 @layer theme, base, antd, components, utilities;
 
@@ -46,7 +46,7 @@
       transform 240ms ease-in;
   }
 
-  /* Doctor tiles stagger in (40 ms apart, from +120 ms) */
+  /* Links and doctor rows stagger in (40 ms apart, from +120 ms) */
   @keyframes smenu-item-in {
     from {
       opacity: 0;
@@ -54,34 +54,50 @@
     }
   }
 
-  .smenu-doc {
+  .smenu-in {
     animation: smenu-item-in 420ms var(--ease-out, cubic-bezier(0.22, 1, 0.36, 1)) both;
     animation-delay: calc(120ms + var(--i, 0) * 40ms);
   }
 
-  .smenu-doc__avatar img {
-    transition: transform 600ms var(--ease-out, ease-out);
+  /* The white logo.svg, tinted gold */
+  .smenu-logo {
+    background: #bb9358;
+    -webkit-mask: url('/assets/icons/logo.svg') center / contain no-repeat;
+    mask: url('/assets/icons/logo.svg') center / contain no-repeat;
   }
 
-  .smenu-doc:hover .smenu-doc__avatar img {
-    transform: scale(1.06);
+  /* Arrows slide right on hover / focus; doctor names turn gold */
+  .smenu-arrow {
+    flex: none;
+    transition: transform 240ms var(--ease-out, ease-out);
   }
 
-  .smenu-doc:hover .smenu-doc__arrow,
-  .smenu-doc:focus-visible .smenu-doc__arrow {
-    background: var(--color-gold-400, #d7a561);
-    transform: translate(1px, 1px);
-  }
-
-  .smenu-section-link {
+  /* Hover colours are Tailwind hover: utilities on the elements (a component-layer rule would lose to their
+     text-/bg- utilities); only the doctor name, which has no colour utility, is coloured here. */
+  .smenu-link,
+  .smenu-doc__name,
+  .smenu-hover,
+  .smenu-close,
+  .smenu-reset {
     transition:
       color 240ms var(--ease-out, ease-out),
-      transform 240ms var(--ease-out, ease-out);
+      text-decoration-color 240ms var(--ease-out, ease-out);
   }
 
-  .smenu-section-link:hover,
-  .smenu-section-link:focus-visible {
-    transform: translateX(12px);
+  .smenu-link:hover .smenu-arrow,
+  .smenu-link:focus-visible .smenu-arrow,
+  .smenu-doc:hover .smenu-arrow,
+  .smenu-doc:focus-visible .smenu-arrow {
+    transform: translateX(6px);
+  }
+
+  .smenu-doc:hover .smenu-doc__name,
+  .smenu-doc:focus-visible .smenu-doc__name {
+    color: #bb9358;
+  }
+
+  .smenu-doc:focus-visible {
+    box-shadow: inset 0 2px 0 -1px #bb9358;
   }
 
   .smenu-close svg {
@@ -92,8 +108,32 @@
     transform: rotate(90deg);
   }
 
+  /* CTA turns dark on hover; the (dark) WhatsApp glyph flips to white with it */
+  .smenu-cta {
+    transition:
+      background-color 260ms var(--ease-out, ease-out),
+      color 260ms var(--ease-out, ease-out),
+      transform 220ms var(--ease-out, ease-out);
+  }
+
+  .smenu-cta img {
+    transition: filter 260ms var(--ease-out, ease-out);
+  }
+
+  .smenu-cta:hover img {
+    filter: brightness(0) invert(1);
+  }
+
+  .smenu-cta:active {
+    transform: scale(0.98);
+  }
+
+  .smenu-root :focus-visible {
+    outline-color: #8f6526;
+  }
+
   @media (prefers-reduced-motion: reduce) {
-    .smenu-doc {
+    .smenu-in {
       animation: none;
     }
 
@@ -103,10 +143,9 @@
       transition-duration: 0ms !important;
     }
 
-    .smenu-section-link:hover,
-    .smenu-section-link:focus-visible,
+    .smenu-arrow,
     .smenu-close:hover svg {
-      transform: none;
+      transform: none !important;
     }
   }
 }
