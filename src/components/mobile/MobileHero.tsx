@@ -1,5 +1,6 @@
 import { asset } from '../../data/hero';
 import { mobileHero } from '../../data/mobileHero';
+import { ParticlesCanvas } from '../fx/ParticlesCanvas';
 import { CtaButton } from '../hero/CtaButton';
 import { useHero } from '../hero/HeroContext';
 import { openSurgeonMenu, useSurgeonMenuTrigger } from '../surgeon-menu/menuTrigger';
@@ -65,6 +66,8 @@ export function MobileHero() {
           aria-hidden="true"
         />
         <div className="m-hero__shade pointer-events-none absolute inset-0" aria-hidden="true" />
+        {/* Same gold dust as the desktop stage; z-auto keeps it under the header, text and CTA that follow */}
+        <ParticlesCanvas className="z-auto" />
 
         {/* Header: logo · phone · menu */}
         <div className="absolute inset-x-4 top-[31px] flex h-[42px] items-center justify-between">

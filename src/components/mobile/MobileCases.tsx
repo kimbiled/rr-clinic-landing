@@ -1,6 +1,6 @@
 import { useEffect, useMemo, useRef, useState, type CSSProperties, type KeyboardEvent, type PointerEvent } from 'react';
 import { asset } from '../../data/hero';
-import type { BeforeAfterCase, Case, ImageAsset } from '../../data/types';
+import type { BeforeAfterCase, Case, Framing, ImageAsset } from '../../data/types';
 import { coverRect, framingStyle } from '../carousel/geometry';
 import { useHero } from '../hero/HeroContext';
 
@@ -10,10 +10,22 @@ const HALF = { before: { x: 0, w: 0.5 }, after: { x: 0.5, w: 0.5 } } as const;
 
 const isBeforeAfter = (c: Case): c is BeforeAfterCase => c.type === 'beforeAfter';
 
-/** Image placed so its Figma crop fills its half of the card (aspect kept); the rest spills under the other half. */
+/**
+ * The Figma crops are cut for the desktop card half (100 × 220); the phone half is narrower, so "cover" would
+ * trim the sides and zoom in. Instead keep the crop's full width and grow it vertically around its centre
+ * (≈ 16 % more head and chin), staying inside the source; only when that would run off the image fall back to cover.
+ */
+function fitWidth(rect: Framing, w: number, h: number, slotAspect: number): Framing {
+  const nh = (rect.w * w) / slotAspect / h;
+  if (nh < rect.h || nh > 1) return coverRect(rect, w, h, slotAspect);
+  const y = Math.min(1 - nh, Math.max(0, rect.y - (nh - rect.h) / 2));
+  return { x: rect.x, y, w: rect.w, h: nh };
+}
+
+/** Image placed so its (widened) Figma crop fills its half of the card (aspect kept); the rest spills under the other half. */
 function sideStyle(img: ImageAsset, side: 'before' | 'after'): CSSProperties | undefined {
   if (!img.framing) return undefined;
-  return framingStyle(coverRect(img.framing, img.width, img.height, CARD_ASPECT / 2), HALF[side]);
+  return framingStyle(fitWidth(img.framing, img.width, img.height, CARD_ASPECT / 2), HALF[side]);
 }
 
 const ArrowIcon = ({ dir }: { dir: -1 | 1 }) => (
