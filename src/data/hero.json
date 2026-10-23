@@ -59,19 +59,9 @@
       "href": "#doctors"
     },
     {
-      "id": "cases",
-      "label": "До/после",
-      "href": "#cases"
-    },
-    {
       "id": "prices",
       "label": "Цены",
       "href": "#prices"
-    },
-    {
-      "id": "contacts",
-      "label": "Контакты",
-      "href": "#contacts"
     }
   ],
   "hero": {

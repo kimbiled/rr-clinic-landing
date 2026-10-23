@@ -1,6 +1,5 @@
 import { useRef, type MouseEvent } from 'react';
 import { asset } from '../../data/hero';
-import { openSurgeonMenu, useSurgeonMenuTrigger } from '../surgeon-menu/menuTrigger';
 import { CtaButton } from './CtaButton';
 import { HeroChips } from './HeroChips';
 import { useHero } from './HeroContext';
@@ -39,12 +38,11 @@ function splitSubtitle(subtitle: string): string[] {
  * of the 720 stage. The layer is pointer-events:none; only [data-interactive] children catch the pointer.
  */
 export function HeroContent() {
-  const { data, reducedMotion, startReveal, surgeonMenuOpen, setSurgeonMenuOpen } = useHero();
-  const { hero } = data;
+  const { data, reducedMotion, startReveal } = useHero();
+  const { hero, clinic } = data;
   const primary = hero.ctas.find((c) => c.variant === 'primary');
   const secondary = hero.ctas.find((c) => c.variant === 'secondary');
-  const primaryRef = useRef<HTMLButtonElement>(null);
-  const menuTrigger = useSurgeonMenuTrigger('cta', surgeonMenuOpen);
+  const primaryRef = useRef<HTMLAnchorElement>(null);
 
   const { idle } = useHeroReveal({ reducedMotion, bgSrc: asset(hero.background.src), startReveal });
 
@@ -96,8 +94,10 @@ export function HeroContent() {
               label={primary.label}
               idle={idle}
               data-cta={primary.id}
-              {...menuTrigger}
-              onClick={(e) => openSurgeonMenu(e.currentTarget, setSurgeonMenuOpen, 'cta')}
+              // "Подобрать специалиста" is a WhatsApp chat now; the surgeon menu lives behind the navbar "Меню".
+              href={clinic.whatsappHref || primary.href}
+              target={clinic.whatsappHref ? '_blank' : undefined}
+              rel="noopener noreferrer"
             />
           </span>
         )}

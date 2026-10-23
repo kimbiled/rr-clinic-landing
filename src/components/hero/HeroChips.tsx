@@ -65,7 +65,7 @@ export function HeroChips({ resetFocusRef }: { resetFocusRef: RefObject<HTMLElem
   const name = shown ? doctorName(shown) : '';
 
   const onReset = () => {
-    // m-2: the chip hides itself, so hand keyboard focus to the CTA that opens the menu.
+    // m-2: the chip hides itself, so hand keyboard focus to the primary CTA.
     if (document.activeElement === chipRef.current) resetFocusRef.current?.focus();
     selectDoctor(null);
   };

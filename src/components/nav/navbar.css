@@ -154,70 +154,67 @@
     border-radius: 2px;
   }
 
-  /* ---------- "Связаться" + WhatsApp (Figma 1610:487 / 1610:489) ---------- */
-  .rr-nav__contact,
-  .rr-nav__wa {
-    transition:
-      background-color 200ms var(--nav-ease),
-      transform 200ms var(--nav-ease);
+  /* ---------- "Меню" pill: the links pill's glass + a hairline ---------- */
+  .rr-nav__menu-btn {
+    background:
+      linear-gradient(rgb(255 255 255 / 0.2), rgb(255 255 255 / 0.2)),
+      rgb(41 29 16 / var(--nav-pill-tint, 0.3));
+    -webkit-backdrop-filter: blur(var(--glass-blur, 12px));
+    backdrop-filter: blur(var(--glass-blur, 12px));
+    box-shadow: inset 0 0 0 1px rgb(255 255 255 / 0.22);
+    cursor: pointer;
   }
 
-  .rr-nav__contact:hover {
-    background: #fff;
-    transform: translateY(-1px);
-  }
-
-  .rr-nav__wa:hover {
-    background: #fff;
-  }
-
-  .rr-nav__wa img {
+  .rr-nav__menu-btn svg {
     transition: transform 200ms var(--nav-ease);
   }
 
-  .rr-nav__wa:hover img {
+  .rr-nav__menu-btn:hover {
+    background:
+      linear-gradient(rgb(255 255 255 / 0.3), rgb(255 255 255 / 0.3)),
+      rgb(41 29 16 / var(--nav-pill-tint, 0.3));
+  }
+
+  .rr-nav__menu-btn:hover svg {
+    transform: scaleX(0.85);
+    transform-origin: 0 50%;
+  }
+
+  .rr-nav__menu-btn:active {
+    scale: 0.97;
+  }
+
+  /* ---------- "Связаться" + WhatsApp: one button (pill fused with the disc) ---------- */
+  .rr-nav__contact-pill,
+  .rr-nav__contact-wa {
+    background: var(--color-neutral-100, #f0efee);
+    transition: background-color 200ms var(--nav-ease);
+  }
+
+  .rr-nav__contact {
+    transition: scale 200ms var(--nav-ease);
+  }
+
+  .rr-nav__contact:hover .rr-nav__contact-pill,
+  .rr-nav__contact:hover .rr-nav__contact-wa {
+    background: #fff;
+  }
+
+  .rr-nav__contact img {
+    transition: transform 200ms var(--nav-ease);
+  }
+
+  .rr-nav__contact:hover img {
     transform: rotate(-8deg);
   }
 
-  .rr-nav__contact:active,
-  .rr-nav__wa:active {
-    transform: scale(0.97);
+  .rr-nav__contact:active {
+    scale: 0.97;
   }
 
-  /* WhatsApp tooltip (replaces antd Tooltip, N2-4): shows on hover after 400 ms, or on keyboard focus */
-  .rr-nav__tip {
-    position: absolute;
-    top: calc(100% + 10px);
-    left: 50%;
-    padding: 6px 10px;
-    border-radius: 8px;
-    background: rgb(41 29 16 / 0.92);
-    box-shadow: 0 6px 16px rgb(20 13 6 / 0.3);
-    color: #fff;
-    font-size: 13px;
-    line-height: 16px;
-    font-weight: 400;
-    white-space: nowrap;
-    pointer-events: none;
-    opacity: 0;
-    visibility: hidden;
-    transform: translate(-50%, -4px);
-    transition:
-      opacity 160ms var(--nav-ease),
-      transform 160ms var(--nav-ease),
-      visibility 0s linear 160ms;
-  }
-
-  .rr-nav__wa:hover .rr-nav__tip,
-  .rr-nav__wa:focus-visible .rr-nav__tip {
-    opacity: 1;
-    visibility: visible;
-    transform: translate(-50%, 0);
-    transition-delay: 400ms, 400ms, 0s;
-  }
-
-  .rr-nav__wa:focus-visible .rr-nav__tip {
-    transition-delay: 0s;
+  .rr-nav__contact:focus-visible {
+    outline-offset: 3px;
+    border-radius: 20px;
   }
 
   @media (prefers-reduced-motion: reduce) {

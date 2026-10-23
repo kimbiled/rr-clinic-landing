@@ -184,17 +184,4 @@
     background: var(--color-gold-950);
     filter: blur(200px);
   }
-
-  /* Placeholder below the hero (scroll room to test the navbar island) */
-  .page-placeholder {
-    min-height: 60vh;
-    padding: 120px var(--nav-pad-x);
-    background: var(--color-taupe-50);
-    color: #5c5752;
-    font-family: var(--font-display);
-  }
-
-  .page-placeholder p {
-    max-width: 560px;
-  }
 }

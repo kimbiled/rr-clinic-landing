@@ -150,6 +150,45 @@
     box-shadow: 0 0 0 5px rgb(94 139 123 / 0.25);
   }
 
+  /* Reveal: each country pill rises into place with a slight overshoot, lowest first (--pin-d, WorldMap.tsx).
+     Hover transitions stay undelayed. */
+  @media (prefers-reduced-motion: no-preference) {
+    [data-rv] .rr-map__label,
+    [data-rv] .rr-map__dot {
+      translate: 0 0;
+      transition:
+        transform 250ms var(--ease-out),
+        background-color 250ms var(--ease-out),
+        color 250ms var(--ease-out),
+        box-shadow 250ms var(--ease-out),
+        opacity 500ms var(--ease-out) var(--pin-d, 0ms),
+        translate 800ms cubic-bezier(0.34, 1.45, 0.64, 1) var(--pin-d, 0ms);
+    }
+
+    [data-rv='out'] .rr-map__label {
+      opacity: 0;
+      translate: 0 18px;
+    }
+
+    [data-rv='out'] .rr-map__dot {
+      opacity: 0;
+    }
+  }
+
+  /* Trust card title: line-by-line rise out of a mask (Trust.tsx, data-lines) */
+  @media (prefers-reduced-motion: no-preference) {
+    .rr-lines [data-line] {
+      transition:
+        translate 900ms var(--ease-out) calc(150ms + var(--ln-i, 0) * 110ms),
+        opacity 700ms var(--ease-out) calc(150ms + var(--ln-i, 0) * 110ms);
+    }
+
+    .rr-lines[data-lines='out'] [data-line] {
+      translate: 0 110%;
+      opacity: 0;
+    }
+  }
+
   @media (prefers-reduced-motion: reduce) {
     .rr-map__country,
     .rr-map__pin,

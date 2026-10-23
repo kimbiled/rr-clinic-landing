@@ -27,6 +27,7 @@ const ISLAND = {
   padL: 22,
   padR: 8,
   logoGap: 18,
+  menuBtnGap: 8, // "Меню" pill → links
   linkGap: 20,
   menuPad: 4,
   dividerL: 20,
@@ -41,6 +42,7 @@ interface Geo {
   rowLeft: number;
   rowWidth: number;
   logoDx: number;
+  menuBtnDx: number;
   linkDx: number[];
   menuDx: number;
   menuScale: number;
@@ -75,6 +77,7 @@ export function Navbar() {
   const rowRef = useRef<HTMLDivElement>(null);
   const surfaceRef = useRef<HTMLDivElement>(null);
   const logoRef = useRef<HTMLAnchorElement>(null);
+  const menuBtnRef = useRef<HTMLButtonElement>(null);
   const menuRef = useRef<HTMLElement>(null);
   const actionsRef = useRef<HTMLDivElement>(null);
   const linkRefs = useRef<(HTMLElement | null)[]>([]);
@@ -102,10 +105,11 @@ export function Navbar() {
   const measure = useCallback(() => {
     const row = rowRef.current;
     const logo = logoRef.current;
+    const menuBtn = menuBtnRef.current;
     const menu = menuRef.current;
     const actions = actionsRef.current;
     const links = linkRefs.current.filter((el): el is HTMLElement => !!el);
-    if (!row || !logo || !menu || !actions || !links.length) return;
+    if (!row || !logo || !menuBtn || !menu || !actions || !links.length) return;
 
     // offset* ignore transforms, so this is always the expanded layout.
     const vw = document.documentElement.clientWidth;
@@ -116,6 +120,8 @@ export function Navbar() {
       ISLAND.padL +
       logo.offsetWidth +
       ISLAND.logoGap +
+      menuBtn.offsetWidth +
+      ISLAND.menuBtnGap +
       menuIslandW +
       ISLAND.dividerL +
       ISLAND.dividerW +
@@ -125,7 +131,8 @@ export function Navbar() {
     const left = Math.round((vw - width) / 2);
 
     const logoX = left + ISLAND.padL;
-    const menuX = logoX + logo.offsetWidth + ISLAND.logoGap;
+    const menuBtnX = logoX + logo.offsetWidth + ISLAND.logoGap;
+    const menuX = menuBtnX + menuBtn.offsetWidth + ISLAND.menuBtnGap;
     const menuExpandedX = rowLeft + leftIn(menu, row);
     let x = menuX + ISLAND.menuPad;
     const linkDx = links.map((a, i) => {
@@ -142,6 +149,7 @@ export function Navbar() {
       rowLeft,
       rowWidth: row.offsetWidth,
       logoDx: logoX - (rowLeft + leftIn(logo, row)),
+      menuBtnDx: menuBtnX - (rowLeft + leftIn(menuBtn, row)),
       linkDx,
       menuDx: menuX - menuExpandedX,
       menuScale: menuIslandW / menu.offsetWidth,
@@ -302,7 +310,24 @@ export function Navbar() {
           </a>
         </div>
 
+        {/* "Меню": opens the full-screen menu; same glass as the links pill */}
         <div className="ml-[29px] flex-none" data-reveal="nav">
+          <button
+            ref={menuBtnRef}
+            type="button"
+            className="rr-nav__flip rr-nav__menu-btn pointer-events-auto flex h-10 items-center gap-2 rounded-pill pr-[18px] pl-4 font-medium whitespace-nowrap text-white"
+            style={tx(geo?.menuBtnDx, island)}
+            {...menuTrigger}
+            onClick={(e) => openSurgeonMenu(e.currentTarget, setSurgeonMenuOpen, 'nav')}
+          >
+            <svg viewBox="0 0 18 12" width={18} height={12} fill="none" aria-hidden="true">
+              <path d="M1 1h16M1 6h16M1 11h10" stroke="currentColor" strokeWidth="1.4" strokeLinecap="round" />
+            </svg>
+            Меню
+          </button>
+        </div>
+
+        <div className="ml-2 flex-none" data-reveal="nav">
           <nav ref={menuRef} aria-label="Основное меню" className="relative flex h-10 items-center px-4">
             <span
               className="rr-nav__menu-bg absolute inset-0 rounded-md"
@@ -352,23 +377,17 @@ export function Navbar() {
 
         <div className="flex-none" data-reveal="nav">
           <div ref={actionsRef} className="rr-nav__flip pointer-events-auto flex items-center" style={tx(geo?.actionsDx, island)}>
-            <a
-              href="#contacts"
-              className="rr-nav__contact inline-flex h-10 items-center rounded-pill bg-neutral-100 px-4 font-medium whitespace-nowrap text-neutral-900"
-            >
-              Связаться
-            </a>
-            {/* N2-4: CSS tooltip (no antd on the first-paint path); the link's aria-label carries the name. */}
+            {/* One button: the "Связаться" pill fused with the WhatsApp disc, both open WhatsApp. */}
             <a
               href={clinic.whatsappHref}
               target="_blank"
               rel="noopener noreferrer"
-              aria-label="Написать в WhatsApp"
-              className="rr-nav__wa relative z-[1] ml-2 grid size-10 place-items-center rounded-full bg-neutral-100"
+              aria-label="Связаться в WhatsApp"
+              className="rr-nav__contact flex h-10 items-center font-medium whitespace-nowrap text-neutral-900"
             >
-              <img src={asset('assets/icons/whatsapp.svg')} width={16} height={16} alt="" className="size-4" />
-              <span className="rr-nav__tip" aria-hidden="true">
-                Написать в WhatsApp
+              <span className="rr-nav__contact-pill flex h-full items-center rounded-[14px] pr-[18px] pl-4">Связаться</span>
+              <span className="rr-nav__contact-wa -ml-1 grid size-10 place-items-center rounded-full">
+                <img src={asset('assets/icons/whatsapp.svg')} width={16} height={16} alt="" className="size-4" />
               </span>
             </a>
           </div>

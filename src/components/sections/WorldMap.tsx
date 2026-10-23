@@ -1,9 +1,12 @@
-import { useState } from 'react';
+import { useState, type CSSProperties } from 'react';
 import { asset } from '../../data/hero';
 import { worldMap } from '../../data/worldMap';
 
 /** Countries without a label in the design: their pin only appears while the country is hovered. */
 const HOVER_ONLY = new Set(['kazakhstan']);
+/** Reveal (Trust section data-rv): the pills rise in one by one, lowest on the map first. */
+const PIN_REVEAL_START_MS = 450;
+const PIN_REVEAL_STEP_MS = 140;
 
 /**
  * Trust world map: the static base (every other country) as an <img>, the patients' countries + Kazakhstan
@@ -12,6 +15,10 @@ const HOVER_ONLY = new Set(['kazakhstan']);
 export function WorldMap({ className }: { className?: string }) {
   const [active, setActive] = useState<string | null>(null);
   const { countries } = worldMap;
+  const revealOrder = countries
+    .filter((c) => !HOVER_ONLY.has(c.key))
+    .sort((a, b) => b.y - a.y)
+    .map((c) => c.key);
   // Back to default as soon as the pointer leaves the country or its pin. Moving country → own pin fires
   // leave + enter in the same tick, so React batches them and the highlight doesn't flicker.
   const leave = () => setActive(null);
@@ -51,7 +58,13 @@ export function WorldMap({ className }: { className?: string }) {
         <span
           key={c.key}
           className="rr-map__pin absolute"
-          style={{ left: `${c.x}%`, top: `${c.y}%` }}
+          style={
+            {
+              left: `${c.x}%`,
+              top: `${c.y}%`,
+              '--pin-d': `${PIN_REVEAL_START_MS + Math.max(0, revealOrder.indexOf(c.key)) * PIN_REVEAL_STEP_MS}ms`,
+            } as CSSProperties
+          }
           data-hover-only={HOVER_ONLY.has(c.key) || undefined}
           data-active={active === c.key || undefined}
           onPointerEnter={() => setActive(c.key)}

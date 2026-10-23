@@ -116,7 +116,8 @@ export const programs: ProgramsContent = {
   text: 'Продуманные программы для тех, кто хочет максимальный результат с минимальным количеством восстановлений',
   request: {
     title: 'Есть другой запрос?',
-    link: { label: 'Расскажите, что хотите изменить.', href: '#contacts' },
+    // Opens WhatsApp when the clinic has one (Programs.tsx); this anchor is only the fallback.
+    link: { label: 'Расскажите, что хотите изменить.', href: '#doctors' },
     text: 'Мы оценим ваш случай и обсудим возможные варианты коррекции',
   },
   consultLabel: 'Получить консультацию',

@@ -6,7 +6,6 @@ import { useIsMobile } from './hooks/useIsMobile';
 import { Navbar } from './components/nav/Navbar';
 import { loadSurgeonMenu } from './components/surgeon-menu/menuTrigger';
 import { SurgeonMenuFallback } from './components/surgeon-menu/SurgeonMenuFallback';
-import { Contacts } from './components/sections/Contacts';
 import { Trust } from './components/sections/Trust';
 import { Programs } from './components/sections/Programs';
 
@@ -81,11 +80,6 @@ export default function App() {
         <Trust />
         <DeferredTeam />
         <Programs />
-        {/* "Смотреть работы" target — the cases section is the next design to come. */}
-        <section id="cases" className="page-placeholder" aria-label="Кейсы до и после">
-          <p>Здесь будет блок кейсов «до/после» — следующий в очереди дизайна.</p>
-        </section>
-        <Contacts />
       </main>
       <DeferredSurgeonMenu />
     </HeroProvider>

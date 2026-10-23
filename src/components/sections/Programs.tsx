@@ -90,7 +90,12 @@ export function Programs() {
             >
               <h3 className="font-display text-[26.5px] leading-[32px] font-light tracking-[-0.03em] text-[#8b6a3e]">{request.title}</h3>
               <p className="mt-[9px] font-text text-[16px] leading-[17px] tracking-[-0.02em] text-[#8c7a66]">
-                <a href={request.link.href} className="rr-request__link underline decoration-1 underline-offset-2">
+                <a
+                  href={heroData.clinic.whatsappHref || request.link.href}
+                  target={heroData.clinic.whatsappHref ? '_blank' : undefined}
+                  rel="noopener noreferrer"
+                  className="rr-request__link underline decoration-1 underline-offset-2"
+                >
                   {request.link.label}
                 </a>{' '}
                 {request.text}

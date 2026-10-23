@@ -1,10 +1,66 @@
+import { useEffect, useState, type CSSProperties } from 'react';
 import { asset } from '../../data/hero';
-import { trust } from '../../data/landing';
+import { trust, type RichText as RichTextValue } from '../../data/landing';
 import { CtaButton } from '../hero/CtaButton';
 import { RichText, withBreaks } from './RichText';
 import { revealItem, revealScope, useInView } from './useInView';
 import { WorldMap } from './WorldMap';
 import './sections.css';
+
+const COUNT_FROM = 0.1; // "1000+" starts at 100+
+const COUNT_DELAY_MS = 250;
+const COUNT_MS = 1800;
+const easeOutCubic = (t: number) => 1 - (1 - t) ** 3;
+const prefersReducedMotion = () =>
+  typeof window !== 'undefined' && window.matchMedia('(prefers-reduced-motion: reduce)').matches;
+
+/** A "1000+"-style figure counts up from a tenth of its value once it scrolls into view; anything else renders as is. */
+function StatValue({ value }: { value: string }) {
+  const match = /^(\d+)(\+?)$/.exec(value);
+  const to = match ? Number(match[1]) : 0;
+  const suffix = match?.[2] ?? '';
+  const from = Math.round(to * COUNT_FROM);
+  const { ref, inView } = useInView<HTMLSpanElement>();
+  const [n, setN] = useState(() => (prefersReducedMotion() ? to : from));
+
+  useEffect(() => {
+    if (!suffix || !inView || prefersReducedMotion()) return undefined;
+    let raf = 0;
+    let start = 0;
+    const tick = (now: number) => {
+      if (!start) start = now;
+      const t = Math.min(1, Math.max(0, (now - start - COUNT_DELAY_MS) / COUNT_MS));
+      setN(Math.round(from + (to - from) * easeOutCubic(t)));
+      if (t < 1) raf = requestAnimationFrame(tick);
+    };
+    raf = requestAnimationFrame(tick);
+    return () => cancelAnimationFrame(raf);
+  }, [inView, from, to, suffix]);
+
+  if (!suffix) return <>{value}</>;
+  return (
+    <span ref={ref}>
+      <span aria-hidden="true">
+        {n}
+        {suffix}
+      </span>
+      <span className="sr-only">{value}</span>
+    </span>
+  );
+}
+
+/** Splits a RichText value at its "\n"s into one RichText per line (accent/strong fragments keep their tone). */
+function richLines(value: RichTextValue): RichTextValue[] {
+  const lines: (RichTextValue[number])[][] = [[]];
+  for (const part of value) {
+    const text = typeof part === 'string' ? part : part.text;
+    text.split('\n').forEach((chunk, i) => {
+      if (i > 0) lines.push([]);
+      if (chunk) lines[lines.length - 1].push(typeof part === 'string' ? chunk : { ...part, text: chunk });
+    });
+  }
+  return lines;
+}
 
 /**
  * "Нам доверяют пациенты из 14 стран" (design 2026-10-22): headline, text and four key figures on the left,
@@ -13,6 +69,7 @@ import './sections.css';
  */
 export function Trust() {
   const { ref, inView } = useInView<HTMLElement>();
+  const panel = useInView<HTMLDivElement>();
   const { card } = trust;
 
   return (
@@ -45,7 +102,7 @@ export function Trust() {
                 <div key={stat.label} className="flex flex-col gap-2.5">
                   <dt className="sr-only">{stat.label}</dt>
                   <dd className="rr-trim-cap order-first font-display text-[36px] leading-none font-light tracking-[-0.02em] text-[#5e8d7e]">
-                    {stat.value}
+                    <StatValue value={stat.value} />
                   </dd>
                   <dd
                     className="rr-trim-cap max-w-[195.5px] font-text text-[16px] leading-none tracking-[-0.02em] text-[#625f5e]"
@@ -88,14 +145,27 @@ export function Trust() {
           ))}
 
           {/* White panel (490 × 378 @ 32, 38) */}
-          <div className="relative mt-[38px] mb-[58px] ml-8 flex w-[490px] flex-col rounded-[32px] bg-white px-10 pt-[38px] pb-6 text-left">
-            <h3 className="font-display text-[32px] leading-[1.1] font-normal tracking-[-0.02em] text-neutral-900">
-              <RichText value={card.title} accentClassName="text-[#9b8c7e]" />
+          <div
+            ref={panel.ref}
+            className="relative mt-[38px] mb-[58px] ml-8 flex w-[490px] flex-col rounded-[32px] bg-white px-10 pt-[38px] pb-6 text-left"
+          >
+            {/* Each line rises out of its own mask once the panel is in view */}
+            <h3
+              className="rr-lines font-display text-[32px] leading-[1.1] font-normal tracking-[-0.02em] text-neutral-900"
+              data-lines={panel.inView ? 'in' : 'out'}
+            >
+              {richLines(card.title).map((line, i) => (
+                <span key={i} className="-mx-1 -mb-2 block overflow-hidden px-1 pb-2">
+                  <span className="block" data-line="" style={{ '--ln-i': i } as CSSProperties}>
+                    <RichText value={line} accentClassName="text-[#9b8c7e]" />
+                  </span>
+                </span>
+              ))}
             </h3>
 
             <p className="mt-4 font-text text-[17px] leading-[23px] text-[#625f5e]">{withBreaks(card.text)}</p>
 
-            <div className="mt-[22px] flex gap-[11px]">
+            <div className="mt-[22px] -ml-2 flex gap-[11px]">
               {card.ctas.map((cta) =>
                 cta.variant === 'primary' ? (
                   <CtaButton
