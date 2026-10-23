@@ -2,6 +2,7 @@ import { useCallback, useEffect, useLayoutEffect, useRef, useState, type CSSProp
 import { asset } from '../../data/hero';
 import { useHero } from '../hero/HeroContext';
 import { openSurgeonMenu, useSurgeonMenuTrigger } from '../surgeon-menu/menuTrigger';
+import { onAnchorClick, smoothScrollTo } from './smoothScroll';
 import './navbar.css';
 
 // Navbar (owner FE-3). Expanded bar (Figma 1610:466) ⇄ centred dark-glass island on scroll (spec §2.2, §9.6).
@@ -262,7 +263,7 @@ export function Navbar() {
 
   const onLogo = (event: MouseEvent<HTMLAnchorElement>) => {
     event.preventDefault();
-    window.scrollTo({ top: 0, behavior: reducedMotion ? 'auto' : 'smooth' });
+    smoothScrollTo(0, { reducedMotion });
   };
 
   const surfaceStyle: CSSProperties | undefined = geo
@@ -359,6 +360,7 @@ export function Navbar() {
                       className={linkClass}
                       style={tx(geo?.linkDx[i], island)}
                       aria-current={activeId === item.id ? 'true' : undefined}
+                      onClick={(e) => onAnchorClick(e, reducedMotion)}
                     >
                       {item.label}
                     </a>

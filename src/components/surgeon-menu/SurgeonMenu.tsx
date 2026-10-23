@@ -6,6 +6,7 @@ import { useHero } from '../hero/HeroContext';
 import { useIsMobile } from '../../hooks/useIsMobile';
 import { AntdProvider } from '../../theme/AntdProvider';
 import { restoreTriggerFocus, setPageInert, SURGEON_MENU_ID } from './menuTrigger';
+import { onAnchorClick, smoothScrollTo } from '../nav/smoothScroll';
 import './surgeon-menu.css';
 
 // Full-screen menu (design 2026-10-22, "Menu"): white page — header (logo, place, phone, close), section links
@@ -63,8 +64,10 @@ export function SurgeonMenu() {
     optionRefs.current[index]?.focus();
   };
 
-  const scrollTo = (id: string) =>
-    document.getElementById(id)?.scrollIntoView({ behavior: reducedMotion ? 'auto' : 'smooth', block: 'start' });
+  const scrollTo = (id: string) => {
+    const target = document.getElementById(id);
+    if (target) smoothScrollTo(target, { reducedMotion });
+  };
 
   // A doctor from the data filters the hero cases ("познакомьтесь с его работами"); one not in the data yet
   // opens the team section.
@@ -206,7 +209,10 @@ export function SurgeonMenu() {
                 <li key={link.href} className="smenu-in" style={{ '--i': i } as CSSProperties}>
                   <a
                     href={link.href}
-                    onClick={close}
+                    onClick={(e) => {
+                      onAnchorClick(e, reducedMotion);
+                      close();
+                    }}
                     className="smenu-link inline-flex items-center gap-3.5 font-display text-[28px] leading-9 font-light tracking-[-0.02em] text-[#2e2c2c] hover:text-[#bb9358] focus-visible:text-[#bb9358] max-md:text-[24px] max-md:leading-8"
                   >
                     {link.label}
