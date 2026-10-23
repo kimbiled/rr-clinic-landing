@@ -28,7 +28,7 @@ const SURGEON_ORDER = [
  */
 /**
  * Team-card cut-outs (Figma exports, transparent background — see scripts/optimize-images.sh). Kept here,
- * not in hero.json `photo`, so the hero avatars (which fall back to `photo`) stay as they are.
+ * not in hero.json `photo`; the hero hover panel uses the face crops in hero.json `avatar` (avatar-<id>.webp).
  */
 const cutout = (id: string, width: number): ImageAsset => ({ src: `assets/img/web/doctor-${id}.webp`, width, height: 750 });
 export const TEAM_PHOTOS: Record<string, ImageAsset> = {
@@ -37,6 +37,8 @@ export const TEAM_PHOTOS: Record<string, ImageAsset> = {
   'musa-baurzhan': cutout('musa-baurzhan', 601),
   'temirkhanov-amir': cutout('temirkhanov-amir', 563),
   'chatinyan-garik': cutout('chatinyan-garik', 563),
+  'kodzoeva-leyla': cutout('kodzoeva-leyla', 563),
+  'tulepbergenova-tomiris': cutout('tulepbergenova-tomiris', 659),
 };
 
 export const CARD_TEXT: Record<string, { patronymic?: string; note?: string }> = {

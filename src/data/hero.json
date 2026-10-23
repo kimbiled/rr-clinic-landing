@@ -104,7 +104,11 @@
       "role": "Пластический хирург",
       "specialty": "Специалист по абдоминопластике с ушиванием диастаза",
       "photo": null,
-      "avatar": null,
+      "avatar": {
+        "src": "assets/img/web/avatar-kurmanbaev-rustam.webp",
+        "width": 192,
+        "height": 192
+      },
       "city": "Астана",
       "href": "#doctors",
       "figmaNodeId": "1763:7302"
@@ -117,7 +121,11 @@
       "role": "Пластический хирург",
       "specialty": "Автор методики «Голливудский фейслифтинг»",
       "photo": null,
-      "avatar": null,
+      "avatar": {
+        "src": "assets/img/web/avatar-romanovskaya-tatyana.webp",
+        "width": 192,
+        "height": 192
+      },
       "city": "Астана",
       "href": "#doctors",
       "figmaNodeId": "1763:7307"
@@ -130,7 +138,11 @@
       "role": "Пластический хирург",
       "specialty": "Пластика век, увеличение и подтяжка груди",
       "photo": null,
-      "avatar": null,
+      "avatar": {
+        "src": "assets/img/web/avatar-musa-baurzhan.webp",
+        "width": 192,
+        "height": 192
+      },
       "city": "Астана",
       "href": "#doctors",
       "figmaNodeId": "1763:7312"
@@ -143,7 +155,11 @@
       "role": "Пластический хирург",
       "specialty": "Абдоминопластика, липомоделирование и комплексная коррекция фигуры",
       "photo": null,
-      "avatar": null,
+      "avatar": {
+        "src": "assets/img/web/avatar-temirkhanov-amir.webp",
+        "width": 192,
+        "height": 192
+      },
       "city": "Астана",
       "href": "#doctors",
       "figmaNodeId": "1763:7317"
@@ -156,7 +172,11 @@
       "role": "Пластический хирург",
       "specialty": "Специалист по интимной пластике и пластике груди",
       "photo": null,
-      "avatar": null,
+      "avatar": {
+        "src": "assets/img/web/avatar-kodzoeva-leyla.webp",
+        "width": 192,
+        "height": 192
+      },
       "city": "Астана",
       "href": "#doctors",
       "figmaNodeId": "1763:7333"
@@ -169,7 +189,11 @@
       "role": "Пластический и челюстно-лицевой хирург",
       "specialty": "Пластический и челюстно-лицевой хирург. Открытая и закрытая ринопластика",
       "photo": null,
-      "avatar": null,
+      "avatar": {
+        "src": "assets/img/web/avatar-chatinyan-garik.webp",
+        "width": 192,
+        "height": 192
+      },
       "city": "Астана",
       "href": "#doctors",
       "figmaNodeId": "1763:7322"
@@ -182,7 +206,11 @@
       "role": "Пластический хирург",
       "specialty": "Пластика век и лица",
       "photo": null,
-      "avatar": null,
+      "avatar": {
+        "src": "assets/img/web/avatar-tulepbergenova-tomiris.webp",
+        "width": 192,
+        "height": 192
+      },
       "city": "Астана",
       "href": "#doctors",
       "figmaNodeId": "1715:4160"

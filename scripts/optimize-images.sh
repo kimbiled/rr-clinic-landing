@@ -140,9 +140,30 @@ fit_long "$SRC/avatar-savelyev.png" avatar-savelyev "$CARD_MAX"
 
 echo "Team cut-outs (alpha kept; 296x375 card -> 750 px tall @2x):"
 # Embedded PNGs of the Figma exports doctor-<id>-figma.svg (transparent background).
-for id in kurmanbaev-rustam romanovskaya-tatyana musa-baurzhan temirkhanov-amir chatinyan-garik; do
+for id in kurmanbaev-rustam romanovskaya-tatyana musa-baurzhan temirkhanov-amir chatinyan-garik kodzoeva-leyla tulepbergenova-tomiris; do
   encode "$SRC/doctor-$id.png" "doctor-$id" 0 750
 done
+
+echo "Hero avatars (face square cut from the team cut-out, flattened on beige; 192 px):"
+# avatar_face <id> "<x y w h>": the square is 1.8 x the face box found by macOS Vision
+# (VNDetectFaceRectanglesRequest on doctor-<id>.png), centred slightly above the face centre.
+avatar_face() {
+  local id="$1" crop="$2"
+  if (( HAS_CWEBP )); then
+    # shellcheck disable=SC2086
+    cwebp -quiet -q "$QUALITY" -m 6 -sharp_yuv -metadata none -blend_alpha 0xE9E1D8 -crop $crop -resize 192 192 \
+      "$SRC/doctor-$id.png" -o "$OUT/avatar-$id.webp" && echo "  avatar-$id.webp"
+  else
+    echo "  ! avatar-$id needs cwebp (alpha flattened onto beige)" >&2
+  fi
+}
+avatar_face chatinyan-garik "185 46 599 599"
+avatar_face kodzoeva-leyla "172 44 495 495"
+avatar_face kurmanbaev-rustam "458 119 1244 1244"
+avatar_face musa-baurzhan "244 21 590 590"
+avatar_face romanovskaya-tatyana "201 37 1246 1246"
+avatar_face temirkhanov-amir "240 72 608 608"
+avatar_face tulepbergenova-tomiris "184 28 502 502"
 
 echo "Wide (2x display, cap $WIDE_CAP, no upscale):"
 fit_wide "$SRC/bg-columns.png" bg-columns 1440
