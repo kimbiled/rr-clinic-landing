@@ -63,7 +63,7 @@ function richLines(value: RichTextValue): RichTextValue[] {
 }
 
 /**
- * "Нам доверяют пациенты из 14 стран" (design 2026-10-22): headline, text and four key figures on the left,
+ * "Нам доверяют пациенты из 15 стран" (design 2026-10-22): headline, text and four key figures on the left,
  * the world map with the patients' countries on the right; below, the founders photo card (1240×476)
  * with a white panel — clinic headline, text and CTAs.
  */

@@ -62,7 +62,7 @@
 
   /* ---- Trust map: patients' countries tinted, Kazakhstan dark; hover deepens the country + lifts its pin ---- */
   .rr-map__country {
-    fill: #c6dcd4;
+    fill: #9dc2b4;
     stroke: #fff;
     stroke-width: 0.5;
     stroke-linejoin: round;
@@ -75,7 +75,7 @@
   }
 
   .rr-map__country[data-active] {
-    fill: #8db6a8;
+    fill: #78a595;
   }
 
   .rr-map__country[data-country='kazakhstan'][data-active] {
@@ -95,6 +95,15 @@
   .rr-map__pin[data-hover-only]:not([data-active]) {
     opacity: 0;
     pointer-events: none;
+  }
+
+  .rr-map__pin[data-active] {
+    z-index: 1;
+  }
+
+  /* Dot-only pins: the label is there (keeps the anchor) but hidden until the country is hovered */
+  .rr-map__pin[data-dot-only]:not([data-active]) .rr-map__label {
+    visibility: hidden;
   }
 
   .rr-map__label {

@@ -4,6 +4,8 @@ import { worldMap } from '../../data/worldMap';
 
 /** Countries without a label in the design: their pin only appears while the country is hovered. */
 const HOVER_ONLY = new Set(['kazakhstan']);
+/** Patients' countries too close to a labelled neighbour: just the dot, the label shows on hover. */
+const DOT_ONLY = new Set(['lithuania', 'belarus', 'ukraine', 'moldova', 'italy', 'turkey', 'kyrgyzstan']);
 /** Reveal (Trust section data-rv): the pills rise in one by one, lowest on the map first. */
 const PIN_REVEAL_START_MS = 450;
 const PIN_REVEAL_STEP_MS = 140;
@@ -54,7 +56,8 @@ export function WorldMap({ className }: { className?: string }) {
         ))}
       </svg>
 
-      {countries.map((c) => (
+      {/* Dot-only pins first, so the labelled pills paint over their dots where they overlap */}
+      {[...countries].sort((a, b) => +DOT_ONLY.has(b.key) - +DOT_ONLY.has(a.key)).map((c) => (
         <span
           key={c.key}
           className="rr-map__pin absolute"
@@ -66,6 +69,7 @@ export function WorldMap({ className }: { className?: string }) {
             } as CSSProperties
           }
           data-hover-only={HOVER_ONLY.has(c.key) || undefined}
+          data-dot-only={DOT_ONLY.has(c.key) || undefined}
           data-active={active === c.key || undefined}
           onPointerEnter={() => setActive(c.key)}
           onPointerLeave={leave}
