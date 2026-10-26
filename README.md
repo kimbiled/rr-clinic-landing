@@ -24,6 +24,7 @@ src/
   hooks/  theme/  styles/
   data/                 hero.json (контент), types.ts (типы), hero.ts (heroData, getDoctor, getCasesByDoctor, asset)
 public/assets/          img/web (оптимизированные картинки), icons, fonts
+public/<slug>/          страницы врачей и /privacy-policy, сохранённые со старого сайта (Framer): index.html + files/
 assets-src/img/         исходные PNG (не изменяются)
 scripts/                optimize-images.sh, validate-data.mjs
 docs/                   PLAN.md, design-spec.md, data-schema.md, qa/, ref/ (референсы дизайна)

@@ -70,8 +70,12 @@ export function SurgeonMenu() {
   };
 
   // A doctor from the data filters the hero cases ("познакомьтесь с его работами"); one not in the data yet
-  // opens the team section.
+  // opens their own page, or the team section when there is none.
   const choose = (doctor: MenuDoctor) => {
+    if (!doctor.doctorId && doctor.href) {
+      window.location.assign(doctor.href);
+      return;
+    }
     if (doctor.doctorId) {
       selectDoctor(doctor.doctorId);
       scrollTo('hero');

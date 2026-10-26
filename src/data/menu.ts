@@ -7,6 +7,8 @@ export interface MenuDoctor {
   name: string;
   tags: [string, string];
   doctorId?: string;
+  /** The doctor's own page, for entries without `doctorId`. */
+  href?: string;
 }
 
 export const menu = {
@@ -26,14 +28,14 @@ export const menu = {
     { name: 'Гарик Чатинян', tags: ['Ринопластика', 'Подтяжка лица'], doctorId: 'chatinyan-garik' },
     { name: 'Амир Темирханов', tags: ['Коррекция фигуры', 'Подтяжка груди'], doctorId: 'temirkhanov-amir' },
     // TODO(content): not in hero.json yet (no photo / cases).
-    { name: 'Алина Улагашева', tags: ['Пластика груди', 'Пластика лица'] },
+    { name: 'Алина Улагашева', tags: ['Пластика груди', 'Пластика лица'], href: '/ulagasheva-alina' },
     { name: 'Татьяна Романовская', tags: ['Подтяжка лица', 'Блефаропластика'], doctorId: 'romanovskaya-tatyana' },
     { name: 'Евгений Савельев', tags: ['Пластика груди', 'Повторные операции'], doctorId: 'savelyev-evgeniy' },
     { name: 'Лейла Кодзоева', tags: ['Интимная пластика', 'Пластика груди'], doctorId: 'kodzoeva-leyla' },
     { name: 'Томирис Тулепбергенова', tags: ['Блефаропластика', 'Хирург-резидент'], doctorId: 'tulepbergenova-tomiris' },
     { name: 'Бауржан Муса', tags: ['Блефаропластика', 'Подтяжка груди'], doctorId: 'musa-baurzhan' },
     // TODO(content): not in hero.json yet (no photo / cases).
-    { name: 'Анар Темирхан', tags: ['Блефаропластика', 'Резидентура'] },
+    { name: 'Анар Темирхан', tags: ['Блефаропластика', 'Резидентура'], href: '/temirkhan-anar' },
   ] satisfies MenuDoctor[],
   help: ['Не знаете, с чего начать?', 'Поможем выбрать направление и врача.'],
   consultLabel: 'Получить консультацию',

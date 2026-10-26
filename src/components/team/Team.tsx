@@ -58,10 +58,11 @@ export function Team() {
 
   const doctorsWithCases = useMemo(() => new Set(heroData.cases.map((c) => c.doctorId)), []);
 
-  // "Подробнее": when the surgeon has works in the hero carousel, open the existing surgeon flow
-  // (filter the hero by doctor) and scroll up to it; otherwise fall back to the plain link.
+  // "Подробнее": a surgeon with their own page (/<slug>) opens it. Otherwise, when the surgeon has works
+  // in the hero carousel, open the existing surgeon flow (filter the hero by doctor) and scroll up to it.
   const onMore = useCallback(
     (doctor: Doctor) => {
+      if (doctor.href.startsWith('/')) return false;
       if (!doctorsWithCases.has(doctor.id)) return false;
       selectDoctor(doctor.id);
       document.getElementById('hero')?.scrollIntoView({ behavior: reducedMotion ? 'auto' : 'smooth', block: 'start' });
