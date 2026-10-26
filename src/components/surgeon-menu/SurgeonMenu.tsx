@@ -69,10 +69,10 @@ export function SurgeonMenu() {
     if (target) smoothScrollTo(target, { reducedMotion });
   };
 
-  // A doctor from the data filters the hero cases ("познакомьтесь с его работами"); one not in the data yet
-  // opens their own page, or the team section when there is none.
+  // A doctor with their own page opens it; otherwise one from the data filters the hero cases
+  // ("познакомьтесь с его работами") and the rest go to the team section.
   const choose = (doctor: MenuDoctor) => {
-    if (!doctor.doctorId && doctor.href) {
+    if (doctor.href) {
       window.location.assign(doctor.href);
       return;
     }
