@@ -343,7 +343,7 @@ fbq('track', 'PageView');
 	
 	<script data-framer-appear-animation="no-preference"></script>
 	<script>typeof document<"u"&&(window.process={...window.process,env:{...window.process?.env,NODE_ENV:"production"}});</script>
-	<link rel="modulepreload" fetchpriority="low" href="https://framerusercontent.com/sites/17VXhmfdt2lH6iX7r8acSp/rolldown-runtime.Bi-D_2cA.mjs"><link rel="modulepreload" fetchpriority="low" href="https://framerusercontent.com/sites/17VXhmfdt2lH6iX7r8acSp/react.B4lOa1lM.mjs"><link rel="modulepreload" fetchpriority="low" href="https://framerusercontent.com/sites/17VXhmfdt2lH6iX7r8acSp/framer.CkmLu_YF.mjs"><link rel="modulepreload" fetchpriority="low" href="https://framerusercontent.com/sites/17VXhmfdt2lH6iX7r8acSp/motion.qaWN63Bz.mjs"><link rel="modulepreload" fetchpriority="low" href="https://framerusercontent.com/sites/17VXhmfdt2lH6iX7r8acSp/tvuvjPnFbmZ9pJq66Idgips2OPYgkSAFrGoDHkd3LIE.CWV4RjVr.mjs"><link rel="modulepreload" fetchpriority="low" href="https://framerusercontent.com/sites/17VXhmfdt2lH6iX7r8acSp/Video.DRu7vlwX.mjs"><link rel="modulepreload" fetchpriority="low" href="https://framerusercontent.com/sites/17VXhmfdt2lH6iX7r8acSp/shared-lib.CZTmNy0v.mjs"><link rel="modulepreload" fetchpriority="low" href="https://framerusercontent.com/sites/17VXhmfdt2lH6iX7r8acSp/FD5GiEpAf.BUzzqv4b.mjs"><link rel="modulepreload" fetchpriority="low" href="https://framerusercontent.com/sites/17VXhmfdt2lH6iX7r8acSp/iTeEPVVXj.Cqxv2A4O.mjs"><link rel="modulepreload" fetchpriority="low" href="https://framerusercontent.com/sites/17VXhmfdt2lH6iX7r8acSp/wprvOADU5.De03fRZu.mjs"><script type="module" async data-framer-bundle="main" fetchpriority="low" src="https://framerusercontent.com/sites/17VXhmfdt2lH6iX7r8acSp/script_main.ChKCgIJW.mjs"></script><div id="svg-templates" style="position: absolute; overflow: hidden; bottom: 0; left: 0; width: 0; height: 0; z-index: 0; contain: strict" aria-hidden="true">
+	<div id="svg-templates" style="position: absolute; overflow: hidden; bottom: 0; left: 0; width: 0; height: 0; z-index: 0; contain: strict" aria-hidden="true">
 <svg width="116" height="20" viewBox="0 0 116 20" fill="none" id="svg-876996331_3414">
 <path fill-rule="evenodd" clip-rule="evenodd" d="M8.98996 2.67508C9.3633 1.77758 10.6366 1.77758 11.01 2.67508L12.745 6.84675L17.2483 7.20841C18.2183 7.28591 18.6116 8.49591 17.8725 9.12924L14.4416 12.0684L15.4891 16.4626C15.715 17.4092 14.6858 18.1567 13.8558 17.6501L9.99996 15.2951L6.14413 17.6501C5.31413 18.1567 4.28496 17.4084 4.5108 16.4626L5.55829 12.0684L2.12746 9.12924C1.38829 8.49591 1.78163 7.28591 2.75163 7.20841L7.25496 6.84675L8.98996 2.67508Z" fill="#E5B460"/>
 <path fill-rule="evenodd" clip-rule="evenodd" d="M32.99 2.67508C33.3633 1.77758 34.6366 1.77758 35.01 2.67508L36.745 6.84675L41.2483 7.20841C42.2183 7.28591 42.6116 8.49591 41.8725 9.12924L38.4416 12.0684L39.4891 16.4626C39.715 17.4092 38.6858 18.1567 37.8558 17.6501L34 15.2951L30.1441 17.6501C29.3141 18.1567 28.285 17.4084 28.5108 16.4626L29.5583 12.0684L26.1275 9.12924C25.3883 8.49591 25.7816 7.28591 26.7516 7.20841L31.255 6.84675L32.99 2.67508Z" fill="#E5B460"/>
@@ -750,16 +750,48 @@ fbq('track', 'PageView');
 </style><!-- SnippetEnd: KqU3OZZqA --><!-- End of bodyEnd -->
 
 <script>
-  /* RR landing: entrance-animated elements already on screen are shown at once instead of after hydration. */
+  /* RR landing: entrance-animated elements already on screen are shown at once instead of after hydration; the ones
+     scrolled into view before Framer's JS has started are shown as they appear (patch 7), later ones animate as usual. */
   (function () {
     var vh = window.innerHeight;
     var els = document.querySelectorAll('#main [style*="will-change:transform"][style*="opacity:0"]');
+    var io = 'IntersectionObserver' in window ? new IntersectionObserver(function (entries) {
+      for (var j = 0; j < entries.length; j++) {
+        if (!entries[j].isIntersecting) continue;
+        entries[j].target.setAttribute('data-rr-shown', '');
+        io.unobserve(entries[j].target);
+      }
+    }) : null;
     for (var i = 0; i < els.length; i++) {
       if (!/opacity:0(;|$)/.test(els[i].getAttribute('style'))) continue;
       var r = els[i].getBoundingClientRect();
       if (r.bottom > 0 && r.top < vh && r.width > 0) els[i].setAttribute('data-rr-shown', '');
+      else if (io) io.observe(els[i]);
     }
     document.documentElement.classList.remove('rr-wait');
+
+    /* Patch 7: Framer's JS (hydration) starts after the load event, or at the first touch, key, wheel or scroll. */
+    var bundle = {"attrs":{"type":"module","async":"","data-framer-bundle":"main","fetchpriority":"low","src":"https://framerusercontent.com/sites/17VXhmfdt2lH6iX7r8acSp/script_main.ChKCgIJW.mjs"},"preload":["https://framerusercontent.com/sites/17VXhmfdt2lH6iX7r8acSp/rolldown-runtime.Bi-D_2cA.mjs","https://framerusercontent.com/sites/17VXhmfdt2lH6iX7r8acSp/react.B4lOa1lM.mjs","https://framerusercontent.com/sites/17VXhmfdt2lH6iX7r8acSp/framer.CkmLu_YF.mjs","https://framerusercontent.com/sites/17VXhmfdt2lH6iX7r8acSp/motion.qaWN63Bz.mjs","https://framerusercontent.com/sites/17VXhmfdt2lH6iX7r8acSp/tvuvjPnFbmZ9pJq66Idgips2OPYgkSAFrGoDHkd3LIE.CWV4RjVr.mjs","https://framerusercontent.com/sites/17VXhmfdt2lH6iX7r8acSp/Video.DRu7vlwX.mjs","https://framerusercontent.com/sites/17VXhmfdt2lH6iX7r8acSp/shared-lib.CZTmNy0v.mjs","https://framerusercontent.com/sites/17VXhmfdt2lH6iX7r8acSp/FD5GiEpAf.BUzzqv4b.mjs","https://framerusercontent.com/sites/17VXhmfdt2lH6iX7r8acSp/iTeEPVVXj.Cqxv2A4O.mjs","https://framerusercontent.com/sites/17VXhmfdt2lH6iX7r8acSp/wprvOADU5.De03fRZu.mjs"]};
+    if (!bundle) return;
+    var started = false;
+    function start() {
+      if (started) return;
+      started = true;
+      for (var k = 0; k < bundle.preload.length; k++) {
+        var link = document.createElement('link');
+        link.rel = 'modulepreload';
+        link.href = bundle.preload[k];
+        document.head.appendChild(link);
+      }
+      var s = document.createElement('script');
+      for (var name in bundle.attrs) s.setAttribute(name, bundle.attrs[name]);
+      s.onload = s.onerror = function () { if (io) io.disconnect(); };
+      document.body.appendChild(s);
+    }
+    var triggers = ['pointerdown', 'keydown', 'touchstart', 'wheel', 'scroll'];
+    for (var t = 0; t < triggers.length; t++) window.addEventListener(triggers[t], start, { once: true, passive: true });
+    if (document.readyState === 'complete') setTimeout(start, 0);
+    else window.addEventListener('load', function () { setTimeout(start, 0); });
   })();
   /* RR landing: the header logo leads to our home page (Framer linked it to the top of this page). */
   (function () {

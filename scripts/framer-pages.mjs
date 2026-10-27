@@ -30,6 +30,9 @@
 //   4. Meta Pixel loads after the page has loaded instead of competing with the first screen (PageView still fires).
 //   5. The header logo leads to our home page (Framer links it to the top of the same page).
 //   6. In-site <a href="https://rr-clinic.kz/..."> become relative, so they stay on this host.
+//   7. Framer's JS (~340 KB: main bundle + modulepreloads) starts after the load event, or at the first touch, key,
+//      wheel or scroll. The page is already complete without it; it brings the menu, sliders and animations. Until
+//      then, entrance-animated blocks are shown as they scroll into view, so nothing stays blank.
 import { mkdir, rm, writeFile } from 'node:fs/promises';
 import { dirname, join } from 'node:path';
 import { fileURLToPath } from 'node:url';
@@ -104,16 +107,48 @@ const HEAD = `
 
 const BODY = `
 <script>
-  /* RR landing: entrance-animated elements already on screen are shown at once instead of after hydration. */
+  /* RR landing: entrance-animated elements already on screen are shown at once instead of after hydration; the ones
+     scrolled into view before Framer's JS has started are shown as they appear (patch 7), later ones animate as usual. */
   (function () {
     var vh = window.innerHeight;
     var els = document.querySelectorAll('#main [style*="will-change:transform"][style*="opacity:0"]');
+    var io = 'IntersectionObserver' in window ? new IntersectionObserver(function (entries) {
+      for (var j = 0; j < entries.length; j++) {
+        if (!entries[j].isIntersecting) continue;
+        entries[j].target.setAttribute('data-rr-shown', '');
+        io.unobserve(entries[j].target);
+      }
+    }) : null;
     for (var i = 0; i < els.length; i++) {
       if (!/opacity:0(;|$)/.test(els[i].getAttribute('style'))) continue;
       var r = els[i].getBoundingClientRect();
       if (r.bottom > 0 && r.top < vh && r.width > 0) els[i].setAttribute('data-rr-shown', '');
+      else if (io) io.observe(els[i]);
     }
     document.documentElement.classList.remove('rr-wait');
+
+    /* Patch 7: Framer's JS (hydration) starts after the load event, or at the first touch, key, wheel or scroll. */
+    var bundle = __RR_BUNDLE__;
+    if (!bundle) return;
+    var started = false;
+    function start() {
+      if (started) return;
+      started = true;
+      for (var k = 0; k < bundle.preload.length; k++) {
+        var link = document.createElement('link');
+        link.rel = 'modulepreload';
+        link.href = bundle.preload[k];
+        document.head.appendChild(link);
+      }
+      var s = document.createElement('script');
+      for (var name in bundle.attrs) s.setAttribute(name, bundle.attrs[name]);
+      s.onload = s.onerror = function () { if (io) io.disconnect(); };
+      document.body.appendChild(s);
+    }
+    var triggers = ['pointerdown', 'keydown', 'touchstart', 'wheel', 'scroll'];
+    for (var t = 0; t < triggers.length; t++) window.addEventListener(triggers[t], start, { once: true, passive: true });
+    if (document.readyState === 'complete') setTimeout(start, 0);
+    else window.addEventListener('load', function () { setTimeout(start, 0); });
   })();
   /* RR landing: the header logo leads to our home page (Framer linked it to the top of this page). */
   (function () {
@@ -269,20 +304,39 @@ function deferPixel(html) {
   );
 }
 
+/**
+ * Patch 7: take Framer's main bundle and its modulepreloads out of the HTML, so ~340 KB of JS no longer competes with
+ * the first screen; the BODY script adds them back after the load event (or at the first interaction).
+ */
+function deferBundle(html, slug) {
+  const tag = /<script type="module"([^>]*\bdata-framer-bundle="main"[^>]*)><\/script>/.exec(html);
+  if (!tag) {
+    console.warn(`  ${slug}: Framer bundle not found, hydration left as it is`);
+    return { html, bundle: null };
+  }
+  const attrs = { type: 'module' };
+  for (const [, name, value] of tag[1].matchAll(/([\w-]+)(?:="([^"]*)")?/g)) attrs[name] = value ?? '';
+  const preload = [...html.matchAll(/<link rel="modulepreload"[^>]*\bhref="([^"]+)"[^>]*>/g)].map((m) => m[1]);
+  const out = html.replace(tag[0], '').replace(/<link rel="modulepreload"[^>]*>/g, '');
+  return { html: out, bundle: { attrs, preload } };
+}
+
 function patch(html, slug) {
   const wrapper = /<div style="width:100%;min-height:100vh;overflow-x:hidden;zoom:1;opacity:0;/;
   if (!wrapper.test(html)) throw new Error(`${slug}: zoom wrapper not found — check patch 1 against the new Framer markup`);
   if (!html.includes('</head>') || !html.includes('</body>')) throw new Error(`${slug}: no </head> or </body>`);
   const images = patchImages(html, slug);
+  const deferred = deferBundle(images.html, slug);
   console.log(
     `  images: ${images.eager} first screen, ${images.shrunk} hidden-variant sizes → 1px, ${images.lazy} made lazy` +
-      (images.preload ? ', phone hero photo preloaded' : ''),
+      (images.preload ? ', phone hero photo preloaded' : '') +
+      (deferred.bundle ? `; bundle + ${deferred.bundle.preload.length} modules after load` : ''),
   );
-  return deferPixel(images.html)
+  return deferPixel(deferred.html)
     .replace(/(<a\b[^>]*\bhref=")https:\/\/rr-clinic\.kz\/?/g, '$1/')
     .replace(/<head\b[^>]*>/, (head) => `${head}${images.preload}`)
     .replace('</head>', `${HEAD}</head>`)
-    .replace('</body>', `${BODY}</body>`);
+    .replace('</body>', `${BODY.replace('__RR_BUNDLE__', JSON.stringify(deferred.bundle))}</body>`);
 }
 
 const slugs = process.argv.length > 2 ? process.argv.slice(2) : SLUGS;
