@@ -132,6 +132,24 @@ split_pair "$SRC/case6-face-pair.png" case6
 fit_long "$SRC/case3-face-pair.png" case3-face-pair 1000
 fit_long "$SRC/case6-face-pair.png" case6-face-pair 1000
 
+echo "Surgery before/after cards (377x446 card -> 800 px wide @2x):"
+# Body cut-outs are flattened onto the Figma card fill; the pairs are split into halves
+# (the face pair has a 2-3 px divider at x=768, so each half stops short of it).
+if (( HAS_CWEBP )); then
+  for f in surgery-breast-before surgery-breast-after; do
+    cwebp -quiet -q "$QUALITY" -m 6 -sharp_yuv -metadata none -blend_alpha 0xA99784 -resize 800 0 \
+      "$SRC/$f.png" -o "$OUT/$f.webp" && echo "  $f.webp"
+  done
+  cwebp -quiet -q "$QUALITY" -m 6 -sharp_yuv -metadata none -blend_alpha 0xA99784 -crop 0 0 1080 2160 -resize 800 0 \
+    "$SRC/surgery-abdominoplasty-pair.png" -o "$OUT/surgery-abdominoplasty-before.webp" && echo "  surgery-abdominoplasty-before.webp"
+  cwebp -quiet -q "$QUALITY" -m 6 -sharp_yuv -metadata none -blend_alpha 0xA99784 -crop 1080 0 1080 2160 -resize 800 0 \
+    "$SRC/surgery-abdominoplasty-pair.png" -o "$OUT/surgery-abdominoplasty-after.webp" && echo "  surgery-abdominoplasty-after.webp"
+else
+  echo "  ! surgery body photos need cwebp (alpha flattened onto the Figma fill)" >&2
+fi
+encode "$SRC/surgery-facelift-pair.png" surgery-facelift-before 0 0 "0 0 765 1024"
+encode "$SRC/surgery-facelift-pair.png" surgery-facelift-after 0 0 "771 0 765 1024"
+
 echo "Avatar:"
 # Figma framing of the 18px avatar: x=.1778 y=.1204 w=.6443 h=.4322 of 1696x2528
 # -> square 1093x1093 @ (301,304). 192px covers 18px..96px @2x.

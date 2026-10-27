@@ -269,26 +269,24 @@ export const surgery: SurgeryContent = {
   eyebrow: 'Услуги',
   title: 'Пластическая хирургия',
   text: 'Операции для лица и тела — выберите интересующее направление.',
-  // TODO(content): placeholder photos from the hero cases until the client sends the ones in the design
-  // (abdominoplasty has none yet). Replace src/width/height; the card crops with object-cover.
   cases: [
     {
       title: 'Увеличение груди',
       categoryId: 'breast',
-      before: { src: 'assets/img/web/case1-before.webp', width: 341, height: 600, alt: 'Грудь до увеличения' },
-      after: { src: 'assets/img/web/case1-after.webp', width: 341, height: 600, alt: 'Грудь после увеличения' },
+      before: { src: 'assets/img/web/surgery-breast-before.webp', width: 800, height: 1410, alt: 'Грудь до увеличения' },
+      after: { src: 'assets/img/web/surgery-breast-after.webp', width: 800, height: 1410, alt: 'Грудь после увеличения' },
     },
     {
       title: 'Голливудский фейслифтинг',
       categoryId: 'face',
-      before: { src: 'assets/img/web/case3-before.webp', width: 400, height: 600, alt: 'Лицо до фейслифтинга' },
-      after: { src: 'assets/img/web/case3-after.webp', width: 400, height: 600, alt: 'Лицо после фейслифтинга' },
+      before: { src: 'assets/img/web/surgery-facelift-before.webp', width: 765, height: 1024, alt: 'Лицо до фейслифтинга' },
+      after: { src: 'assets/img/web/surgery-facelift-after.webp', width: 765, height: 1024, alt: 'Лицо после фейслифтинга' },
     },
     {
       title: 'Абдоминопластика',
       categoryId: 'body',
-      before: { src: 'assets/img/web/case7-before.webp', width: 273, height: 600, alt: 'Живот до абдоминопластики' },
-      after: { src: 'assets/img/web/case7-after.webp', width: 273, height: 600, alt: 'Живот после абдоминопластики' },
+      before: { src: 'assets/img/web/surgery-abdominoplasty-before.webp', width: 800, height: 1600, alt: 'Живот до абдоминопластики' },
+      after: { src: 'assets/img/web/surgery-abdominoplasty-after.webp', width: 800, height: 1600, alt: 'Живот после абдоминопластики' },
     },
   ],
 };
