@@ -13,14 +13,17 @@
 //   1. Zoom wrapper. Framer's custom wrapper scales the page by innerWidth / (innerWidth < 768 ? 393 : 1440) and stays
 //      at opacity 0 until its JS runs, so nothing was visible until the main bundle hydrated (LCP 6–10 s). A head
 //      script applies the same zoom with CSS before the first paint and keeps it in sync on resize.
+//      The page also stays hidden until the parser reaches the end of #main: the phone hero sits near the end of the
+//      HTML and is moved to the top with CSS `order`, so painting the document as it streams in showed the sections
+//      below first and then pushed them down when the hero arrived (mobile CLS ~1.0 on a real network).
 //   2. Entrance animations in the first screen. Appear-animated elements start at opacity 0 until the bundle runs; the
 //      ones already in the viewport are shown straight away (their transform still settles when Framer animates).
 //      Elements further down keep their scroll animations.
 //   3. Images. The HTML holds every breakpoint's variant and only hides the others with display:none, which does not
 //      stop their images from downloading (a phone fetched the 3720 px desktop hero). In the first screen (everything up
-//      to the end of the hero) an image's `sizes` is set to 1px for the breakpoints that hide it, so a hidden copy costs
-//      the smallest file; below the hero, images without a loading attribute become lazy, so hidden copies are never
-//      fetched and visible ones load as they approach.
+//      to the end of the hero, plus any section named "...hero", wherever it sits in the HTML) an image's `sizes` is set
+//      to 1px for the breakpoints that hide it, so a hidden copy costs the smallest file; everywhere else, images without
+//      a loading attribute become lazy, so hidden copies are never fetched and visible ones load as they approach.
 //   4. Meta Pixel loads after the page has loaded instead of competing with the first screen (PageView still fires).
 //   5. The header logo leads to our home page (Framer links it to the top of the same page).
 //   6. In-site <a href="https://rr-clinic.kz/..."> become relative, so they stay on this host.
@@ -47,12 +50,17 @@ const SLUGS = [
 const HEAD = `
 <!-- RR landing: show the page before Framer's JS runs (scripts/framer-pages.mjs) -->
 <style>
+  html.rr-wait #main { visibility: hidden; }
   #main > div:first-of-type { opacity: 1 !important; zoom: var(--rr-zoom, 1) !important; min-height: calc(100vh / var(--rr-zoom, 1)) !important; }
   [data-rr-shown] { opacity: 1 !important; }
   [data-framer-name$="[Vectorized]"] { cursor: pointer; }
 </style>
 <script>
   (function () {
+    // Hidden until the end of #main is parsed (BODY script); the timeout only guards against that script never running.
+    var root = document.documentElement;
+    root.classList.add('rr-wait');
+    setTimeout(function () { root.classList.remove('rr-wait'); }, 4000);
     function zoom() {
       var w = window.innerWidth;
       document.documentElement.style.setProperty('--rr-zoom', String(w / (w < 768 ? 393 : 1440)));
@@ -74,6 +82,7 @@ const BODY = `
       var r = els[i].getBoundingClientRect();
       if (r.bottom > 0 && r.top < vh && r.width > 0) els[i].setAttribute('data-rr-shown', '');
     }
+    document.documentElement.classList.remove('rr-wait');
   })();
   /* RR landing: the header logo leads to our home page (Framer linked it to the top of this page). */
   (function () {
@@ -123,6 +132,7 @@ function patchImages(html, slug) {
   const stack = []; // per open div: the breakpoint hashes it hides
   let pastHero = false;
   let heroSeen = false;
+  let heroSection = false; // the current root child is named "...hero" (the phone hero sits near the end of the HTML)
   let sections = 0;
   const edits = [];
   const counts = { eager: 0, shrunk: 0, lazy: 0 };
@@ -132,7 +142,7 @@ function patchImages(html, slug) {
     if (m[0].startsWith('<img')) {
       const hidden = new Set(stack.flat());
       let tag = m[0];
-      if (pastHero) {
+      if (pastHero && !heroSection) {
         if (!/\sloading=/.test(tag)) {
           tag = tag.replace('<img', '<img loading="lazy"');
           counts.lazy++;
@@ -158,7 +168,8 @@ function patchImages(html, slug) {
     stack.push([...cls.matchAll(/\bhidden-([a-z0-9]+)/g)].map((h) => h[1]));
     if (stack.length === 2) {
       sections++;
-      if (/data-framer-name="[^"]*hero/i.test(m[2])) heroSeen = true;
+      heroSection = /data-framer-name="[^"]*hero/i.test(m[2]);
+      if (heroSection) heroSeen = true;
       // Pages without a section named "...Hero": treat the first three root children as the first screen.
       if (!heroSeen && sections > 3) pastHero = true;
     }

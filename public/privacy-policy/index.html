@@ -238,12 +238,17 @@ fbq('track', 'PageView');
 
 <!-- RR landing: show the page before Framer's JS runs (scripts/framer-pages.mjs) -->
 <style>
+  html.rr-wait #main { visibility: hidden; }
   #main > div:first-of-type { opacity: 1 !important; zoom: var(--rr-zoom, 1) !important; min-height: calc(100vh / var(--rr-zoom, 1)) !important; }
   [data-rr-shown] { opacity: 1 !important; }
   [data-framer-name$="[Vectorized]"] { cursor: pointer; }
 </style>
 <script>
   (function () {
+    // Hidden until the end of #main is parsed (BODY script); the timeout only guards against that script never running.
+    var root = document.documentElement;
+    root.classList.add('rr-wait');
+    setTimeout(function () { root.classList.remove('rr-wait'); }, 4000);
     function zoom() {
       var w = window.innerWidth;
       document.documentElement.style.setProperty('--rr-zoom', String(w / (w < 768 ? 393 : 1440)));
@@ -437,6 +442,7 @@ fbq('track', 'PageView');
       var r = els[i].getBoundingClientRect();
       if (r.bottom > 0 && r.top < vh && r.width > 0) els[i].setAttribute('data-rr-shown', '');
     }
+    document.documentElement.classList.remove('rr-wait');
   })();
   /* RR landing: the header logo leads to our home page (Framer linked it to the top of this page). */
   (function () {
