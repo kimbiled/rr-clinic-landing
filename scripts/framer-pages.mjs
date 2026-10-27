@@ -32,9 +32,7 @@
 //   6. In-site <a href="https://rr-clinic.kz/..."> become relative, so they stay on this host.
 //   7. Framer's JS (~340 KB: main bundle + modulepreloads) starts after the load event, or at the first touch, key,
 //      wheel or scroll. The page is already complete without it; it brings the menu, sliders and animations. Until
-//      then, entrance-animated blocks are shown as they scroll into view, so nothing stays blank.
-//   8. The hero's Google Fonts (Manrope) are preloaded, Cyrillic and Latin subsets together (see heroFontPreloads).
-import { mkdir, rm, writeFile } from 'node:fs/promises';
+//      then, entrance-animated blocks are shown as they scroll into view, so nothing stays blank.import { mkdir, rm, writeFile } from 'node:fs/promises';
 import { dirname, join } from 'node:path';
 import { fileURLToPath } from 'node:url';
 
@@ -307,29 +305,6 @@ function patchImages(html, slug) {
   return { html: out, preload, ...counts };
 }
 
-/**
- * Patch 8: Google Fonts used in the hero (Manrope) come as per-script subsets with font-display: swap. When the Cyrillic
- * and Latin files arrive at different times, the heading re-wraps twice and the bottom-anchored hero text jumps
- * (CLS 0.3 on /kurmanbayev-rustam). Preloading both subsets makes them arrive together, early.
- */
-function heroFontPreloads(html) {
-  const families = new Set();
-  for (const m of html.matchAll(/data-framer-name="[^"]*hero[^"]*"/gi)) {
-    for (const [, sel] of html.slice(m.index, m.index + 60000).matchAll(/--font-selector:\s*([A-Za-z0-9+/=]+)/g)) {
-      const name = Buffer.from(sel, 'base64').toString();
-      if (name.startsWith('GF;')) families.add(name.slice(3).replace(/-[\w]+$/, ''));
-    }
-  }
-  const urls = new Set();
-  for (const [face] of html.matchAll(/@font-face\s*\{[^}]*\}/g)) {
-    const family = /font-family:\s*["']?([^"';]+?)["']?\s*;/.exec(face)?.[1];
-    const range =/unicode-range:\s*([^;}]*)/.exec(face)?.[1] ?? '';
-    const url = /url\(([^)]*fonts\.gstatic\.com[^)]*\.woff2)\)/.exec(face)?.[1];
-    if (url && families.has(family) && (range.includes('U+0400-045F') || range.startsWith('U+0000-00FF'))) urls.add(url);
-  }
-  return [...urls].map((url) => `<link rel="preload" as="font" type="font/woff2" href="${url}" crossorigin>`).join('');
-}
-
 /** Patch 4: run the inline Meta Pixel snippet after the load event. */
 function deferPixel(html) {
   return html.replace(/<script>(\s*!function\(f,b,e,v,n,t,s\)[\s\S]*?)<\/script>/, (_, code) =>
@@ -367,7 +342,7 @@ function patch(html, slug) {
   );
   return deferPixel(deferred.html)
     .replace(/(<a\b[^>]*\bhref=")https:\/\/rr-clinic\.kz\/?/g, '$1/')
-    .replace(/<head\b[^>]*>/, (head) => `${head}${images.preload}${heroFontPreloads(html)}`)
+    .replace(/<head\b[^>]*>/, (head) => `${head}${images.preload}`)
     .replace('</head>', `${HEAD}</head>`)
     .replace('</body>', `${BODY.replace('__RR_BUNDLE__', JSON.stringify(deferred.bundle))}</body>`);
 }
