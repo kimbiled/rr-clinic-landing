@@ -2,7 +2,7 @@
 <!-- Made in Framer · framer.com -->
 <!-- Published Oct 26, 2026, 4:38 PM UTC -->
 <html dir="ltr">
-<head><link rel="preload" as="image" fetchpriority="high" media="(max-width: 809.98px)" imagesrcset="https://framerusercontent.com/images/7YIGPn7gRl8ta2XgztezxR4eYXs.png?scale-down-to=1024&amp;width=804&amp;height=1300 633w,https://framerusercontent.com/images/7YIGPn7gRl8ta2XgztezxR4eYXs.png?width=804&amp;height=1300 804w" imagesizes="(min-width: 1440px) 1px, (min-width: 810px) and (max-width: 1439.98px) 1px, (max-width: 809.98px) 331px">
+<head><link rel="preload" as="image" fetchpriority="high" media="(max-width: 809.98px)" imagesrcset="https://framerusercontent.com/images/7YIGPn7gRl8ta2XgztezxR4eYXs.png?scale-down-to=1024&amp;width=804&amp;height=1300 633w,https://framerusercontent.com/images/7YIGPn7gRl8ta2XgztezxR4eYXs.png?width=804&amp;height=1300 804w" imagesizes="(min-width: 1440px) 1px, (min-width: 810px) and (max-width: 1439.98px) 1px, (max-width: 809.98px) 331px"><link rel="preload" as="font" type="font/woff2" href="https://framerusercontent.com/assets/7RAvnlUKPTJmdlE33ZboEDjYu6c.woff2" crossorigin><link rel="preload" as="font" type="font/woff2" href="https://framerusercontent.com/assets/4PvvwwL8flzRaCaIJaSFgzlVLxQ.woff2" crossorigin><link rel="preload" as="font" type="font/woff2" href="https://framerusercontent.com/assets/Ky6hmPGFlmXHEfxTQjMhPoYQrw.woff2" crossorigin>
 	<meta charset="utf-8">
 	<meta name="viewport" content="width=device-width">
 	<meta name="generator" content="Framer 6d5a0f2">
@@ -903,7 +903,19 @@ fbq('track', 'PageView');
       var r = els[i].getBoundingClientRect();
       if (r.bottom > 0 && r.top < vh && r.width > 0) els[i].setAttribute('data-rr-shown', '');
     }
-    document.documentElement.classList.remove('rr-wait');
+    /* Show the page once the custom fonts (preloaded in the head) are in, or after 800 ms at most: a later font swap
+       re-flows the bottom-anchored hero text, which counted as a layout shift. */
+    var shown = false;
+    function show() {
+      if (shown) return;
+      shown = true;
+      document.documentElement.classList.remove('rr-wait');
+    }
+    var families = ["Futura PT Book","Futura PT Medium","Futura PT Light"];
+    if (families.length && document.fonts && document.fonts.load) {
+      Promise.all(families.map(function (f) { return document.fonts.load('1em "' + f + '"'); })).then(show, show);
+      setTimeout(show, 800);
+    } else show();
   })();
   /* RR landing: the header logo leads to our home page (Framer linked it to the top of this page). */
   (function () {

@@ -15,7 +15,8 @@
 //      script applies the same zoom with CSS before the first paint and keeps it in sync on resize.
 //      The page also stays hidden until the parser reaches the end of #main: the phone hero sits near the end of the
 //      HTML and is moved to the top with CSS `order`, so painting the document as it streams in showed the sections
-//      below first and then pushed them down when the hero arrived (mobile CLS ~1.0 on a real network).
+//      below first and then pushed them down when the hero arrived (mobile CLS ~1.0 on a real network). It also waits
+//      (800 ms at most) for the site's Futura PT fonts, preloaded in the head, so a font swap does not re-flow the text.
 //   2. Entrance animations in the first screen. Appear-animated elements start at opacity 0 until the bundle runs; the
 //      ones already in the viewport are shown straight away (their transform still settles when Framer animates).
 //      Elements further down keep their scroll animations.
@@ -103,7 +104,19 @@ const BODY = `
       var r = els[i].getBoundingClientRect();
       if (r.bottom > 0 && r.top < vh && r.width > 0) els[i].setAttribute('data-rr-shown', '');
     }
-    document.documentElement.classList.remove('rr-wait');
+    /* Show the page once the custom fonts (preloaded in the head) are in, or after 800 ms at most: a later font swap
+       re-flows the bottom-anchored hero text, which counted as a layout shift. */
+    var shown = false;
+    function show() {
+      if (shown) return;
+      shown = true;
+      document.documentElement.classList.remove('rr-wait');
+    }
+    var families = __RR_FONTS__;
+    if (families.length && document.fonts && document.fonts.load) {
+      Promise.all(families.map(function (f) { return document.fonts.load('1em "' + f + '"'); })).then(show, show);
+      setTimeout(show, 800);
+    } else show();
   })();
   /* RR landing: the header logo leads to our home page (Framer linked it to the top of this page). */
   (function () {
@@ -252,6 +265,21 @@ function patchImages(html, slug) {
   return { html: out, preload, ...counts };
 }
 
+/** The site's own fonts (Futura PT, uploaded to Framer): preload links + family names to wait for before showing the page. */
+function customFonts(html) {
+  const families = [];
+  let preload = '';
+  for (const [face] of html.matchAll(/@font-face\s*\{[^}]*\}/g)) {
+    const url = /url\("?(https:\/\/framerusercontent\.com\/assets\/[^")]+\.woff2)"?\)/.exec(face)?.[1];
+    const family = /font-family:\s*"?([^";]+?)"?\s*;/.exec(face)?.[1];
+    // Fonts split by unicode-range (Inter) would need the right subset guessed; only whole-font files are preloaded.
+    if (!url || !family || families.includes(family) || /unicode-range/.test(face)) continue;
+    families.push(family);
+    preload += `<link rel="preload" as="font" type="font/woff2" href="${url}" crossorigin>`;
+  }
+  return { families, preload };
+}
+
 /** Patch 4: run the inline Meta Pixel snippet after the load event. */
 function deferPixel(html) {
   return html.replace(/<script>(\s*!function\(f,b,e,v,n,t,s\)[\s\S]*?)<\/script>/, (_, code) =>
@@ -264,15 +292,16 @@ function patch(html, slug) {
   if (!wrapper.test(html)) throw new Error(`${slug}: zoom wrapper not found — check patch 1 against the new Framer markup`);
   if (!html.includes('</head>') || !html.includes('</body>')) throw new Error(`${slug}: no </head> or </body>`);
   const images = patchImages(html, slug);
+  const fonts = customFonts(html);
   console.log(
     `  images: ${images.eager} first screen, ${images.shrunk} hidden-variant sizes → 1px, ${images.lazy} made lazy` +
       (images.preload ? ', phone hero photo preloaded' : ''),
   );
   return deferPixel(images.html)
     .replace(/(<a\b[^>]*\bhref=")https:\/\/rr-clinic\.kz\/?/g, '$1/')
-    .replace(/<head\b[^>]*>/, (head) => `${head}${images.preload}`)
+    .replace(/<head\b[^>]*>/, (head) => `${head}${images.preload}${fonts.preload}`)
     .replace('</head>', `${HEAD}</head>`)
-    .replace('</body>', `${BODY}</body>`);
+    .replace('</body>', `${BODY.replace('__RR_FONTS__', JSON.stringify(fonts.families))}</body>`);
 }
 
 const slugs = process.argv.length > 2 ? process.argv.slice(2) : SLUGS;
