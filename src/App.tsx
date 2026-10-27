@@ -8,6 +8,9 @@ import { loadSurgeonMenu } from './components/surgeon-menu/menuTrigger';
 import { SurgeonMenuFallback } from './components/surgeon-menu/SurgeonMenuFallback';
 import { Trust } from './components/sections/Trust';
 import { Programs } from './components/sections/Programs';
+import { Journey } from './components/sections/Journey';
+import { Surgery } from './components/sections/Surgery';
+import { Operations } from './components/sections/Operations';
 
 // Team is below the fold and is the only section using antd (Segmented). It is code-split AND only
 // requested when the visitor scrolls within ~800 px of it (R3-1), so antd never competes with the
@@ -80,6 +83,9 @@ export default function App() {
         <Trust />
         <DeferredTeam />
         <Programs />
+        <Journey />
+        <Surgery />
+        <Operations />
       </main>
       <DeferredSurgeonMenu />
     </HeroProvider>
