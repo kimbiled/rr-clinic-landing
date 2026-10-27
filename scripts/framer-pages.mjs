@@ -24,6 +24,9 @@
 //      to the end of the hero, plus any section named "...hero", wherever it sits in the HTML) an image's `sizes` is set
 //      to 1px for the breakpoints that hide it, so a hidden copy costs the smallest file; everywhere else, images without
 //      a loading attribute become lazy, so hidden copies are never fetched and visible ones load as they approach.
+//      The phone hero photo (the phone LCP) is preloaded at high priority, phones only.
+//   3b. Full-size CDN images without srcset (before/after sliders: up to 4400 px, ~1 MB each) get the CDN's
+//      scale-down-to copy: in the HTML here, and for the ones Framer's JS creates via a small src/setAttribute hook.
 //   4. Meta Pixel loads after the page has loaded instead of competing with the first screen (PageView still fires).
 //   5. The header logo leads to our home page (Framer links it to the top of the same page).
 //   6. In-site <a href="https://rr-clinic.kz/..."> become relative, so they stay on this host.
@@ -68,6 +71,24 @@ const HEAD = `
     zoom();
     window.addEventListener('resize', zoom);
   })();
+  (function () {
+    /* Framer's code components (before/after sliders) set full-size CDN images (up to 4400 px, ~1 MB) with no srcset:
+       ask the CDN for a scaled-down copy instead (patch 3b). */
+    var cap = window.innerWidth < 810 ? 1536 : 2048;
+    function shrink(v) { return ${shrinkUrl.toString().replace(/\s+/g, ' ')}(v, cap); }
+    var setAttr = Element.prototype.setAttribute;
+    Element.prototype.setAttribute = function (name, value) {
+      if (this.tagName === 'IMG' && name === 'src' && typeof value === 'string') value = shrink(value);
+      return setAttr.call(this, name, value);
+    };
+    var desc = Object.getOwnPropertyDescriptor(HTMLImageElement.prototype, 'src');
+    Object.defineProperty(HTMLImageElement.prototype, 'src', {
+      configurable: true,
+      enumerable: desc.enumerable,
+      get: desc.get,
+      set: function (value) { desc.set.call(this, typeof value === 'string' ? shrink(value) : value); },
+    });
+  })();
 </script>
 `;
 
@@ -102,6 +123,19 @@ const BODY = `
 </script>
 `;
 
+/**
+ * A full-size Framer CDN image (no scale-down-to) whose longer side exceeds `cap` → the CDN's scaled-down copy.
+ * Also inlined into the page (HEAD), so it is written in plain ES5 without comments.
+ */
+function shrinkUrl(url, cap) {
+  var m = /^(https:\/\/framerusercontent\.com\/images\/[^?]+)\?(.*)$/.exec(url);
+  if (!m || /(^|&)scale-down-to=/.test(m[2])) return url;
+  var w = /(?:^|&)width=(\d+)/.exec(m[2]);
+  var h = /(?:^|&)height=(\d+)/.exec(m[2]);
+  if (!w || Math.max(+w[1], h ? +h[1] : 0) <= cap) return url;
+  return m[1] + '?scale-down-to=' + cap + '&' + m[2];
+}
+
 /** Breakpoint hash → media query, from the hydration data on #main. */
 function breakpoints(html) {
   const m = /breakpoints&quot;:(\[.*?\])/.exec(html);
@@ -109,15 +143,37 @@ function breakpoints(html) {
   return new Map(JSON.parse(m[1].replaceAll('&quot;', '"')).map((b) => [b.hash, b.mediaQuery]));
 }
 
+/** Splits "a, max(b, c), d" at the commas outside parentheses. */
+function splitTopLevel(list) {
+  const parts = [];
+  let depth = 0;
+  let from = 0;
+  for (let i = 0; i < list.length; i++) {
+    if (list[i] === '(') depth++;
+    else if (list[i] === ')') depth--;
+    else if (list[i] === ',' && depth === 0) {
+      parts.push(list.slice(from, i).trim());
+      from = i + 1;
+    }
+  }
+  parts.push(list.slice(from).trim());
+  return parts;
+}
+
 /** "(min-width: 1440px) 1240px, ..." → the clauses for hidden media queries say 1px. */
 function shrinkSizes(sizes, hiddenMedia) {
-  return sizes
-    .split(/,\s*/)
+  return splitTopLevel(sizes)
     .map((clause) => {
-      const at = clause.lastIndexOf(' ');
-      return at > 0 && hiddenMedia.has(clause.slice(0, at)) ? `${clause.slice(0, at)} 1px` : clause;
+      for (const query of hiddenMedia) if (clause.startsWith(`${query} `)) return `${query} 1px`;
+      return clause;
     })
     .join(', ');
+}
+
+/** Patch 3b for images in the HTML: full-size CDN `src` without srcset → scaled-down copy (attribute values use &amp;). */
+function shrinkSrc(tag) {
+  if (/\ssrcset="/.test(tag)) return tag;
+  return tag.replace(/\ssrc="([^"]*)"/, (_, src) => ` src="${shrinkUrl(src.replaceAll('&amp;', '&'), 1536).replaceAll('&', '&amp;')}"`);
 }
 
 /** Patch 3: walks the divs under the Framer root, tracking which breakpoints hide each image and whether it is past the hero. */
@@ -129,6 +185,8 @@ function patchImages(html, slug) {
     return { html, eager: 0, shrunk: 0, lazy: 0 };
   }
   const start = html.lastIndexOf('<div', rootAt);
+  const phone = [...media].find(([, query]) => query.startsWith('(max-width'));
+  let lcp = null; // phone LCP guess: the largest phone-visible image with a srcset in the first screen
   const stack = []; // per open div: the breakpoint hashes it hides
   let pastHero = false;
   let heroSeen = false;
@@ -141,7 +199,7 @@ function patchImages(html, slug) {
   for (let m; (m = tags.exec(html)); ) {
     if (m[0].startsWith('<img')) {
       const hidden = new Set(stack.flat());
-      let tag = m[0];
+      let tag = shrinkSrc(m[0]);
       if (pastHero && !heroSection) {
         if (!/\sloading=/.test(tag)) {
           tag = tag.replace('<img', '<img loading="lazy"');
@@ -153,8 +211,12 @@ function patchImages(html, slug) {
           tag = tag.replace(/\ssizes="([^"]*)"/, (_, s) => ` sizes="${shrinkSizes(s, hiddenMedia)}"`);
           counts.shrunk++;
         } else counts.eager++;
+        const area = Number(/\swidth="(\d+)"/.exec(tag)?.[1] ?? 0) * Number(/\sheight="(\d+)"/.exec(tag)?.[1] ?? 0);
+        if (phone && !hidden.has(phone[0]) && /\ssrcset="/.test(tag) && area > (lcp?.area ?? 0)) {
+          lcp = { area, edit: edits.length };
+        }
       }
-      if (tag !== m[0]) edits.push([m.index, m.index + m[0].length, tag]);
+      edits.push([m.index, m.index + m[0].length, tag]);
       continue;
     }
     if (m[1]) {
@@ -174,9 +236,20 @@ function patchImages(html, slug) {
       if (!heroSeen && sections > 3) pastHero = true;
     }
   }
+  // The phone hero sits near the end of the HTML, so its photo is found late: preload it (phones only) at high priority.
+  let preload = '';
+  if (lcp) {
+    const edit = edits[lcp.edit];
+    edit[2] = edit[2].replace('<img', '<img fetchpriority="high"');
+    const srcset = /\ssrcset="([^"]*)"/.exec(edit[2])[1];
+    const sizes = /\ssizes="([^"]*)"/.exec(edit[2])?.[1];
+    preload =
+      `<link rel="preload" as="image" fetchpriority="high" media="${phone[1]}" imagesrcset="${srcset}"` +
+      `${sizes ? ` imagesizes="${sizes}"` : ''}>`;
+  }
   let out = html;
-  for (const [from, to, text] of edits.reverse()) out = out.slice(0, from) + text + out.slice(to);
-  return { html: out, ...counts };
+  for (const [from, to, text] of edits.reverse()) if (html.slice(from, to) !== text) out = out.slice(0, from) + text + out.slice(to);
+  return { html: out, preload, ...counts };
 }
 
 /** Patch 4: run the inline Meta Pixel snippet after the load event. */
@@ -191,9 +264,13 @@ function patch(html, slug) {
   if (!wrapper.test(html)) throw new Error(`${slug}: zoom wrapper not found — check patch 1 against the new Framer markup`);
   if (!html.includes('</head>') || !html.includes('</body>')) throw new Error(`${slug}: no </head> or </body>`);
   const images = patchImages(html, slug);
-  console.log(`  images: ${images.eager} first screen, ${images.shrunk} hidden-variant sizes → 1px, ${images.lazy} made lazy`);
+  console.log(
+    `  images: ${images.eager} first screen, ${images.shrunk} hidden-variant sizes → 1px, ${images.lazy} made lazy` +
+      (images.preload ? ', phone hero photo preloaded' : ''),
+  );
   return deferPixel(images.html)
     .replace(/(<a\b[^>]*\bhref=")https:\/\/rr-clinic\.kz\/?/g, '$1/')
+    .replace(/<head\b[^>]*>/, (head) => `${head}${images.preload}`)
     .replace('</head>', `${HEAD}</head>`)
     .replace('</body>', `${BODY}</body>`);
 }

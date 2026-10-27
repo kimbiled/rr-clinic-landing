@@ -256,6 +256,24 @@ fbq('track', 'PageView');
     zoom();
     window.addEventListener('resize', zoom);
   })();
+  (function () {
+    /* Framer's code components (before/after sliders) set full-size CDN images (up to 4400 px, ~1 MB) with no srcset:
+       ask the CDN for a scaled-down copy instead (patch 3b). */
+    var cap = window.innerWidth < 810 ? 1536 : 2048;
+    function shrink(v) { return function shrinkUrl(url, cap) { var m = /^(https:\/\/framerusercontent\.com\/images\/[^?]+)\?(.*)$/.exec(url); if (!m || /(^|&)scale-down-to=/.test(m[2])) return url; var w = /(?:^|&)width=(\d+)/.exec(m[2]); var h = /(?:^|&)height=(\d+)/.exec(m[2]); if (!w || Math.max(+w[1], h ? +h[1] : 0) <= cap) return url; return m[1] + '?scale-down-to=' + cap + '&' + m[2]; }(v, cap); }
+    var setAttr = Element.prototype.setAttribute;
+    Element.prototype.setAttribute = function (name, value) {
+      if (this.tagName === 'IMG' && name === 'src' && typeof value === 'string') value = shrink(value);
+      return setAttr.call(this, name, value);
+    };
+    var desc = Object.getOwnPropertyDescriptor(HTMLImageElement.prototype, 'src');
+    Object.defineProperty(HTMLImageElement.prototype, 'src', {
+      configurable: true,
+      enumerable: desc.enumerable,
+      get: desc.get,
+      set: function (value) { desc.set.call(this, typeof value === 'string' ? shrink(value) : value); },
+    });
+  })();
 </script>
 </head>
 <body>
