@@ -24,9 +24,10 @@ src/
   hooks/  theme/  styles/
   data/                 hero.json (контент), types.ts (типы), hero.ts (heroData, getDoctor, getCasesByDoctor, asset)
 public/assets/          img/web (оптимизированные картинки), icons, fonts
-public/<slug>/          страницы врачей и /privacy-policy, сохранённые со старого сайта (Framer): index.html + files/
+public/<slug>/          страницы врачей и /privacy-policy из Framer (rr-clinic.kz): index.html, обновлять через
+                        `node scripts/framer-pages.mjs` (картинки и JS — с CDN Framer)
 assets-src/img/         исходные PNG (не изменяются)
-scripts/                optimize-images.sh, validate-data.mjs
+scripts/                optimize-images.sh, validate-data.mjs, framer-pages.mjs
 docs/                   PLAN.md, design-spec.md, data-schema.md, qa/, ref/ (референсы дизайна)
 legacy/                 прежняя версия на vanilla JS (только для справки; sync-hero-data.sh устарел)
 ```
