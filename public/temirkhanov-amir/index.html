@@ -2,7 +2,7 @@
 <!-- Made in Framer · framer.com -->
 <!-- Published Oct 26, 2026, 4:38 PM UTC -->
 <html dir="ltr">
-<head><link rel="preload" as="image" fetchpriority="high" media="(max-width: 809.98px)" imagesrcset="https://framerusercontent.com/images/6CtPNSZlFhMM1T2BJ9DXZydk.png?width=851&amp;height=1849 851w" imagesizes="(min-width: 1440px) 1px, (min-width: 810px) and (max-width: 1439.98px) 1px, (max-width: 809.98px) 430px"><link rel="preload" as="font" type="font/woff2" href="https://framerusercontent.com/assets/7RAvnlUKPTJmdlE33ZboEDjYu6c.woff2" crossorigin><link rel="preload" as="font" type="font/woff2" href="https://framerusercontent.com/assets/4PvvwwL8flzRaCaIJaSFgzlVLxQ.woff2" crossorigin><link rel="preload" as="font" type="font/woff2" href="https://framerusercontent.com/assets/Ky6hmPGFlmXHEfxTQjMhPoYQrw.woff2" crossorigin>
+<head><link rel="preload" as="image" fetchpriority="high" media="(max-width: 809.98px)" imagesrcset="https://framerusercontent.com/images/6CtPNSZlFhMM1T2BJ9DXZydk.png?width=851&amp;height=1849 851w" imagesizes="(min-width: 1440px) 1px, (min-width: 810px) and (max-width: 1439.98px) 1px, (max-width: 809.98px) 430px">
 	<meta charset="utf-8">
 	<meta name="viewport" content="width=device-width">
 	<meta name="generator" content="Framer 6d5a0f2">
@@ -257,13 +257,20 @@ fbq('track', 'PageView');
     window.addEventListener('resize', zoom);
   })();
   (function () {
-    /* Framer's code components (before/after sliders) set full-size CDN images (up to 4400 px, ~1 MB) with no srcset:
-       ask the CDN for a scaled-down copy instead (patch 3b). */
+    /* Images created by Framer's JS (only those: the parser does not go through these setters) (patch 3b):
+       - code components (before/after sliders) set full-size CDN images (up to 4400 px, ~1 MB) with no srcset:
+         ask the CDN for a scaled-down copy instead;
+       - after hydration the case carousels re-create ~20 images at once: unless the component chose a loading mode,
+         they load lazily, so the ones off screen wait for the visitor instead of competing with the first screen. */
     var cap = window.innerWidth < 810 ? 1536 : 2048;
     function shrink(v) { return function shrinkUrl(url, cap) { var m = /^(https:\/\/framerusercontent\.com\/images\/[^?]+)\?(.*)$/.exec(url); if (!m || /(^|&)scale-down-to=/.test(m[2])) return url; var w = /(?:^|&)width=(\d+)/.exec(m[2]); var h = /(?:^|&)height=(\d+)/.exec(m[2]); if (!w || Math.max(+w[1], h ? +h[1] : 0) <= cap) return url; return m[1] + '?scale-down-to=' + cap + '&' + m[2]; }(v, cap); }
     var setAttr = Element.prototype.setAttribute;
+    function lazy(img) { if (!img.hasAttribute('loading')) setAttr.call(img, 'loading', 'lazy'); }
     Element.prototype.setAttribute = function (name, value) {
-      if (this.tagName === 'IMG' && name === 'src' && typeof value === 'string') value = shrink(value);
+      if (this.tagName === 'IMG' && name === 'src' && typeof value === 'string') {
+        lazy(this);
+        value = shrink(value);
+      }
       return setAttr.call(this, name, value);
     };
     var desc = Object.getOwnPropertyDescriptor(HTMLImageElement.prototype, 'src');
@@ -271,7 +278,10 @@ fbq('track', 'PageView');
       configurable: true,
       enumerable: desc.enumerable,
       get: desc.get,
-      set: function (value) { desc.set.call(this, typeof value === 'string' ? shrink(value) : value); },
+      set: function (value) {
+        lazy(this);
+        desc.set.call(this, typeof value === 'string' ? shrink(value) : value);
+      },
     });
   })();
 </script>
@@ -956,19 +966,7 @@ fbq('track', 'PageView');
       var r = els[i].getBoundingClientRect();
       if (r.bottom > 0 && r.top < vh && r.width > 0) els[i].setAttribute('data-rr-shown', '');
     }
-    /* Show the page once the custom fonts (preloaded in the head) are in, or after 800 ms at most: a later font swap
-       re-flows the bottom-anchored hero text, which counted as a layout shift. */
-    var shown = false;
-    function show() {
-      if (shown) return;
-      shown = true;
-      document.documentElement.classList.remove('rr-wait');
-    }
-    var families = ["Futura PT Book","Futura PT Medium","Futura PT Light"];
-    if (families.length && document.fonts && document.fonts.load) {
-      Promise.all(families.map(function (f) { return document.fonts.load('1em "' + f + '"'); })).then(show, show);
-      setTimeout(show, 800);
-    } else show();
+    document.documentElement.classList.remove('rr-wait');
   })();
   /* RR landing: the header logo leads to our home page (Framer linked it to the top of this page). */
   (function () {
