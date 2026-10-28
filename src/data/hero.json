@@ -235,6 +235,30 @@
       "city": "Астана",
       "href": "/savelyev-evgeniy",
       "figmaNodeId": "1610:402"
+    },
+    {
+      "id": "ulagasheva-alina",
+      "name": "Улагашева Алина",
+      "firstName": "Алина",
+      "lastName": "Улагашева",
+      "role": "Пластический хирург",
+      "specialty": "Эстетическая хирургия груди и лица",
+      "photo": null,
+      "avatar": null,
+      "city": "Астана",
+      "href": "/ulagasheva-alina"
+    },
+    {
+      "id": "temirkhan-anar",
+      "name": "Темирхан Анар",
+      "firstName": "Анар",
+      "lastName": "Темирхан",
+      "role": "Хирург-резидент",
+      "specialty": "Хирург-резидент, отделение пластической хирургии RR Clinic",
+      "photo": null,
+      "avatar": null,
+      "city": "Астана",
+      "href": "/temirkhan-anar"
     }
   ],
   "cases": [

@@ -63,9 +63,9 @@ function richLines(value: RichTextValue): RichTextValue[] {
 }
 
 /**
- * "Нам доверяют пациенты из 15 стран" (design 2026-10-22): headline, text and four key figures on the left,
- * the world map with the patients' countries on the right; below, the founders photo card (1240×476)
- * with a white panel — clinic headline, text and CTAs.
+ * "Нам доверяют пациенты из 14 стран" (design 2026-10-28): centred headline and text, the world map with the
+ * patients' countries, four key figures in a row; below, the founders photo card (1240×476) with a white
+ * panel — clinic headline, text and CTAs.
  */
 export function Trust() {
   const { ref, inView } = useInView<HTMLElement>();
@@ -80,46 +80,43 @@ export function Trust() {
       className="rr-section relative bg-white"
       {...revealScope(inView)}
     >
-      <div className="mx-auto max-w-[1440px] px-(--sec-pad) pt-6">
-        <div className="flex items-start justify-between gap-10">
-          <div className="pt-[62px]">
-            <h2
-              id="trust-title"
-              className="font-display text-[32px] leading-[1.1] font-normal tracking-[-0.02em] text-neutral-900"
-              {...revealItem(0)}
-            >
-              {trust.title[0]}
-              <br />
-              <span className="text-[#5e8d7e]">{trust.title[1]}</span>
-            </h2>
+      <div className="mx-auto max-w-[1440px] px-(--sec-pad) pt-[72px]">
+        <div className="text-center">
+          <h2
+            id="trust-title"
+            className="font-display text-[48px] leading-[1.1] font-normal tracking-[-0.03em] text-neutral-900"
+            {...revealItem(0)}
+          >
+            {trust.title[0]} <span className="text-[#5e8d7e]">{trust.title[1]}</span>
+          </h2>
 
-            <p className="mt-[34px] font-text text-[18px] leading-[1.25] text-[#625f5e]" {...revealItem(1)}>
-              {withBreaks(trust.text)}
-            </p>
-
-            <dl className="mt-10 grid grid-cols-[216px_216px] gap-x-5 gap-y-6" {...revealItem(2)}>
-              {trust.stats.map((stat) => (
-                <div key={stat.label} className="flex flex-col gap-2.5">
-                  <dt className="sr-only">{stat.label}</dt>
-                  <dd className="rr-trim-cap order-first font-display text-[36px] leading-none font-light tracking-[-0.02em] text-[#5e8d7e]">
-                    <StatValue value={stat.value} />
-                  </dd>
-                  <dd
-                    className="rr-trim-cap max-w-[195.5px] font-text text-[16px] leading-none tracking-[-0.02em] text-[#625f5e]"
-                    aria-hidden="true"
-                  >
-                    {stat.label}
-                  </dd>
-                </div>
-              ))}
-            </dl>
-          </div>
-
-          <WorldMap className="w-[716px] shrink-0" />
+          <p className="mt-6 font-text text-[20px] leading-[1.35] text-[#625f5e]" {...revealItem(1)}>
+            {withBreaks(trust.text)}
+          </p>
         </div>
 
+        <WorldMap className="mx-auto mt-12 w-full max-w-[1164px]" />
+
+        <dl className="mt-12 flex justify-between gap-6" {...revealItem(2)}>
+          {trust.stats.map((stat) => (
+            <div key={stat.label} className="flex w-[244px] flex-col gap-5 border-l border-[#e3e0de] pl-6">
+              <dt className="sr-only">{stat.label.replace('\n', ' ')}</dt>
+              <dd className="rr-trim-cap order-first font-display text-[72px] leading-none font-light tracking-[-0.04em] text-[#5e8d7e]">
+                <StatValue value={stat.value} />
+                {stat.unit && <span className="ml-2 text-[30px] tracking-[-0.02em]">{stat.unit}</span>}
+              </dd>
+              <dd
+                className="font-text text-[18px] leading-[1.2] tracking-[-0.01em] text-[#625f5e]"
+                aria-hidden="true"
+              >
+                {withBreaks(stat.label)}
+              </dd>
+            </div>
+          ))}
+        </dl>
+
         <div
-          className="rr-trust relative isolate mt-4 flex overflow-hidden rounded-[48px] bg-[#8a7562]"
+          className="rr-trust relative isolate mt-20 flex overflow-hidden rounded-[48px] bg-[#8a7562]"
           {...revealItem(3)}
         >
           <img

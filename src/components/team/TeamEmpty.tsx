@@ -1,12 +1,12 @@
 const GHOSTS = 6;
 
-/** Empty tab: the card row as soft "ghost" frames with a centred note — same 375 px footprint as the doctors row. */
+/** Empty tab: the card row as soft "ghost" frames with a centred note — same 562 px footprint as the doctors row. */
 export function TeamEmpty({ label }: { label: string }) {
   return (
-    <div className="team-empty relative h-[375px] overflow-hidden">
+    <div className="team-empty relative h-[562px] overflow-hidden">
       <ul aria-hidden="true" className="flex w-max gap-5">
         {Array.from({ length: GHOSTS }, (_, i) => (
-          <li key={i} className="team-card h-[375px] w-[296px] shrink-0 rounded-[20px] bg-[#f5f2ef]" style={{ ['--i' as string]: i }} />
+          <li key={i} className="team-card h-[562px] w-[300px] shrink-0 rounded-[24px] bg-[#f5f2f0]" style={{ ['--i' as string]: i }} />
         ))}
       </ul>
 

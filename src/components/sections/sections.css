@@ -61,8 +61,13 @@
   }
 
   /* ---- Trust map: patients' countries tinted, Kazakhstan dark; hover deepens the country + lifts its pin ---- */
+  .rr-map__geo {
+    -webkit-mask-image: linear-gradient(180deg, transparent, #000 10%, #000 74%, transparent);
+    mask-image: linear-gradient(180deg, transparent, #000 10%, #000 74%, transparent);
+  }
+
   .rr-map__country {
-    fill: #9dc2b4;
+    fill: #c2d9d1;
     stroke: #fff;
     stroke-width: 0.5;
     stroke-linejoin: round;
@@ -71,23 +76,21 @@
   }
 
   .rr-map__country[data-country='kazakhstan'] {
-    fill: #5e8b7b;
+    fill: #5a8a7c;
   }
 
   .rr-map__country[data-active] {
-    fill: #78a595;
+    fill: #9dc2b4;
   }
 
   .rr-map__country[data-country='kazakhstan'][data-active] {
     fill: #44705f;
   }
 
-  /* Pin: anchored at the dot; the label sits above it with a small tail */
+  /* Pin: a zero-size anchor at the dot; the label sits on its data-side (WorldMap.tsx) */
   .rr-map__pin {
-    display: flex;
-    flex-direction: column;
-    align-items: center;
-    translate: -50% calc(-100% + 2.5px);
+    width: 0;
+    height: 0;
     cursor: pointer;
     transition: opacity 250ms var(--ease-out);
   }
@@ -101,62 +104,117 @@
     z-index: 1;
   }
 
-  /* Dot-only pins: the label is there (keeps the anchor) but hidden until the country is hovered */
-  .rr-map__pin[data-dot-only]:not([data-active]) .rr-map__label {
-    visibility: hidden;
+  .rr-map__dot {
+    position: absolute;
+    left: 0;
+    top: 0;
+    width: 9px;
+    height: 9px;
+    margin: -4.5px 0 0 -4.5px;
+    border-radius: 50%;
+    background: #4f7f72;
+    box-shadow:
+      0 0 0 2px #fff,
+      0 0 0 2px rgb(79 127 114 / 0);
+    transition: box-shadow 250ms var(--ease-out);
+  }
+
+  .rr-map__pin[data-no-dot] .rr-map__dot {
+    display: none;
+  }
+
+  /* RR Clinic: white ring over the dark Kazakhstan */
+  .rr-map__pin[data-country='kazakhstan'] .rr-map__dot {
+    width: 13px;
+    height: 13px;
+    margin: -6.5px 0 0 -6.5px;
+    background: transparent;
+    box-shadow: inset 0 0 0 2px #fff;
   }
 
   .rr-map__label {
-    position: relative;
-    padding: 5px 10px;
+    position: absolute;
+    padding: 6px 12px;
     border-radius: 99px;
     background: #fff;
-    box-shadow: 0 2px 8px rgb(46 44 44 / 0.1);
+    box-shadow: 0 4px 14px rgb(46 44 44 / 0.1);
     font-family: var(--font-text);
-    font-size: 13px;
-    line-height: 14px;
+    font-size: 15px;
+    line-height: 16px;
     color: #2e2c2c;
     white-space: nowrap;
-    transform-origin: 50% 100%;
+    translate: 0 var(--rise, 0px);
     transition:
       transform 250ms var(--ease-out),
       background-color 250ms var(--ease-out),
       color 250ms var(--ease-out);
   }
 
-  .rr-map__label::after {
-    content: '';
-    position: absolute;
-    left: 50%;
-    top: 100%;
-    border: 4px solid transparent;
-    border-top-color: #fff;
-    translate: -50% -1px;
-    transition: border-color 250ms var(--ease-out);
+  .rr-map__pin[data-side='top'] .rr-map__label {
+    bottom: 12px;
+    left: 0;
+    translate: -50% var(--rise, 0px);
   }
 
-  .rr-map__dot {
-    margin-top: 7px;
-    width: 5px;
-    height: 5px;
-    border-radius: 50%;
-    background: #5e8b7b;
-    box-shadow: 0 0 0 0 rgb(94 139 123 / 0.4);
-    transition: box-shadow 250ms var(--ease-out);
+  .rr-map__pin[data-side='top-left'] .rr-map__label {
+    bottom: 8px;
+    right: -4px;
+  }
+
+  .rr-map__pin[data-side='top-right'] .rr-map__label {
+    bottom: 6px;
+    left: 6px;
+  }
+
+  .rr-map__pin[data-side='left'] .rr-map__label {
+    top: -6px;
+    right: 12px;
+  }
+
+  .rr-map__pin[data-side='right'] .rr-map__label {
+    top: -6px;
+    left: 14px;
+  }
+
+  .rr-map__pin[data-side='bottom-left'] .rr-map__label {
+    top: 2px;
+    right: 6px;
+  }
+
+  .rr-map__pin[data-side='bottom-right'] .rr-map__label {
+    top: 2px;
+    left: 6px;
+  }
+
+  .rr-map__pin[data-no-dot] .rr-map__label {
+    left: 0;
+  }
+
+  .rr-map__pin[data-country='kazakhstan'] .rr-map__label {
+    background: #c39b62;
+    color: #fff;
   }
 
   .rr-map__pin[data-active] .rr-map__label {
-    transform: scale(1.08);
+    transform: scale(1.06);
     background: #5e8b7b;
     color: #fff;
   }
 
-  .rr-map__pin[data-active] .rr-map__label::after {
-    border-top-color: #5e8b7b;
+  .rr-map__pin[data-country='kazakhstan'][data-active] .rr-map__label {
+    background: #9a7442;
   }
 
   .rr-map__pin[data-active] .rr-map__dot {
-    box-shadow: 0 0 0 5px rgb(94 139 123 / 0.25);
+    box-shadow:
+      0 0 0 2px #fff,
+      0 0 0 7px rgb(79 127 114 / 0.25);
+  }
+
+  .rr-map__pin[data-country='kazakhstan'][data-active] .rr-map__dot {
+    box-shadow:
+      inset 0 0 0 2px #fff,
+      0 0 0 5px rgb(255 255 255 / 0.3);
   }
 
   /* Reveal: each country pill rises into place with a slight overshoot, lowest first (--pin-d, WorldMap.tsx).
@@ -164,7 +222,6 @@
   @media (prefers-reduced-motion: no-preference) {
     [data-rv] .rr-map__label,
     [data-rv] .rr-map__dot {
-      translate: 0 0;
       transition:
         transform 250ms var(--ease-out),
         background-color 250ms var(--ease-out),
@@ -176,7 +233,7 @@
 
     [data-rv='out'] .rr-map__label {
       opacity: 0;
-      translate: 0 18px;
+      --rise: 18px;
     }
 
     [data-rv='out'] .rr-map__dot {
@@ -205,41 +262,6 @@
     .rr-map__dot {
       transition: none;
     }
-  }
-
-  /* ---- Programs: gold grid frame (rules fade towards the edges, verticals fade out below the card) ---- */
-  .rr-programs {
-    --prog-line: #efdfc0;
-  }
-
-  .rr-programs__rule {
-    height: 1px;
-    background: linear-gradient(
-      90deg,
-      rgb(239 223 192 / 0.25),
-      var(--prog-line) 25%,
-      var(--prog-line) 75%,
-      rgb(239 223 192 / 0.25)
-    );
-  }
-
-  .rr-programs__frame::before,
-  .rr-programs__frame::after {
-    content: '';
-    position: absolute;
-    top: 0;
-    bottom: 0;
-    width: 1px;
-    background: linear-gradient(180deg, transparent, var(--prog-line) 6%, var(--prog-line) 55%, transparent 98%);
-    pointer-events: none;
-  }
-
-  .rr-programs__frame::before {
-    left: 0;
-  }
-
-  .rr-programs__frame::after {
-    right: 0;
   }
 
   /* "Есть другой запрос?": beige card with the Figma arches pattern (373×130, already at 5 % ink) */

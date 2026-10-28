@@ -26,6 +26,9 @@ export interface LandingImage {
 
 export interface TrustStat {
   value: string;
+  /** Smaller word after the figure ("12 месяцев"). */
+  unit?: string;
+  /** "\n" = forced line break. */
   label: string;
 }
 
@@ -36,7 +39,7 @@ export interface TrustContent {
   /** "\n" = forced line break. */
   text: string;
   stats: TrustStat[];
-  /** Founders card under the map. */
+  /** Founders card under the figures. */
   card: {
     /** `accent` = muted brand name; "\n" = forced line break. */
     title: RichText;
@@ -74,12 +77,12 @@ export interface ProgramsContent {
 
 export const trust: TrustContent = {
   id: 'trust',
-  title: ['Нам доверяют пациенты', 'из 15 стран'],
-  text: 'К нам летят из Германии, ОАЭ, США и Израиля —\nи возвращаются с результатом, который говорит сам за себя',
+  title: ['Нам доверяют пациенты', 'из 14 стран'],
+  text: 'К нам летят из Германии, ОАЭ, США и Израиля — и возвращаются\nс результатом, который говорит сам за себя',
   stats: [
-    { value: '10', label: 'узких специалистов под одной крышей' },
-    { value: '4', label: 'анестезиолога в штате' },
-    { value: '1 год', label: 'наблюдения включён после операции' },
+    { value: '10', label: 'узких специалистов\nпод одной крышей' },
+    { value: '4', label: 'анестезиолога в\nштате' },
+    { value: '12', unit: 'месяцев', label: 'Наблюдение после\nоперации' },
     { value: '1000+', label: 'довольных пациентов' },
   ],
   card: {

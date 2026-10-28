@@ -12,7 +12,7 @@ export interface TeamTab {
   members: Doctor[];
 }
 
-/** Design order of the "Пластические хирурги" row (Figma 04 / Наша команда). */
+/** Design order of the "Пластические хирурги" row (design 2026-10-28, ten cards). */
 const SURGEON_ORDER = [
   'kurmanbaev-rustam',
   'romanovskaya-tatyana',
@@ -20,39 +20,44 @@ const SURGEON_ORDER = [
   'temirkhanov-amir',
   'chatinyan-garik',
   'kodzoeva-leyla',
+  'ulagasheva-alina',
+  'savelyev-evgeniy',
+  'tulepbergenova-tomiris',
+  'temirkhan-anar',
 ];
+
+/**
+ * Team-card photos: the Figma card exports (assets-src/img/team-<id>-figma.svg — arches, blurred backdrop,
+ * cut-out and glows) flattened at 2x, see scripts/optimize-images.sh. Kept here, not in hero.json `photo`;
+ * the hero hover panel uses the face crops in hero.json `avatar` (avatar-<id>.webp).
+ */
+const card = (id: string): ImageAsset => ({ src: `assets/img/web/team-${id}.webp`, width: 600, height: 1124 });
+export const TEAM_PHOTOS: Record<string, ImageAsset> = Object.fromEntries(SURGEON_ORDER.map((id) => [id, card(id)]));
 
 /**
  * Team-card copy from the design: the card shows "Фамилия / Имя Отчество" and a short note, which
  * differ from the hero data (no patronymics there). Missing entries fall back to the doctor data.
  */
-/**
- * Team-card cut-outs (Figma exports, transparent background — see scripts/optimize-images.sh). Kept here,
- * not in hero.json `photo`; the hero hover panel uses the face crops in hero.json `avatar` (avatar-<id>.webp).
- */
-const cutout = (id: string, width: number): ImageAsset => ({ src: `assets/img/web/doctor-${id}.webp`, width, height: 750 });
-export const TEAM_PHOTOS: Record<string, ImageAsset> = {
-  'kurmanbaev-rustam': cutout('kurmanbaev-rustam', 539),
-  'romanovskaya-tatyana': cutout('romanovskaya-tatyana', 565),
-  'musa-baurzhan': cutout('musa-baurzhan', 601),
-  'temirkhanov-amir': cutout('temirkhanov-amir', 563),
-  'chatinyan-garik': cutout('chatinyan-garik', 563),
-  'kodzoeva-leyla': cutout('kodzoeva-leyla', 563),
-  'tulepbergenova-tomiris': cutout('tulepbergenova-tomiris', 659),
-};
-
 export const CARD_TEXT: Record<string, { patronymic?: string; note?: string }> = {
   'kurmanbaev-rustam': { patronymic: 'Амангельдыевич', note: 'Абдоминопластика с ушиванием диастаза' },
-  'romanovskaya-tatyana': { patronymic: 'Владимировна' },
-  'musa-baurzhan': { patronymic: 'Жаннатович' },
-  'temirkhanov-amir': { patronymic: 'Багдатович' },
-  'chatinyan-garik': { note: 'Открытая и закрытая ринопластика' },
+  'romanovskaya-tatyana': { patronymic: 'Владимировна', note: 'Автор методики «Голливудский фейслифтинг»' },
+  'musa-baurzhan': { patronymic: 'Жаннатович', note: 'Пластика век, увеличение и подтяжка груди' },
+  'temirkhanov-amir': { patronymic: 'Багдатович', note: 'Абдоминопластика, липомоделирование' },
+  'chatinyan-garik': { patronymic: 'Артурович', note: 'Челюстно-лицевой хирург, открытая и закрытая ринопластика' },
+  'kodzoeva-leyla': { patronymic: 'Магомедовна', note: 'Интимная пластика и пластика груди' },
+  'ulagasheva-alina': { patronymic: 'Ибрагимовна', note: 'Эстетическая хирургия груди и лица' },
+  'savelyev-evgeniy': { patronymic: 'Игоревич', note: 'Восстановление фигуры и сложные повторные операции' },
+  'tulepbergenova-tomiris': {
+    patronymic: 'Арыстанбековна',
+    note: 'Хирург-резидент, отделение пластической хирургии RR Clinic',
+  },
+  'temirkhan-anar': { patronymic: 'Нурланкызы', note: 'Хирург-резидент, отделение пластической хирургии RR Clinic' },
 };
 
 function orderedSurgeons(doctors: Doctor[]): Doctor[] {
   const byId = new Map(doctors.map((d) => [d.id, d]));
   const head = SURGEON_ORDER.map((id) => byId.get(id)).filter((d): d is Doctor => Boolean(d));
-  // Anyone else in the data (Тулепбергенова, Савельев…) follows the six from the design.
+  // Anyone else in the data follows the design's ten.
   const tail = doctors.filter((d) => !SURGEON_ORDER.includes(d.id));
   return [...head, ...tail];
 }

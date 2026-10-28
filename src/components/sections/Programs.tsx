@@ -57,13 +57,8 @@ export function Programs() {
       className="rr-section rr-programs relative bg-white pt-8 text-neutral-900"
       {...revealScope(inView)}
     >
-      {/* Full-bleed gold rules above and below the heading row (the 32 px above them is white padding, not margin:
-          a margin would show the dark page background between the sections) */}
-      <span className="rr-programs__rule pointer-events-none absolute inset-x-0 top-8" aria-hidden="true" />
-      <span className="rr-programs__rule pointer-events-none absolute inset-x-0 top-[228px]" aria-hidden="true" />
-
       <div className="mx-auto max-w-[1440px] px-(--sec-pad) pb-[60px]">
-        <div className="rr-programs__frame relative px-8">
+        <div className="relative px-8">
           <div className="flex h-[196px] items-start justify-between gap-10">
             <div className="pt-[34px]">
               <p className="rr-eyebrow" {...revealItem(0)}>

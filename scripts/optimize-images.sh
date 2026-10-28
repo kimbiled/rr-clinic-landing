@@ -156,10 +156,12 @@ echo "Avatar:"
 encode "$SRC/avatar-savelyev.png" avatar-savelyev-face 192 192 "301 304 1093 1093"
 fit_long "$SRC/avatar-savelyev.png" avatar-savelyev "$CARD_MAX"
 
-echo "Team cut-outs (alpha kept; 296x375 card -> 750 px tall @2x):"
-# Embedded PNGs of the Figma exports doctor-<id>-figma.svg (transparent background).
-for id in kurmanbaev-rustam romanovskaya-tatyana musa-baurzhan temirkhanov-amir chatinyan-garik kodzoeva-leyla tulepbergenova-tomiris; do
-  encode "$SRC/doctor-$id.png" "doctor-$id" 0 750
+echo "Team cards (300x562 card @2x, rounded corners keep alpha):"
+# team-<id>.png = the Figma card export team-<id>-figma.svg (arches, blurred backdrop, cut-out, glows)
+# rendered at 2x by headless Chrome, which also draws the export's backdrop-filter blur.
+for id in kurmanbaev-rustam romanovskaya-tatyana musa-baurzhan temirkhanov-amir chatinyan-garik kodzoeva-leyla \
+  ulagasheva-alina savelyev-evgeniy tulepbergenova-tomiris temirkhan-anar; do
+  encode "$SRC/team-$id.png" "team-$id" 0 0
 done
 
 echo "Hero avatars (face square cut from the team cut-out, flattened on beige; 192 px):"
