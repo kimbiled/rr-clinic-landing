@@ -13,6 +13,8 @@ export type RichText = ReadonlyArray<
 
 export interface SectionCta {
   label: string;
+  /** Shorter label on phones. */
+  mobileLabel?: string;
   href: string;
   variant: 'primary' | 'secondary';
 }
@@ -48,8 +50,10 @@ export interface TrustContent {
     ctas: SectionCta[];
     /** Full-card photo (founders in front of the columns, statue on the right). */
     photo: LandingImage;
-    /** Name chips over the photo, positioned in % of the card. */
-    people: { name: string; left: string; top: string }[];
+    /** Phone photo: the founders cropped from `photo`, shown above the panel. */
+    photoMobile: LandingImage;
+    /** Name chips over the photo, positioned in % of the card (`mobile`: % of the phone photo). */
+    people: { name: string; left: string; top: string; mobile: { left: string; top: string } }[];
   };
 }
 
@@ -95,7 +99,7 @@ export const trust: TrustContent = {
       'сопровождает пациента от первой консультации\nдо восстановления после операции.',
     ctas: [
       // TODO(content): confirm targets with the client — no "about" page / licences viewer exists yet.
-      { label: 'Узнать больше о клинике', href: '#doctors', variant: 'primary' },
+      { label: 'Узнать больше о клинике', mobileLabel: 'О клинике', href: '#doctors', variant: 'primary' },
       { label: 'Лицензии', href: '#licenses', variant: 'secondary' },
     ],
     photo: {
@@ -105,9 +109,16 @@ export const trust: TrustContent = {
       height: 1120,
       alt: 'Основатели RR Clinic Рустам Курманбаев и Татьяна Романовская',
     },
+    photoMobile: {
+      // trust-card cropped to the founders (scripts/optimize-images.sh → trust-card-mobile)
+      src: 'assets/img/web/trust-card-mobile.webp',
+      width: 714,
+      height: 576,
+      alt: 'Основатели RR Clinic Рустам Курманбаев и Татьяна Романовская',
+    },
     people: [
-      { name: 'Курманбаев Рустам', left: '59.3%', top: '71.6%' },
-      { name: 'Татьяна Романовская', left: '88.1%', top: '77.9%' },
+      { name: 'Курманбаев Рустам', left: '59.3%', top: '71.6%', mobile: { left: '30%', top: '50%' } },
+      { name: 'Татьяна Романовская', left: '88.1%', top: '77.9%', mobile: { left: '70%', top: '66%' } },
     ],
   },
 };
@@ -234,7 +245,7 @@ export interface OperationsContent {
   /** WhatsApp message for an operation row; `{name}` is replaced with the operation. */
   message: string;
   categories: OperationCategory[];
-  cta: { title: string; text: string; label: string; message: string };
+  cta: { title: string; text: string; label: string; mobileLabel?: string; message: string };
 }
 
 export const journey: JourneyContent = {
@@ -379,6 +390,7 @@ export const operations: OperationsContent = {
     title: 'Не знаете, с чего начать?',
     text: 'Обсудите свой запрос с хирургом.',
     label: 'Записаться на очную консультацию',
+    mobileLabel: 'Записаться на консультацию',
     message: 'Здравствуйте! Хочу записаться на очную консультацию',
   },
 };
@@ -388,6 +400,8 @@ export type FaqTopic = 'safety' | 'prep' | 'prices' | 'after' | 'visitors';
 export interface FaqContent {
   id: string;
   title: string;
+  /** Phones (design 2026-10-29). */
+  mobileTitle: string;
   /** "\n" = forced line break. */
   text: string;
   /** "Все вопросы" first, then one tab per topic. */
@@ -399,6 +413,7 @@ export interface FaqContent {
 export const faq: FaqContent = {
   id: 'faq',
   title: 'Ответы на вопросы, которые задают чаще всего',
+  mobileTitle: 'Частые вопросы',
   text: 'Собрали самые популярные вопросы — если не нашли ответ,\nменеджер ответит за 15 минут',
   tabs: [
     { id: 'all', label: 'Все вопросы' },

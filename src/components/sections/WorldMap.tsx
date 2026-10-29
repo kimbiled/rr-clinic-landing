@@ -1,16 +1,25 @@
 import { useState, type CSSProperties } from 'react';
 import { asset } from '../../data/hero';
 import { worldMap } from '../../data/worldMap';
+import { useIsMobile } from '../../hooks/useIsMobile';
 
-/** Map rows shown (design 2026-10-28): from the Arctic islands down to just below Thailand, in viewBox units. */
-const CROP_TOP = -250;
-const CROP_HEIGHT = 270;
-const [, VIEW_TOP, VIEW_WIDTH, VIEW_HEIGHT] = worldMap.viewBox.split(' ').map(Number);
+const [VIEW_LEFT, VIEW_TOP, VIEW_WIDTH, VIEW_HEIGHT] = worldMap.viewBox.split(' ').map(Number);
+
+/** Part of the map shown, in viewBox units. Desktop (design 2026-10-28): the full width, from the Arctic
+ *  islands down to just below Thailand. Phones (design 2026-10-29): Europe to Thailand. */
+interface Crop {
+  x: number;
+  y: number;
+  w: number;
+  h: number;
+}
+const CROP_DESKTOP: Crop = { x: VIEW_LEFT, y: -250, w: VIEW_WIDTH, h: 270 };
+const CROP_MOBILE: Crop = { x: 318, y: -239, w: 283, h: 242 };
 
 type Side = 'top' | 'top-left' | 'top-right' | 'left' | 'right' | 'bottom-left' | 'bottom-right';
 
 /**
- * Pins as placed in the design: dot position in % of the cropped map, and the label's side of the dot.
+ * Pins as placed in the design: dot position in % of the desktop crop, and the label's side of the dot.
  * Countries not listed here keep their generated pin and show it only while hovered.
  */
 const PINS: Record<string, { x: number; y: number; side: Side; label?: string; noDot?: boolean }> = {
@@ -32,8 +41,15 @@ const PINS: Record<string, { x: number; y: number; side: Side; label?: string; n
 const PIN_REVEAL_START_MS = 450;
 const PIN_REVEAL_STEP_MS = 140;
 
-/** Generated pin (% of the full viewBox) → % of the cropped map. */
-const cropY = (y: number) => (((y / 100) * VIEW_HEIGHT + VIEW_TOP - CROP_TOP) / CROP_HEIGHT) * 100;
+/** Pin → viewBox units: design pins are % of the desktop crop, generated ones % of the full viewBox. */
+const fromDesktop = (x: number, y: number) => ({
+  vx: CROP_DESKTOP.x + (x / 100) * CROP_DESKTOP.w,
+  vy: CROP_DESKTOP.y + (y / 100) * CROP_DESKTOP.h,
+});
+const fromView = (x: number, y: number) => ({
+  vx: VIEW_LEFT + (x / 100) * VIEW_WIDTH,
+  vy: VIEW_TOP + (y / 100) * VIEW_HEIGHT,
+});
 
 /**
  * Trust world map: the static base (every other country) as an <img>, the patients' countries + Kazakhstan
@@ -42,18 +58,22 @@ const cropY = (y: number) => (((y / 100) * VIEW_HEIGHT + VIEW_TOP - CROP_TOP) / 
  */
 export function WorldMap({ className }: { className?: string }) {
   const [active, setActive] = useState<string | null>(null);
-  const pins = worldMap.countries.map((c) => {
-    const placed = PINS[c.key];
-    return {
-      key: c.key,
-      label: placed?.label ?? c.label,
-      x: placed?.x ?? c.x,
-      y: placed?.y ?? cropY(c.y),
-      side: placed?.side ?? 'top',
-      noDot: placed?.noDot ?? false,
-      hoverOnly: !placed,
-    };
-  });
+  const crop = useIsMobile() ? CROP_MOBILE : CROP_DESKTOP;
+  const pins = worldMap.countries
+    .map((c) => {
+      const placed = PINS[c.key];
+      const { vx, vy } = placed ? fromDesktop(placed.x, placed.y) : fromView(c.x, c.y);
+      return {
+        key: c.key,
+        label: placed?.label ?? c.label,
+        x: ((vx - crop.x) / crop.w) * 100,
+        y: ((vy - crop.y) / crop.h) * 100,
+        side: placed?.side ?? 'top',
+        noDot: placed?.noDot ?? false,
+        hoverOnly: !placed,
+      };
+    })
+    .filter((p) => p.x > 2 && p.x < 98 && p.y > 2 && p.y < 98);
   const revealOrder = pins
     .filter((p) => !p.hoverOnly)
     .sort((a, b) => b.y - a.y)
@@ -65,7 +85,7 @@ export function WorldMap({ className }: { className?: string }) {
   return (
     <div
       className={`rr-map relative ${className ?? ''}`}
-      style={{ aspectRatio: `${VIEW_WIDTH} / ${CROP_HEIGHT}` }}
+      style={{ aspectRatio: `${crop.w} / ${crop.h}` }}
       role="img"
       aria-label={`Карта: ${worldMap.countries
         .filter((c) => c.key !== 'kazakhstan')
@@ -75,10 +95,12 @@ export function WorldMap({ className }: { className?: string }) {
       {/* Full-height map shifted up inside a clipping box that fades out at the top and bottom */}
       <div className="rr-map__geo absolute inset-0 overflow-hidden">
         <div
-          className="absolute inset-x-0"
+          className="absolute"
           style={{
-            top: `${((VIEW_TOP - CROP_TOP) / CROP_HEIGHT) * 100}%`,
-            height: `${(VIEW_HEIGHT / CROP_HEIGHT) * 100}%`,
+            left: `${((VIEW_LEFT - crop.x) / crop.w) * 100}%`,
+            top: `${((VIEW_TOP - crop.y) / crop.h) * 100}%`,
+            width: `${(VIEW_WIDTH / crop.w) * 100}%`,
+            height: `${(VIEW_HEIGHT / crop.h) * 100}%`,
           }}
         >
           <img

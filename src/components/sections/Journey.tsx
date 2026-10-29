@@ -36,23 +36,23 @@ export function Journey() {
       {...revealScope(inView)}
     >
       <div className="mx-auto max-w-[1440px] px-(--sec-pad)">
-        <div className="rr-frame relative px-8 pt-[52px] pb-[64px]">
-          <div className="flex items-start justify-between gap-10">
+        <div className="rr-frame relative px-8 pt-[52px] pb-[64px] max-md:px-0 max-md:pt-10 max-md:pb-12">
+          <div className="flex items-start justify-between gap-10 max-md:flex-col max-md:gap-5">
             <div>
               <h2
                 id="journey-title"
-                className="font-display text-[36px] leading-[44px] font-normal tracking-[-0.02em] text-[#1b1919]"
+                className="font-display text-[36px] leading-[44px] font-normal tracking-[-0.02em] text-[#1b1919] max-md:text-[26px] max-md:leading-8"
                 {...revealItem(0)}
               >
                 {journey.title}
               </h2>
-              <p className="mt-[7px] font-text text-[18px] leading-[20px] text-[#625f5e]" {...revealItem(1)}>
+              <p className="mt-[7px] font-text text-[18px] leading-[20px] text-[#625f5e] max-md:text-[14px] max-md:leading-[18px]" {...revealItem(1)}>
                 {journey.text}
               </p>
             </div>
 
             <div
-              className="rr-toggle relative mt-[-6px] grid shrink-0 grid-cols-2 rounded-pill p-[7px]"
+              className="rr-toggle relative mt-[-6px] grid shrink-0 grid-cols-2 rounded-pill p-[7px] max-md:mt-0 max-md:w-full"
               role="tablist"
               aria-label="Маршрут пациента"
               onKeyDown={onKeyDown}
@@ -75,7 +75,7 @@ export function Journey() {
                   aria-selected={i === active}
                   aria-controls="journey-steps"
                   tabIndex={i === active ? 0 : -1}
-                  className="rr-toggle__tab relative h-11 rounded-pill px-6 font-display text-[14px] leading-5 font-medium whitespace-nowrap"
+                  className="rr-toggle__tab relative h-11 rounded-pill px-6 font-display text-[14px] leading-5 font-medium whitespace-nowrap max-md:h-10 max-md:px-2 max-md:text-[13px]"
                   onClick={() => setActive(i)}
                 >
                   {v.label}
@@ -89,15 +89,17 @@ export function Journey() {
             id="journey-steps"
             role="tabpanel"
             aria-labelledby={`journey-tab-${variant.id}`}
-            className="rr-journey__steps mt-[46px] grid grid-cols-3 gap-x-[46px] gap-y-[40px]"
+            className="rr-journey__steps mt-[46px] grid grid-cols-3 gap-x-[46px] gap-y-[40px] max-md:mt-8 max-md:grid-cols-1 max-md:gap-y-7"
           >
             {variant.steps.map((step, i) => (
               <li key={step.title} className="rr-journey__step" {...revealItem(3 + i)}>
                 <span className="rr-journey__num" aria-hidden="true">
                   {String(i + 1).padStart(2, '0')}
                 </span>
-                <h3 className="mt-[18px] font-display text-[18px] leading-6 font-medium text-[#1b1919]">{step.title}</h3>
-                <p className="mt-[6px] font-text text-[17px] leading-[22px] text-[#625f5e]">{withBreaks(step.text)}</p>
+                <h3 className="mt-[18px] font-display text-[18px] leading-6 font-medium text-[#1b1919] max-md:mt-3 max-md:text-[16px]">{step.title}</h3>
+                <p className="mt-[6px] font-text text-[17px] leading-[22px] text-[#625f5e] max-md:text-[14px] max-md:leading-5 max-md:[&_br]:hidden">
+                  {withBreaks(step.text)}
+                </p>
               </li>
             ))}
           </ol>

@@ -54,25 +54,25 @@ export function Programs() {
       ref={ref}
       id={programs.id}
       aria-labelledby="programs-title"
-      className="rr-section rr-programs relative bg-white pt-8 text-neutral-900"
+      className="rr-section rr-programs relative bg-white pt-8 text-neutral-900 max-md:pt-4"
       {...revealScope(inView)}
     >
-      <div className="mx-auto max-w-[1440px] px-(--sec-pad) pb-[60px]">
-        <div className="relative px-8">
-          <div className="flex h-[196px] items-start justify-between gap-10">
-            <div className="pt-[34px]">
-              <p className="rr-eyebrow" {...revealItem(0)}>
+      <div className="mx-auto max-w-[1440px] px-(--sec-pad) pb-[60px] max-md:pb-12">
+        <div className="relative px-8 max-md:px-0">
+          <div className="flex h-[196px] items-start justify-between gap-10 max-md:h-auto max-md:flex-col max-md:gap-0">
+            <div className="pt-[34px] max-md:pt-6">
+              <p className="rr-eyebrow max-md:!text-[11px]" {...revealItem(0)}>
                 {programs.eyebrow}
               </p>
               <h2
                 id="programs-title"
-                className="mt-[17px] font-display text-[36px] leading-[44px] font-normal tracking-[-0.02em] text-[#1b1919]"
+                className="mt-[17px] font-display text-[36px] leading-[44px] font-normal tracking-[-0.02em] text-[#1b1919] max-md:mt-3 max-md:text-[26px] max-md:leading-8"
                 {...revealItem(1)}
               >
                 {programs.title}
               </h2>
               <p
-                className="mt-[7px] max-w-[540px] font-text text-[18px] leading-[20px] text-[#625f5e]"
+                className="mt-[7px] max-w-[540px] font-text text-[18px] leading-[20px] text-[#625f5e] max-md:text-[14px] max-md:leading-[18px]"
                 {...revealItem(2)}
               >
                 {programs.text}
@@ -80,11 +80,11 @@ export function Programs() {
             </div>
 
             <div
-              className="rr-request mt-[33px] h-[130px] w-[373px] shrink-0 rounded-[24px] px-6 pt-[22px]"
+              className="rr-request mt-[33px] h-[130px] w-[373px] shrink-0 rounded-[24px] px-6 pt-[22px] max-md:mt-5 max-md:h-auto max-md:w-full max-md:rounded-[20px] max-md:px-4 max-md:py-4"
               {...revealItem(3)}
             >
-              <h3 className="font-display text-[26.5px] leading-[32px] font-light tracking-[-0.03em] text-[#8b6a3e]">{request.title}</h3>
-              <p className="mt-[9px] font-text text-[16px] leading-[17px] tracking-[-0.02em] text-[#8c7a66]">
+              <h3 className="font-display text-[26.5px] leading-[32px] font-light tracking-[-0.03em] text-[#8b6a3e] max-md:text-[20px] max-md:leading-6">{request.title}</h3>
+              <p className="mt-[9px] font-text text-[16px] leading-[17px] tracking-[-0.02em] text-[#8c7a66] max-md:mt-1.5 max-md:text-[13px]">
                 <a
                   href={heroData.clinic.whatsappHref || request.link.href}
                   target={heroData.clinic.whatsappHref ? '_blank' : undefined}
@@ -99,7 +99,7 @@ export function Programs() {
           </div>
 
           <div
-            className="rr-prog relative mt-8 h-[356px] overflow-hidden rounded-[56px] bg-[#9c8270] outline-offset-4"
+            className="rr-prog relative mt-8 h-[356px] overflow-hidden rounded-[56px] bg-[#9c8270] outline-offset-4 max-md:mt-6 max-md:h-[540px] max-md:rounded-[24px]"
             role="region"
             aria-roledescription="карусель"
             aria-label={programs.eyebrow}
@@ -128,34 +128,34 @@ export function Programs() {
                     alt={item.image.alt}
                     loading="lazy"
                     decoding="async"
-                    className="rr-prog__img absolute inset-0 -z-10 size-full object-cover"
+                    className="rr-prog__img absolute inset-0 -z-10 size-full object-cover max-md:object-[78%_center]"
                   />
 
-                  <div className="rr-prog__text absolute top-9 left-10 text-white">
-                    <p className="font-text text-[18px] leading-6">{item.kicker}</p>
-                    <h3 className="mt-[9px] font-display text-[40px] leading-[48px] font-light tracking-[-0.01em]">
+                  <div className="rr-prog__text absolute top-9 left-10 text-white max-md:top-6 max-md:right-5 max-md:left-5">
+                    <p className="font-text text-[18px] leading-6 max-md:text-[14px] max-md:leading-5">{item.kicker}</p>
+                    <h3 className="mt-[9px] font-display text-[40px] leading-[48px] font-light tracking-[-0.01em] max-md:mt-1 max-md:text-[28px] max-md:leading-[34px]">
                       {item.title}
                     </h3>
-                    <ul className="mt-[13px] list-disc pl-[20px] font-text text-[16px] leading-[18px] marker:text-[13px]">
+                    <ul className="mt-[13px] list-disc pl-[20px] font-text text-[16px] leading-[18px] marker:text-[13px] max-md:text-[14px] max-md:leading-[19px]">
                       {item.points.map((point) => (
                         <li key={point}>{point}</li>
                       ))}
                     </ul>
                   </div>
 
-                  <div className="rr-prog__ctas absolute bottom-[37px] left-10 flex items-center gap-[24px]">
+                  <div className="rr-prog__ctas absolute bottom-[37px] left-10 flex items-center gap-[24px] max-md:right-5 max-md:bottom-5 max-md:left-5 max-md:flex-col max-md:items-stretch max-md:gap-3">
                     <a
                       href={heroData.clinic.whatsappHref || '#contacts'}
                       target={heroData.clinic.whatsappHref ? '_blank' : undefined}
                       rel="noopener noreferrer"
-                      className="rr-prog__consult inline-flex h-12 items-center gap-2.5 rounded-pill pr-6 pl-5 font-display text-[15px] leading-6 text-[#2e2c2c]"
+                      className="rr-prog__consult inline-flex h-12 items-center gap-2.5 rounded-pill pr-6 pl-5 font-display text-[15px] leading-6 text-[#2e2c2c] max-md:justify-center"
                     >
                       <img src={asset('assets/icons/whatsapp.svg')} width={20} height={20} alt="" className="size-5" />
                       {programs.consultLabel}
                     </a>
                     <a
                       href={surgeon.href}
-                      className="rr-prog__surgeon font-display text-[15px] leading-6 text-white"
+                      className="rr-prog__surgeon font-display text-[15px] leading-6 text-white max-md:text-center"
                     >
                       {surgeon.label} <span aria-hidden="true">→</span>
                     </a>
@@ -165,7 +165,7 @@ export function Programs() {
             })}
 
             {/* Controls: autoplay toggle with progress ring, prev, next (32 px, 5 px apart) */}
-            <div className="absolute right-[38px] bottom-[33px] flex gap-[5px]">
+            <div className="absolute right-[38px] bottom-[33px] flex gap-[5px] max-md:hidden">
               <button
                 type="button"
                 className="rr-prog__btn rr-prog__play relative grid size-8 place-items-center rounded-full"

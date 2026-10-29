@@ -11,6 +11,13 @@
     --sec-pad: min(100px, calc(100vw * 100 / 1440));
   }
 
+  /* Phones (design frame 393): 16 px side gutter */
+  @media (max-width: 767px) {
+    .rr-section {
+      --sec-pad: 16px;
+    }
+  }
+
   .rr-section :focus-visible {
     outline-color: #8f6526; /* the global gold ring is ~2:1 on white */
   }
@@ -190,6 +197,20 @@
     left: 0;
   }
 
+  @media (max-width: 767px) {
+    .rr-map__label {
+      padding: 4px 8px;
+      font-size: 11px;
+      line-height: 12px;
+    }
+
+    .rr-map__dot {
+      width: 7px;
+      height: 7px;
+      margin: -3.5px 0 0 -3.5px;
+    }
+  }
+
   .rr-map__pin[data-country='kazakhstan'] .rr-map__label {
     background: #c39b62;
     color: #fff;
@@ -261,6 +282,18 @@
     .rr-map__label,
     .rr-map__dot {
       transition: none;
+    }
+  }
+
+  /* Programs on phones: the text sits on the photo, so shade the top and bottom */
+  @media (max-width: 767px) {
+    .rr-prog__slide::after {
+      content: '';
+      position: absolute;
+      inset: 0;
+      z-index: -1;
+      background: linear-gradient(180deg, rgb(70 52 40 / 0.7), rgb(70 52 40 / 0.1) 45%, rgb(70 52 40 / 0.15) 60%, rgb(70 52 40 / 0.75));
+      pointer-events: none;
     }
   }
 
@@ -505,6 +538,14 @@
   .rr-rule {
     height: 1px;
     background: #efebe7;
+  }
+
+  /* Phones: no frame verticals (the content runs to the 16 px gutter) */
+  @media (max-width: 767px) {
+    .rr-frame::before,
+    .rr-frame::after {
+      display: none;
+    }
   }
 
   /* "Для жителей Астаны / Для иногородних": gold outline pill, the gold thumb slides under the chosen tab */
@@ -754,6 +795,14 @@
     box-shadow: inset 0 0 0 1px #c5d7d2; /* RR Clinic/Green/200 */
   }
 
+  .rr-faq__tabs {
+    scrollbar-width: none;
+  }
+
+  .rr-faq__tabs::-webkit-scrollbar {
+    display: none;
+  }
+
   .rr-faq__tab {
     color: #2f4a44;
     transition:
@@ -916,5 +965,31 @@
     -webkit-mask-image: linear-gradient(90deg, #000 70%, rgb(0 0 0 / 0.35));
     mask-image: linear-gradient(90deg, #000 70%, rgb(0 0 0 / 0.35));
     user-select: none;
+  }
+
+  /* Phone footer sizes (after the base rules so they win) */
+  @media (max-width: 767px) {
+    .rr-foot__title {
+      font-size: 15px;
+      line-height: 20px;
+    }
+
+    .rr-foot__link,
+    .rr-foot__text {
+      font-size: 12px;
+      line-height: 16px;
+    }
+
+    .rr-foot__muted,
+    .rr-foot__legal {
+      font-size: 11px;
+      line-height: 14px;
+    }
+
+    .rr-foot__mark {
+      margin-top: 12px;
+      font-size: 88px;
+      -webkit-text-stroke-width: 0.8px;
+    }
   }
 }

@@ -3,6 +3,9 @@ import { footer, operations } from '../../data/landing';
 import { whatsappLink } from './whatsapp';
 import './sections.css';
 
+/** Phones: "© … | Лицензии" on one row, the two policies on the next. */
+const LEGAL_MOBILE = ['max-md:mt-6 max-md:justify-self-end', 'max-md:mt-3', 'max-md:mt-3 max-md:justify-self-end'];
+
 function Arrow() {
   return (
     <svg width="10" height="10" viewBox="0 0 10 10" fill="none" aria-hidden="true" className="rr-foot__arrow">
@@ -20,16 +23,18 @@ export function Footer() {
   const { contacts, services } = footer;
 
   return (
-    <footer id={footer.id} className="rr-section relative overflow-hidden bg-white pt-[60px] text-neutral-900">
+    <footer id={footer.id} className="rr-section relative overflow-hidden bg-white pt-[60px] text-neutral-900 max-md:pt-6">
       <span className="rr-rule rr-rule--warm pointer-events-none absolute inset-x-0" aria-hidden="true" />
       <div className="mx-auto max-w-[1440px] px-(--sec-pad)">
-        <div className="rr-frame rr-frame--warm relative grid grid-cols-[396px_218px_272px_1fr] px-6 pt-6 pb-8">
-          <div>
+        <div className="rr-frame rr-frame--warm relative grid grid-cols-[396px_218px_272px_1fr] px-6 pt-6 pb-8 max-md:grid-cols-2 max-md:gap-x-4 max-md:px-0 max-md:pb-6">
+          <div className="max-md:col-span-2 max-md:grid max-md:grid-cols-[auto_1fr] max-md:items-start max-md:gap-x-4">
             <a href="#hero" aria-label="RR Clinic — наверх" className="inline-block">
               <img src={asset('assets/icons/logo-gold.svg')} width={35} height={32} alt="" className="h-8 w-[35px]" />
             </a>
-            <p className="mt-5 max-w-[262px] font-text text-[15px] leading-[1.2] text-[#625f5e]">{footer.tagline}</p>
-            <div className="mt-9 flex gap-3">
+            <p className="mt-5 max-w-[262px] font-text text-[15px] leading-[1.2] text-[#625f5e] max-md:mt-0 max-md:max-w-none max-md:text-[12px] max-md:leading-4">
+              {footer.tagline}
+            </p>
+            <div className="mt-9 flex gap-3 max-md:col-span-2 max-md:mt-3">
               <a
                 href={footer.instagram}
                 target="_blank"
@@ -65,9 +70,9 @@ export function Footer() {
           </div>
 
           {footer.columns.map((column) => (
-            <nav key={column.title} aria-label={column.title}>
+            <nav key={column.title} aria-label={column.title} className="max-md:mt-8">
               <h2 className="rr-foot__title">{column.title}</h2>
-              <ul className="mt-7 flex flex-col gap-[15px]">
+              <ul className="mt-7 flex flex-col gap-[15px] max-md:mt-4 max-md:gap-3">
                 {column.links.map((link) => (
                   <li key={link.label}>
                     <a href={link.href} className="rr-foot__link">
@@ -79,9 +84,9 @@ export function Footer() {
             </nav>
           ))}
 
-          <nav aria-label={services.title}>
+          <nav aria-label={services.title} className="max-md:mt-8">
             <h2 className="rr-foot__title">{services.title}</h2>
-            <ul className="mt-7 flex flex-col gap-[15px]">
+            <ul className="mt-7 flex flex-col gap-[15px] max-md:mt-4 max-md:gap-3">
               {services.items.map((name) => (
                 <li key={name}>
                   <a {...whatsappLink(operations.message.replace('{name}', name))} className="rr-foot__link">
@@ -92,7 +97,7 @@ export function Footer() {
             </ul>
           </nav>
 
-          <div>
+          <div className="max-md:col-span-2 max-md:mt-8">
             <h2 className="rr-foot__title">{contacts.title}</h2>
             <address className="mt-7 flex flex-col items-start gap-[15px] not-italic">
               <span className="rr-foot__text">{contacts.address}</span>
@@ -112,7 +117,7 @@ export function Footer() {
               href={contacts.map.href}
               target="_blank"
               rel="noopener noreferrer"
-              className="rr-foot__map relative mt-7 block h-[152px] w-[295px] overflow-hidden rounded-[24px]"
+              className="rr-foot__map relative mt-7 block h-[152px] w-[295px] overflow-hidden rounded-[24px] max-md:mt-5 max-md:h-[146px] max-md:w-[284px] max-md:rounded-[20px]"
               aria-label={`${contacts.map.alt} — открыть в 2GIS`}
             >
               <img
@@ -132,9 +137,13 @@ export function Footer() {
             </a>
           </div>
 
-          <p className="rr-foot__muted col-start-1 mt-8">{footer.copyright}</p>
-          {footer.legal.map((link) => (
-            <a key={link.label} href={link.href} className="rr-foot__legal mt-8 justify-self-start">
+          <p className="rr-foot__muted col-start-1 mt-8 max-md:mt-6">{footer.copyright}</p>
+          {footer.legal.map((link, i) => (
+            <a
+              key={link.label}
+              href={link.href}
+              className={`rr-foot__legal mt-8 justify-self-start ${LEGAL_MOBILE[i] ?? ''}`}
+            >
               {link.label}
             </a>
           ))}

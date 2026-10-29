@@ -1,3 +1,4 @@
+import { MobileStepper } from './MobileStepper';
 import { useEffect, useMemo, useRef, useState, type CSSProperties, type KeyboardEvent, type PointerEvent } from 'react';
 import { asset } from '../../data/hero';
 import type { BeforeAfterCase, Case, Framing, ImageAsset } from '../../data/types';
@@ -27,12 +28,6 @@ function sideStyle(img: ImageAsset, side: 'before' | 'after'): CSSProperties | u
   if (!img.framing) return undefined;
   return framingStyle(fitWidth(img.framing, img.width, img.height, CARD_ASPECT / 2), HALF[side]);
 }
-
-const ArrowIcon = ({ dir }: { dir: -1 | 1 }) => (
-  <svg viewBox="0 0 22 16" width={22} height={16} fill="none" aria-hidden="true" className={dir < 0 ? 'rotate-180' : undefined}>
-    <path d="M1 8h19M13.5 1.5 20 8l-6.5 6.5" stroke="currentColor" strokeWidth="1.4" strokeLinecap="round" strokeLinejoin="round" />
-  </svg>
-);
 
 /**
  * "Смотреть работы" (phone): one before/after card at a time — drag anywhere on the photo (or use the knob
@@ -170,29 +165,14 @@ export function MobileCases() {
         </button>
       </div>
 
-      <div className="mt-4 flex items-center gap-4">
-        <button
-          type="button"
-          onClick={() => go(-1)}
-          aria-label="Предыдущая работа"
-          className="m-cases__nav m-cases__nav--prev grid size-14 shrink-0 place-items-center rounded-full"
-        >
-          <ArrowIcon dir={-1} />
-        </button>
-        <span className="h-px flex-1 bg-[#dbbb7f]" aria-hidden="true" />
-        <span className="font-text text-[16px] leading-5 text-[#c9a463] tabular-nums" aria-live="polite">
-          {index + 1}/{n}
-        </span>
-        <span className="h-px flex-1 bg-[#dbbb7f]" aria-hidden="true" />
-        <button
-          type="button"
-          onClick={() => go(1)}
-          aria-label="Следующая работа"
-          className="m-cases__nav m-cases__nav--next grid size-14 shrink-0 place-items-center rounded-full"
-        >
-          <ArrowIcon dir={1} />
-        </button>
-      </div>
+      <MobileStepper
+        className="mt-4"
+        index={index}
+        count={n}
+        onStep={go}
+        prevLabel="Предыдущая работа"
+        nextLabel="Следующая работа"
+      />
     </div>
   );
 }

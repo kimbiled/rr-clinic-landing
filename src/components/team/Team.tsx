@@ -10,6 +10,8 @@ import { TeamCarousel, useTeamScroller } from './TeamCarousel';
 import { CarouselControls } from './CarouselControls';
 import { TeamEmpty } from './TeamEmpty';
 import { useRevealOnce } from './useRevealOnce';
+import { useIsMobile } from '../../hooks/useIsMobile';
+import { MobileStepper } from '../mobile/MobileStepper';
 import { AntdProvider } from '../../theme/AntdProvider';
 import { antdTheme } from '../../theme/antdTheme';
 import './team.css';
@@ -50,6 +52,7 @@ const PANEL_ID = 'team-panel';
 
 export function Team() {
   const { reducedMotion, selectDoctor } = useHero();
+  const isMobile = useIsMobile();
   const [tabId, setTabId] = useState<TeamTabId>('surgeons');
   const tab = TEAM_TABS.find((t) => t.id === tabId) ?? TEAM_TABS[0];
   const [headRef, headIn] = useRevealOnce<HTMLDivElement>();
@@ -82,13 +85,16 @@ export function Team() {
   return (
     <AntdProvider theme={lightTheme}>
       <section id="doctors" aria-labelledby="team-title" className="team-section relative overflow-hidden bg-white text-neutral-900">
-        <div className="relative mx-auto max-w-[1440px] px-(--team-pad) pt-16">
+        <div className="relative mx-auto max-w-[1440px] px-(--team-pad) pt-16 max-md:pt-12">
           <div ref={headRef} className={`team-reveal ${headIn ? 'is-in' : ''}`}>
-            <p className="font-text text-[18px] leading-none tracking-[0.1em] text-[#a4a09d] uppercase">Команда</p>
-            <h2 id="team-title" className="mt-[22px] font-display text-[40px] leading-[48px] font-normal text-[#1b1919]">
+            <p className="font-text text-[18px] leading-none tracking-[0.1em] text-[#a4a09d] uppercase max-md:text-[11px]">Команда</p>
+            <h2
+              id="team-title"
+              className="mt-[22px] font-display text-[40px] leading-[48px] font-normal text-[#1b1919] max-md:mt-3 max-md:text-[28px] max-md:leading-[34px]"
+            >
               Наша <span className="text-[#9bb4ae]">команда</span>
             </h2>
-            <p className="mt-4 max-w-[800px] font-text text-[18px] leading-[1.1] text-[#625f5e]">
+            <p className="mt-4 max-w-[800px] font-text text-[18px] leading-[1.1] text-[#625f5e] max-md:mt-2 max-md:text-[14px] max-md:leading-[1.3]">
               Квалифицированные специалисты, которые сопровождают вас от первой консультации до полного восстановления
             </p>
           </div>
@@ -97,7 +103,7 @@ export function Team() {
             <div>
               <TeamTabs tabs={TEAM_TABS} value={tabId} onChange={setTabId} panelId={PANEL_ID} />
             </div>
-            <div>
+            <div className="max-md:hidden">
               <CarouselControls
                 prevDisabled={scroller.isEmpty || scroller.edges.start}
                 nextDisabled={scroller.isEmpty || scroller.edges.end}
@@ -109,7 +115,7 @@ export function Team() {
           </div>
         </div>
 
-        <div id={PANEL_ID} className="relative mt-8 pb-[42px]">
+        <div id={PANEL_ID} className="relative mt-8 pb-[42px] max-md:mt-5 max-md:pb-12">
           <TeamCarousel
             scroller={scroller}
             doctors={tab.members}
@@ -118,6 +124,16 @@ export function Team() {
             onMore={onMore}
             empty={<TeamEmpty label={tab.label} />}
           />
+          {isMobile && !scroller.isEmpty && (
+            <MobileStepper
+              className="mx-(--team-pad) mt-5"
+              index={scroller.index}
+              count={tab.members.length}
+              onStep={scroller.goTo}
+              prevLabel="Предыдущий врач"
+              nextLabel="Следующий врач"
+            />
+          )}
         </div>
       </section>
     </AntdProvider>

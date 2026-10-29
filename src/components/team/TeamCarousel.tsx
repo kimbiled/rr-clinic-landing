@@ -8,6 +8,8 @@ export interface TeamScroller {
   scrollerRef: RefObject<HTMLDivElement | null>;
   listRef: RefObject<HTMLUListElement | null>;
   edges: { start: boolean; end: boolean };
+  /** Card nearest to the row's start (phone stepper "n/N"). */
+  index: number;
   goTo: (dir: -1 | 1 | 0) => void;
   isEmpty: boolean;
 }
@@ -20,15 +22,37 @@ export function useTeamScroller(doctors: Doctor[], reducedMotion: boolean): Team
   const scrollerRef = useRef<HTMLDivElement>(null);
   const listRef = useRef<HTMLUListElement>(null);
   const [edges, setEdges] = useState({ start: true, end: true });
+  const [index, setIndex] = useState(0);
   const drag = useRef({ active: false, moved: false, x: 0, left: 0 });
   const isEmpty = doctors.length === 0;
+
+  /** Snap positions = each card's left edge relative to the scroller's content start. */
+  const snapPoints = useCallback((): number[] => {
+    const el = scrollerRef.current;
+    const list = listRef.current;
+    const first = list?.firstElementChild as HTMLElement | null;
+    if (!el || !list || !first) return [];
+    const max = el.scrollWidth - el.clientWidth;
+    return Array.from(list.children, (c) => Math.min(max, (c as HTMLElement).offsetLeft - first.offsetLeft));
+  }, []);
+
+  const nearest = useCallback((points: number[], x: number) => {
+    let i = 0;
+    points.forEach((p, j) => {
+      if (Math.abs(p - x) < Math.abs(points[i] - x)) i = j;
+    });
+    return i;
+  }, []);
 
   const measure = useCallback(() => {
     const el = scrollerRef.current;
     if (!el) return;
     const max = el.scrollWidth - el.clientWidth;
     setEdges({ start: el.scrollLeft <= 2, end: el.scrollLeft >= max - 2 });
-  }, []);
+    const points = snapPoints();
+    // At the right edge the last few cards share one snap point; count the last card there.
+    setIndex(el.scrollLeft >= max - 2 ? Math.max(0, points.length - 1) : nearest(points, el.scrollLeft));
+  }, [nearest, snapPoints]);
 
   useEffect(() => {
     const el = scrollerRef.current;
@@ -50,31 +74,16 @@ export function useTeamScroller(doctors: Doctor[], reducedMotion: boolean): Team
     };
   }, [measure, doctors]);
 
-  /** Snap positions = each card's left edge relative to the scroller's content start. */
-  const snapPoints = useCallback((): number[] => {
-    const el = scrollerRef.current;
-    const list = listRef.current;
-    const first = list?.firstElementChild as HTMLElement | null;
-    if (!el || !list || !first) return [];
-    const max = el.scrollWidth - el.clientWidth;
-    return Array.from(list.children, (c) => Math.min(max, (c as HTMLElement).offsetLeft - first.offsetLeft));
-  }, []);
-
   const goTo = useCallback(
     (dir: -1 | 1 | 0) => {
       const el = scrollerRef.current;
       if (!el) return;
       const points = snapPoints();
       if (!points.length) return;
-      const x = el.scrollLeft;
-      let nearest = 0;
-      points.forEach((p, i) => {
-        if (Math.abs(p - x) < Math.abs(points[nearest] - x)) nearest = i;
-      });
-      const target = points[Math.max(0, Math.min(points.length - 1, nearest + dir))];
+      const target = points[Math.max(0, Math.min(points.length - 1, nearest(points, el.scrollLeft) + dir))];
       el.scrollTo({ left: target, behavior: reducedMotion ? 'auto' : 'smooth' });
     },
-    [reducedMotion, snapPoints],
+    [nearest, reducedMotion, snapPoints],
   );
 
   // ---- Mouse drag-to-scroll (touch/pen keep native scrolling) ----
@@ -135,7 +144,7 @@ export function useTeamScroller(doctors: Doctor[], reducedMotion: boolean): Team
     };
   }, [goTo, isEmpty]);
 
-  return { scrollerRef, listRef, edges, goTo, isEmpty };
+  return { scrollerRef, listRef, edges, index, goTo, isEmpty };
 }
 
 interface TeamCarouselProps {

@@ -1,6 +1,7 @@
 import { useEffect, useId, useMemo, useRef, useState, type KeyboardEvent, type ReactNode } from 'react';
 import { operations, type OperationCategory, type OperationIcon } from '../../data/landing';
 import { revealItem, revealScope, useInView } from './useInView';
+import { useIsMobile } from '../../hooks/useIsMobile';
 import { whatsappLink } from './whatsapp';
 import './sections.css';
 
@@ -94,11 +95,11 @@ function OperationRow({ name, category }: { name: string; category?: string }) {
     <li>
       <a
         {...whatsappLink(operations.message.replace('{name}', name))}
-        className="rr-op flex h-[70px] items-center justify-between gap-6 border-b border-[#ebe6e1]"
+        className="rr-op flex h-[70px] items-center justify-between gap-6 border-b border-[#ebe6e1] max-md:h-auto max-md:min-h-12 max-md:gap-3 max-md:py-3 max-md:pl-9"
       >
-        <span className="font-display text-[18px] leading-6 text-[#2e2c2c]">{name}</span>
+        <span className="font-display text-[18px] leading-6 text-[#2e2c2c] max-md:text-[15px] max-md:leading-5">{name}</span>
         <span className="flex items-center gap-5">
-          {category && <span className="font-text text-[15px] leading-5 text-[#a4a09d]">{category}</span>}
+          {category && <span className="font-text text-[15px] leading-5 text-[#a4a09d] max-md:hidden">{category}</span>}
           <svg className="rr-op__arrow" width="16" height="12" viewBox="0 0 16 12" aria-hidden="true">
             <path d="M1 6h14M10 1l5 5-5 5" fill="none" stroke="currentColor" strokeWidth="1.2" strokeLinecap="round" strokeLinejoin="round" />
           </svg>
@@ -117,6 +118,9 @@ export function Operations() {
   const { ref, inView } = useInView<HTMLElement>();
   const [activeId, setActiveId] = useState(operations.categories[0].id);
   const [query, setQuery] = useState('');
+  /** Phones: the open accordion category (none at first, as in the design). */
+  const [openId, setOpenId] = useState<string | null>(null);
+  const isMobile = useIsMobile();
   const tabs = useRef<(HTMLButtonElement | null)[]>([]);
   const uid = useId();
 
@@ -133,6 +137,7 @@ export function Operations() {
       if (!categories.some((c) => c.id === id)) return;
       setQuery('');
       setActiveId(id);
+      setOpenId(id);
       ref.current?.scrollIntoView({ behavior: 'smooth', block: 'start' });
     };
     window.addEventListener(OPEN_CATEGORY_EVENT, onOpen);
@@ -160,16 +165,16 @@ export function Operations() {
       <span className="rr-rule pointer-events-none absolute inset-x-0 top-0" aria-hidden="true" />
       <span className="rr-rule pointer-events-none absolute inset-x-0 bottom-0" aria-hidden="true" />
       <div className="mx-auto max-w-[1440px] px-(--sec-pad)">
-        <div className="rr-frame relative px-8 pt-[44px] pb-[78px]">
+        <div className="rr-frame relative px-8 pt-[44px] pb-[78px] max-md:px-0 max-md:pt-10 max-md:pb-12">
           <h2
             id="operations-title"
-            className="font-display text-[36px] leading-[44px] font-normal tracking-[-0.02em] text-[#1b1919]"
+            className="font-display text-[36px] leading-[44px] font-normal tracking-[-0.02em] text-[#1b1919] max-md:text-[26px] max-md:leading-8"
             {...revealItem(0)}
           >
             {operations.title}
           </h2>
 
-          <label className="rr-search relative mt-[40px] flex h-[72px] items-center gap-4 rounded-[20px] px-6" {...revealItem(1)}>
+          <label className="rr-search relative mt-[40px] flex h-[72px] items-center gap-4 rounded-[20px] px-6 max-md:mt-4 max-md:h-[52px] max-md:gap-3 max-md:rounded-[16px] max-md:px-4" {...revealItem(1)}>
             <svg width="16" height="16" viewBox="0 0 16 16" aria-hidden="true" className="shrink-0 text-[#625f5e]">
               <circle cx="7" cy="7" r="5.2" fill="none" stroke="currentColor" strokeWidth="1.3" />
               <path d="m11 11 3.5 3.5" stroke="currentColor" strokeWidth="1.3" strokeLinecap="round" />
@@ -180,17 +185,48 @@ export function Operations() {
               value={query}
               onChange={(e) => setQuery(e.target.value)}
               placeholder={operations.searchPlaceholder}
-              className="rr-search__input h-full min-w-0 flex-1 bg-transparent font-text text-[17px] text-[#2e2c2c] outline-none"
+              className="rr-search__input h-full min-w-0 flex-1 bg-transparent font-text text-[17px] text-[#2e2c2c] outline-none max-md:text-[13px]"
               aria-controls={panelId}
             />
           </label>
 
-          <div className="mt-[34px] grid grid-cols-[284px_1fr] gap-[52px]" {...revealItem(2)}>
+          {isMobile && !searching ? (
+            // Phones: the categories as an accordion — a tap opens the operations under it
+            <ul className="mt-5 flex flex-col" {...revealItem(2)}>
+              {categories.map((c) => {
+                const open = c.id === openId;
+                return (
+                  <li key={c.id} className="border-b border-[#f1ede9] last:border-0">
+                    <button
+                      type="button"
+                      aria-expanded={open}
+                      aria-controls={`${uid}-${c.id}`}
+                      data-active={open || undefined}
+                      className="rr-cat flex h-[52px] w-full items-center gap-3 rounded-[12px] px-1 text-left"
+                      onClick={() => setOpenId(open ? null : c.id)}
+                    >
+                      <CategoryIcon name={c.icon} />
+                      <span className="flex-1 font-text text-[14px] leading-5 text-[#2e2c2c]">{c.label}</span>
+                      <span className="font-text text-[12px] leading-4 text-[#b9b4b0]">{c.items.length}</span>
+                    </button>
+                    {open && (
+                      <ul id={`${uid}-${c.id}`} className="rr-op-list pb-2">
+                        {c.items.map((name) => (
+                          <OperationRow key={name} name={name} />
+                        ))}
+                      </ul>
+                    )}
+                  </li>
+                );
+              })}
+            </ul>
+          ) : (
+          <div className="mt-[34px] grid grid-cols-[284px_1fr] gap-[52px] max-md:mt-6 max-md:grid-cols-1" {...revealItem(2)}>
             <div
               role="tablist"
               aria-orientation="vertical"
               aria-label="Направления"
-              className="flex flex-col gap-[4px]"
+              className="flex flex-col gap-[4px] max-md:hidden"
               onKeyDown={onTabKeyDown}
             >
               {categories.map((c, i) => {
@@ -221,7 +257,7 @@ export function Operations() {
               })}
             </div>
 
-            <div id={panelId} role="tabpanel" aria-live="polite" className="min-h-[440px]">
+            <div id={panelId} role="tabpanel" aria-live="polite" className="min-h-[440px] max-md:min-h-0">
               {searching ? (
                 <>
                   <h3 className="font-display text-[24px] leading-8 font-normal text-[#1b1919]">Результаты поиска</h3>
@@ -251,17 +287,21 @@ export function Operations() {
               )}
             </div>
           </div>
+          )}
 
-          <div className="rr-start mt-[34px] flex h-[112px] items-center justify-between gap-8 rounded-[24px] px-6" {...revealItem(3)}>
+          <div
+            className="rr-start mt-[34px] flex h-[112px] items-center justify-between gap-8 rounded-[24px] px-6 max-md:mt-6 max-md:h-auto max-md:flex-col max-md:items-stretch max-md:gap-4 max-md:rounded-[20px] max-md:p-4"
+            {...revealItem(3)}
+          >
             <div>
-              <h3 className="font-display text-[24px] leading-8 font-normal text-[#2e2c2c]">{cta.title}</h3>
-              <p className="mt-[2px] font-text text-[17px] leading-[22px] text-[#8c8784]">{cta.text}</p>
+              <h3 className="font-display text-[24px] leading-8 font-normal text-[#2e2c2c] max-md:text-[20px] max-md:leading-6">{cta.title}</h3>
+              <p className="mt-[2px] font-text text-[17px] leading-[22px] text-[#8c8784] max-md:text-[13px] max-md:leading-[18px]">{cta.text}</p>
             </div>
             <a
               {...whatsappLink(cta.message)}
-              className="rr-start__btn inline-flex h-[68px] shrink-0 items-center rounded-pill px-6 font-display text-[16px] leading-6 text-white"
+              className="rr-start__btn inline-flex h-[68px] shrink-0 items-center rounded-pill px-6 font-display text-[16px] leading-6 text-white max-md:h-12 max-md:justify-center max-md:text-[14px]"
             >
-              {cta.label}
+              {isMobile ? (cta.mobileLabel ?? cta.label) : cta.label}
             </a>
           </div>
         </div>

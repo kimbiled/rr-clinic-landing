@@ -38,8 +38,30 @@ export const TEAM_PHOTOS: Record<string, ImageAsset> = Object.fromEntries(SURGEO
  * Team-card copy from the design: the card shows "Фамилия / Имя Отчество" and a short note, which
  * differ from the hero data (no patronymics there). Missing entries fall back to the doctor data.
  */
-export const CARD_TEXT: Record<string, { patronymic?: string; note?: string }> = {
-  'kurmanbaev-rustam': { patronymic: 'Амангельдыевич', note: 'Абдоминопластика с ушиванием диастаза' },
+export interface CardText {
+  patronymic?: string;
+  note?: string;
+  /** Phone card extras (design 2026-10-29), shown when present: operation tags over the photo, a role line
+   *  above the name, a longer bio instead of `note`, and up to two figures. */
+  tags?: string[];
+  role?: string;
+  bio?: string;
+  stats?: { value: string; label: string }[];
+}
+
+// TODO(content): the phone design fills tags / role / bio / stats for Курманбаев only — ask the clinic for the rest.
+export const CARD_TEXT: Record<string, CardText> = {
+  'kurmanbaev-rustam': {
+    patronymic: 'Амангельдыевич',
+    note: 'Абдоминопластика с ушиванием диастаза',
+    tags: ['Липоабдоминопластика', 'Маммопластика', 'Липофилинг ягодиц'],
+    role: 'Основатель • Стаж 15 лет',
+    bio: 'Специалист по абдоминопластике с ушиванием диастаза. Возвращает форму живота и контуры тела после родов и похудения.',
+    stats: [
+      { value: '10 000+', label: 'операций' },
+      { value: '400', label: 'операций на теле в год' },
+    ],
+  },
   'romanovskaya-tatyana': { patronymic: 'Владимировна', note: 'Автор методики «Голливудский фейслифтинг»' },
   'musa-baurzhan': { patronymic: 'Жаннатович', note: 'Пластика век, увеличение и подтяжка груди' },
   'temirkhanov-amir': { patronymic: 'Багдатович', note: 'Абдоминопластика, липомоделирование' },

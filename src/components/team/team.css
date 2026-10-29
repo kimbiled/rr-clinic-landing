@@ -5,6 +5,12 @@
     --team-pad: min(80px, calc(100vw * 80 / 1440));
   }
 
+  @media (max-width: 767px) {
+    .team-section {
+      --team-pad: 16px;
+    }
+  }
+
   /* ---------- Focus ring on this light section (R3-4c) ----------
      The global gold ring (#d7a561) is ~2:1 on white; #8f6526 is ~5.2:1 (WCAG 1.4.11 needs 3:1). */
   .team-section :focus-visible {
@@ -136,6 +142,60 @@
     background-color: #fff;
     box-shadow: inset 0 0 0 1px #497f75;
     color: #2f4a44;
+  }
+
+  /* Phone tabs */
+  .team-mtab {
+    padding: 4px;
+    color: #2f4a44;
+    box-shadow: inset 0 0 0 1px #c5d7d2;
+    transition:
+      background-color 250ms var(--ease-out),
+      color 250ms var(--ease-out);
+  }
+
+  .team-mtab[aria-selected='true'] {
+    background: #5a8478;
+    color: #fff;
+    box-shadow: none;
+  }
+
+  .team-mtab[aria-selected='true'] .team-mtab__icon {
+    background: rgb(255 255 255 / 0.95);
+    color: #2f4a44;
+  }
+
+  .team-card__tag {
+    background: rgb(255 255 255 / 0.75);
+    -webkit-backdrop-filter: blur(8px);
+    backdrop-filter: blur(8px);
+  }
+
+  /* Phones: the glass moves from the name plate to the panel that also holds the buttons */
+  @media (max-width: 767px) {
+    .team-card__panel {
+      gap: 14px;
+      padding: 16px;
+      border-radius: 20px;
+      background: linear-gradient(100deg, rgb(255 255 255 / 0.82), rgb(255 255 255 / 0.62));
+      -webkit-backdrop-filter: blur(14px);
+      backdrop-filter: blur(14px);
+      box-shadow: inset 0 0 0 1px rgb(255 255 255 / 0.6);
+    }
+
+    .team-card__plate {
+      padding: 0;
+      border-radius: 0;
+      background: none;
+      -webkit-backdrop-filter: none;
+      backdrop-filter: none;
+      box-shadow: none;
+    }
+
+    .team-card__btn {
+      height: 36px;
+      font-size: 13px;
+    }
   }
 
   /* ---------- Empty tab ---------- */

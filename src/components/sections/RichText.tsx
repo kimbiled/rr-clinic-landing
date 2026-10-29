@@ -1,12 +1,18 @@
 import { Fragment, type ReactNode } from 'react';
 import type { RichText as RichTextValue } from '../../data/landing';
 
-/** Turns "\n" into <br>. */
+/** Turns "\n" into <br>. A space goes before each break, so a layout that hides the <br> (phones:
+ *  `[&_br]:hidden`) still separates the words; before a visible break it collapses. */
 export function withBreaks(text: string): ReactNode {
   const parts = text.split('\n');
   return parts.map((part, i) => (
     <Fragment key={i}>
-      {i > 0 && <br />}
+      {i > 0 && (
+        <>
+          {' '}
+          <br />
+        </>
+      )}
       {part}
     </Fragment>
   ));

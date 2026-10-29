@@ -20,6 +20,16 @@ export const menu = {
     { label: 'Врачи', href: '#doctors' },
     { label: 'Цены', href: '#prices' },
   ],
+  /** Phones (design 2026-10-29): more sections, no doctor list. */
+  mobileLinks: [
+    { label: 'О клинике', href: '#trust' },
+    { label: 'Направления', href: '#operations' },
+    { label: 'Врачи', href: '#doctors' },
+    { label: 'До и после', href: '#surgery' },
+    // TODO(content): no prices section yet — the operations catalog is the closest.
+    { label: 'Цены', href: '#operations' },
+    { label: 'Контакты', href: '#contacts' },
+  ],
   title: 'Ваш запрос. Ваш хирург',
   subtitle: 'Выберите специалиста и познакомьтесь с его работами',
   /** Row by row, two per row (left, right). */

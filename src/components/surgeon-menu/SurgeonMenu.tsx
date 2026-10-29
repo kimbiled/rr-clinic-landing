@@ -27,7 +27,8 @@ export function SurgeonMenu() {
   const { clinic } = data;
   const doctors = menu.doctors as MenuDoctor[];
   // Doctor grid columns (two on desktop, one on phones) — arrow-key navigation follows them.
-  const COLS = useIsMobile() ? 1 : 2;
+  const isMobile = useIsMobile();
+  const COLS = isMobile ? 1 : 2;
 
   const optionRefs = useRef<(HTMLLIElement | null)[]>([]);
   const [active, setActive] = useState(0);
@@ -196,9 +197,9 @@ export function SurgeonMenu() {
           <button
             type="button"
             onClick={close}
-            className="smenu-close ml-auto inline-flex h-8 cursor-pointer items-center gap-2 text-[14px] leading-4 text-[#2e2c2c] hover:text-[#bb9358]"
+            className="smenu-close ml-auto inline-flex h-8 cursor-pointer items-center gap-2 text-[14px] leading-4 text-[#2e2c2c] hover:text-[#bb9358] max-md:size-10 max-md:justify-center max-md:rounded-full max-md:bg-[#f1efed]"
           >
-            {menu.close}
+            <span className="max-md:sr-only">{menu.close}</span>
             <svg viewBox="0 0 8 8" width={8} height={8} fill="none" aria-hidden="true">
               <path d="M1 1l6 6M7 1 1 7" stroke="currentColor" strokeWidth="1.2" strokeLinecap="round" />
             </svg>
@@ -207,17 +208,17 @@ export function SurgeonMenu() {
 
         <div className="mt-[77px] grid grid-cols-[420px_1fr] items-start max-md:mt-10 max-md:grid-cols-1 max-md:gap-12">
           <nav aria-label="Разделы клиники">
-            <p className="text-[14px] leading-4 text-[#7b7876] uppercase">{menu.eyebrow}</p>
-            <ul className="mt-[22px] flex flex-col gap-8 max-md:mt-4 max-md:gap-4">
-              {menu.links.map((link, i) => (
-                <li key={link.href} className="smenu-in" style={{ '--i': i } as CSSProperties}>
+            <p className="text-[14px] leading-4 text-[#7b7876] uppercase max-md:text-[11px]">{menu.eyebrow}</p>
+            <ul className="mt-[22px] flex flex-col gap-8 max-md:mt-6 max-md:gap-7">
+              {(isMobile ? menu.mobileLinks : menu.links).map((link, i) => (
+                <li key={link.label} className="smenu-in" style={{ '--i': i } as CSSProperties}>
                   <a
                     href={link.href}
                     onClick={(e) => {
                       onAnchorClick(e, reducedMotion);
                       close();
                     }}
-                    className="smenu-link inline-flex items-center gap-3.5 font-display text-[28px] leading-9 font-light tracking-[-0.02em] text-[#2e2c2c] hover:text-[#bb9358] focus-visible:text-[#bb9358] max-md:text-[24px] max-md:leading-8"
+                    className="smenu-link inline-flex items-center gap-3.5 font-display text-[28px] leading-9 font-light tracking-[-0.02em] text-[#2e2c2c] hover:text-[#bb9358] focus-visible:text-[#bb9358] max-md:text-[20px] max-md:leading-7"
                   >
                     {link.label}
                     <Arrow className="smenu-arrow" />
@@ -227,7 +228,8 @@ export function SurgeonMenu() {
             </ul>
           </nav>
 
-          <section aria-labelledby={LABEL_ID}>
+          {/* The doctor list is desktop-only (the phone design keeps just the section links) */}
+          <section aria-labelledby={LABEL_ID} className="max-md:hidden">
             <h2
               id={LABEL_ID}
               className="font-display text-[32px] leading-10 font-light tracking-[-0.02em] text-[#2e2c2c] max-md:text-[26px] max-md:leading-8"

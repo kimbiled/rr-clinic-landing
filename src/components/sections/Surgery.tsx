@@ -4,6 +4,7 @@ import { operations, surgery, type SurgeryCase } from '../../data/landing';
 import { useReducedMotion } from '../../hooks/useReducedMotion';
 import { OPEN_CATEGORY_EVENT } from './Operations';
 import { revealItem, revealScope, useInView } from './useInView';
+import { MobileStepper } from '../mobile/MobileStepper';
 import './sections.css';
 
 /** One-time hint that the divider moves: 50 → 62 → 38 → 50 % over this long, once the card is in view. */
@@ -14,7 +15,18 @@ const NUDGE_DELAY_MS = 600;
  * Before/after card: "after" fills the card, "before" is clipped to the left of the divider. A transparent range
  * input covers the card, so dragging, clicking and the arrow keys all move the divider; the title sits above it.
  */
-function BeforeAfter({ item, index, inView }: { item: SurgeryCase; index: number; inView: boolean }) {
+function BeforeAfter({
+  item,
+  index,
+  inView,
+  current,
+}: {
+  item: SurgeryCase;
+  index: number;
+  inView: boolean;
+  /** Phones show one card at a time (the stepper picks it). */
+  current: boolean;
+}) {
   const reducedMotion = useReducedMotion();
   const [pos, setPos] = useState(50);
   const [touched, setTouched] = useState(false);
@@ -40,7 +52,10 @@ function BeforeAfter({ item, index, inView }: { item: SurgeryCase; index: number
   };
 
   return (
-    <li className="rr-ba relative h-[446px] overflow-hidden rounded-[24px] bg-[#b4a294]" {...revealItem(3 + index)}>
+    <li
+      className={`rr-ba relative h-[446px] overflow-hidden rounded-[24px] bg-[#b4a294] max-md:h-[424px] ${current ? '' : 'max-md:hidden'}`}
+      {...revealItem(3 + index)}
+    >
       <img
         src={asset(item.after.src)}
         width={item.after.width}
@@ -107,6 +122,8 @@ function BeforeAfter({ item, index, inView }: { item: SurgeryCase; index: number
 /** "Пластическая хирургия" (design 2026-10-27): heading + three before/after cards; a card's title opens its category below. */
 export function Surgery() {
   const { ref, inView } = useInView<HTMLElement>();
+  const [current, setCurrent] = useState(0);
+  const count = surgery.cases.length;
 
   return (
     <section
@@ -118,26 +135,34 @@ export function Surgery() {
     >
       <span className="rr-rule pointer-events-none absolute inset-x-0 top-0" aria-hidden="true" />
       <div className="mx-auto max-w-[1440px] px-(--sec-pad)">
-        <div className="rr-frame relative px-8 pt-[48px] pb-[40px]">
-          <p className="rr-eyebrow !text-[14px]" {...revealItem(0)}>
+        <div className="rr-frame relative px-8 pt-[48px] pb-[40px] max-md:px-0 max-md:pt-10 max-md:pb-6">
+          <p className="rr-eyebrow !text-[14px] max-md:!text-[11px]" {...revealItem(0)}>
             {surgery.eyebrow}
           </p>
           <h2
             id="surgery-title"
-            className="mt-[14px] font-display text-[36px] leading-[44px] font-normal tracking-[-0.02em] text-[#1b1919]"
+            className="mt-[14px] font-display text-[36px] leading-[44px] font-normal tracking-[-0.02em] text-[#1b1919] max-md:mt-3 max-md:text-[26px] max-md:leading-8"
             {...revealItem(1)}
           >
             {surgery.title}
           </h2>
-          <p className="mt-[7px] font-text text-[18px] leading-[20px] text-[#8c8784]" {...revealItem(2)}>
+          <p className="mt-[7px] font-text text-[18px] leading-[20px] text-[#8c8784] max-md:text-[14px] max-md:leading-[18px]" {...revealItem(2)}>
             {surgery.text}
           </p>
 
-          <ul className="mt-[40px] grid grid-cols-3 gap-[22px]">
+          <ul className="mt-[40px] grid grid-cols-3 gap-[22px] max-md:mt-6 max-md:grid-cols-1">
             {surgery.cases.map((item, i) => (
-              <BeforeAfter key={item.title} item={item} index={i} inView={inView} />
+              <BeforeAfter key={item.title} item={item} index={i} inView={inView} current={i === current} />
             ))}
           </ul>
+          <MobileStepper
+            className="mt-6 md:hidden"
+            index={current}
+            count={count}
+            onStep={(dir) => setCurrent((i) => (i + dir + count) % count)}
+            prevLabel="Предыдущая операция"
+            nextLabel="Следующая операция"
+          />
         </div>
       </div>
     </section>
