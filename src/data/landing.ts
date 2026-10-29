@@ -382,3 +382,167 @@ export const operations: OperationsContent = {
     message: 'Здравствуйте! Хочу записаться на очную консультацию',
   },
 };
+
+export type FaqTopic = 'safety' | 'prep' | 'prices' | 'after' | 'visitors';
+
+export interface FaqContent {
+  id: string;
+  title: string;
+  /** "\n" = forced line break. */
+  text: string;
+  /** "Все вопросы" first, then one tab per topic. */
+  tabs: { id: FaqTopic | 'all'; label: string }[];
+  items: { topic: FaqTopic; question: string; answer: string }[];
+  cta: { title: string; text: string; label: string; message: string };
+}
+
+export const faq: FaqContent = {
+  id: 'faq',
+  title: 'Ответы на вопросы, которые задают чаще всего',
+  text: 'Собрали самые популярные вопросы — если не нашли ответ,\nменеджер ответит за 15 минут',
+  tabs: [
+    { id: 'all', label: 'Все вопросы' },
+    { id: 'safety', label: 'Безопасность' },
+    { id: 'prep', label: 'Подготовка' },
+    { id: 'prices', label: 'Цены' },
+    { id: 'after', label: 'После операции' },
+    { id: 'visitors', label: 'Иногородним' },
+  ],
+  // TODO(content): the design shows the questions only — the answers are drafted from the rest of the landing
+  // (4 anaesthetists, 12 months of follow-up, the out-of-town journey); confirm them with the clinic.
+  items: [
+    {
+      topic: 'safety',
+      question: 'Насколько безопасна операция?',
+      answer:
+        'Перед операцией хирург и анестезиолог оценивают ваше здоровье по анализам и осмотру. Операции проходят ' +
+        'в собственной операционной клиники под контролем анестезиолога — их у нас четверо в штате, — ' +
+        'а после вы остаётесь в палате под наблюдением медицинской команды.',
+    },
+    {
+      topic: 'safety',
+      question: 'Что если будут осложнения?',
+      answer:
+        'Вас ведёт тот же хирург, который оперировал: осмотры и перевязки — в клинике, а 12 месяцев после ' +
+        'операции команда остаётся на связи. Если что-то беспокоит, напишите нам в любой момент — врач ' +
+        'посмотрит и скажет, что делать.',
+    },
+    {
+      topic: 'prep',
+      question: 'Как подготовиться к операции?',
+      answer:
+        'На консультации хирург составит план и даст список анализов. Анестезиолог проверит результаты и даст ' +
+        'рекомендации: какие препараты отменить, когда перестать есть и пить, что взять с собой в клинику.',
+    },
+    {
+      topic: 'prices',
+      question: 'Есть ли рассрочка или кредит?',
+      answer: 'Варианты оплаты зависят от операции — менеджер расскажет об условиях, напишите нам в WhatsApp.',
+    },
+    {
+      topic: 'prices',
+      question: 'Входят ли анализы в стоимость операции?',
+      answer:
+        'Анализы сдаются отдельно — в клинике или в любой лаборатории вашего города. Точный состав стоимости ' +
+        'для вашей операции менеджер пришлёт после консультации.',
+    },
+    {
+      topic: 'after',
+      question: 'Когда будет виден окончательный результат?',
+      answer:
+        'Первые изменения видны сразу, но отёки уходят постепенно. Окончательный результат обычно оценивают ' +
+        'через несколько месяцев — точные сроки зависят от операции, хирург расскажет о них на консультации.',
+    },
+    {
+      topic: 'visitors',
+      question: 'Я из другого города — сколько нужно быть в Астане?',
+      answer:
+        'Консультация проходит онлайн, анализы вы сдаёте у себя в городе. Прилететь нужно минимум за день до ' +
+        'операции, а остаться — на перевязки и снятие швов; дальнейшие осмотры проходят онлайн. Точный срок ' +
+        'хирург назовёт для вашей операции.',
+    },
+    {
+      topic: 'safety',
+      question: 'Какой наркоз используете?',
+      answer:
+        'Вид анестезии подбирает анестезиолог под операцию и ваше здоровье — от местной анестезии до общего ' +
+        'наркоза. На консультации он объяснит, что подойдёт именно вам.',
+    },
+    {
+      topic: 'prep',
+      question: 'Какие анализы нужно сдать?',
+      answer:
+        'Список зависит от операции, возраста и здоровья — его даст хирург после консультации. Обычно это ' +
+        'анализы крови, ЭКГ и заключение терапевта.',
+    },
+    {
+      topic: 'prices',
+      question: 'Что входит в стоимость операции?',
+      answer:
+        'Состав стоимости зависит от операции — менеджер пришлёт подробный расчёт после консультации с хирургом.',
+    },
+  ],
+  cta: {
+    title: 'Не нашли ответ на свой вопрос?',
+    text: 'Менеджер ответит за 15 минут — консультация бесплатна',
+    label: 'Задать свой вопрос',
+    message: 'Здравствуйте! У меня вопрос:',
+  },
+};
+
+export interface FooterContent {
+  id: string;
+  tagline: string;
+  instagram: string;
+  columns: { title: string; links: { label: string; href: string }[] }[];
+  /** "Популярные услуги": each opens WhatsApp with operations.message. */
+  services: { title: string; items: string[] };
+  contacts: { title: string; address: string; email: string; map: LandingImage & { href: string } };
+  copyright: string;
+  legal: { label: string; href: string }[];
+  wordmark: string;
+}
+
+export const footer: FooterContent = {
+  id: 'contacts',
+  tagline: 'Премиальная клиника пластической хирургии в Астане. Дорого. Эффективно. Надёжно',
+  instagram: 'https://www.instagram.com/rr.clinic.kz/',
+  columns: [
+    {
+      title: 'Клиника',
+      links: [
+        { label: 'О клинике', href: '#trust' },
+        { label: 'Врачи', href: '#doctors' },
+        { label: 'Услуги', href: '#services' },
+        { label: 'До/после', href: '#surgery' },
+        { label: 'Цены', href: '#operations' },
+        { label: 'Контакты', href: '#contacts' },
+      ],
+    },
+  ],
+  services: {
+    title: 'Популярные услуги',
+    items: ['Маммопластика', 'Абдоминопластика', 'Липомоделирование', 'Голливудский фейслифтинг', 'Mommy Makeover', 'Блефаропластика'],
+  },
+  contacts: {
+    title: 'Контакты',
+    address: 'Астана, ул. Орынбор, 12, н.п. 68',
+    email: 'info@rr-clinic.com',
+    map: {
+      // OpenStreetMap tiles around Орынбор 12, tinted (assets-src/img/footer-map.png); the card opens 2GIS.
+      src: 'assets/img/web/footer-map.webp',
+      width: 590,
+      height: 304,
+      alt: 'RR Clinic на карте: Астана, ул. Орынбор, 12',
+      href: 'https://2gis.kz/astana/firm/70000001066801836',
+    },
+  },
+  copyright: '© 2026 RR Clinic. Все права защищены.',
+  legal: [
+    // TODO(content): no licences page / data-processing consent yet — confirm targets with the client.
+    { label: 'Лицензии клиники', href: '#licenses' },
+    { label: 'Политика конфиденциальности', href: '/privacy-policy' },
+    { label: 'Согласие на обработку данных', href: '/privacy-policy' },
+  ],
+  wordmark: 'RR Clinic',
+};

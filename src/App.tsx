@@ -11,6 +11,8 @@ import { Programs } from './components/sections/Programs';
 import { Journey } from './components/sections/Journey';
 import { Surgery } from './components/sections/Surgery';
 import { Operations } from './components/sections/Operations';
+import { Faq } from './components/sections/Faq';
+import { Footer } from './components/sections/Footer';
 
 // Team is below the fold and is the only section using antd (Segmented). It is code-split AND only
 // requested when the visitor scrolls within ~800 px of it (R3-1), so antd never competes with the
@@ -86,7 +88,9 @@ export default function App() {
         <Journey />
         <Surgery />
         <Operations />
+        <Faq />
       </main>
+      <Footer />
       <DeferredSurgeonMenu />
     </HeroProvider>
   );

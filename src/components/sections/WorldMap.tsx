@@ -21,6 +21,7 @@ const PINS: Record<string, { x: number; y: number; side: Side; label?: string; n
   moldova: { x: 54.5, y: 52.2, side: 'left' },
   italy: { x: 50, y: 57.6, side: 'bottom-left' },
   turkey: { x: 54.6, y: 58.3, side: 'bottom-right' },
+  israel: { x: 56.9, y: 68.2, side: 'left' },
   russia: { x: 72.6, y: 34, side: 'top' },
   kazakhstan: { x: 67.2, y: 56.4, side: 'top-right', label: 'RR Clinic' },
   kyrgyzstan: { x: 67.7, y: 61, side: 'right', noDot: true },

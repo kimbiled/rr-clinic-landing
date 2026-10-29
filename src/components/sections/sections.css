@@ -748,4 +748,173 @@
   .rr-start__btn:active {
     transform: scale(0.98);
   }
+
+  /* ---- FAQ: capsule tabs, accordion rows, green "Не нашли ответ" bar ---- */
+  .rr-faq__tabs {
+    box-shadow: inset 0 0 0 1px #c5d7d2; /* RR Clinic/Green/200 */
+  }
+
+  .rr-faq__tab {
+    color: #2f4a44;
+    transition:
+      background-color 250ms var(--ease-out),
+      color 250ms var(--ease-out);
+  }
+
+  .rr-faq__tab:hover {
+    background-color: rgb(86 126 117 / 0.08);
+  }
+
+  .rr-faq__tab[aria-selected='true'] {
+    background-color: #5a8478;
+    color: #fff;
+  }
+
+  .rr-faq__item + .rr-faq__item {
+    border-top: 1px solid #ebe7e3;
+  }
+
+  .rr-faq__q {
+    cursor: pointer;
+  }
+
+  .rr-faq__icon {
+    transition: transform 350ms var(--ease-out);
+  }
+
+  .rr-faq__item[data-open] .rr-faq__icon {
+    transform: rotate(45deg);
+  }
+
+  .rr-faq__a {
+    grid-template-rows: 0fr;
+    transition: grid-template-rows 400ms var(--ease-out);
+  }
+
+  .rr-faq__item[data-open] .rr-faq__a {
+    grid-template-rows: 1fr;
+  }
+
+  .rr-ask {
+    /* the request-card arches, inked white at 10 % (arches-light.svg) */
+    background: url('/assets/img/web/arches-light.svg') right center / auto 100% repeat-x, #5a8478;
+  }
+
+  .rr-ask__btn {
+    transition:
+      background-color 220ms var(--ease-out),
+      transform 220ms var(--ease-out);
+  }
+
+  .rr-ask__btn:hover {
+    background-color: #f1efed;
+  }
+
+  .rr-ask__btn:active {
+    transform: scale(0.98);
+  }
+
+  @media (prefers-reduced-motion: reduce) {
+    .rr-faq__a,
+    .rr-faq__icon {
+      transition: none;
+    }
+  }
+
+  /* ---- Footer ---- */
+  .rr-rule--warm {
+    background: #f3ebdf;
+  }
+
+  .rr-frame--warm {
+    --frame-line: #f3ebdf;
+  }
+
+  .rr-foot__title {
+    font-family: var(--font-display);
+    font-size: 18px;
+    line-height: 22px;
+    font-weight: 400;
+    letter-spacing: -0.01em;
+    color: #2e2c2c;
+  }
+
+  .rr-foot__link,
+  .rr-foot__text {
+    font-family: var(--font-text);
+    font-size: 16px;
+    line-height: 20px;
+    color: #625f5e;
+  }
+
+  .rr-foot__link {
+    transition: color 200ms var(--ease-out);
+  }
+
+  .rr-foot__link:hover {
+    color: #2e2c2c;
+  }
+
+  .rr-foot__arrow {
+    transition: translate 200ms var(--ease-out);
+  }
+
+  .rr-foot__link:hover .rr-foot__arrow {
+    translate: 2px 0;
+  }
+
+  .rr-foot__social {
+    background: #efedeb;
+    color: #8c8784;
+    transition:
+      background-color 220ms var(--ease-out),
+      color 220ms var(--ease-out);
+  }
+
+  .rr-foot__social:hover {
+    background: #c39b62;
+    color: #fff;
+  }
+
+  .rr-foot__muted,
+  .rr-foot__legal {
+    font-family: var(--font-text);
+    font-size: 15px;
+    line-height: 20px;
+    color: #8c8784;
+  }
+
+  .rr-foot__legal {
+    text-decoration: underline;
+    text-decoration-thickness: 1px;
+    text-underline-offset: 3px;
+    transition: color 200ms var(--ease-out);
+  }
+
+  .rr-foot__legal:hover {
+    color: #2e2c2c;
+  }
+
+  .rr-foot__map-img {
+    transition: transform 700ms var(--ease-out);
+  }
+
+  .rr-foot__map:hover .rr-foot__map-img {
+    transform: scale(1.04);
+  }
+
+  /* Outlined "RR Clinic": gold hairline letters, cut by the frame and faded towards the right */
+  .rr-foot__mark {
+    margin-top: 28px;
+    font-family: var(--font-display);
+    font-size: 326px;
+    line-height: 0.82;
+    font-weight: 400;
+    letter-spacing: 0;
+    color: transparent;
+    -webkit-text-stroke: 1.2px #ecdcc0;
+    -webkit-mask-image: linear-gradient(90deg, #000 70%, rgb(0 0 0 / 0.35));
+    mask-image: linear-gradient(90deg, #000 70%, rgb(0 0 0 / 0.35));
+    user-select: none;
+  }
 }
