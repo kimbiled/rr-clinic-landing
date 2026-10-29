@@ -531,7 +531,7 @@ export interface FooterContent {
   contacts: { title: string; address: string; email: string; map: LandingImage & { href: string } };
   copyright: string;
   legal: { label: string; href: string }[];
-  wordmark: string;
+  wordmark: LandingImage;
 }
 
 export const footer: FooterContent = {
@@ -575,5 +575,10 @@ export const footer: FooterContent = {
     { label: 'Политика конфиденциальности', href: '/privacy-policy' },
     { label: 'Согласие на обработку данных', href: '/privacy-policy' },
   ],
-  wordmark: 'RR Clinic',
+  wordmark: {
+    src: 'assets/icons/footer-wordmark.svg',
+    width: 1241,
+    height: 300,
+    alt: 'RR Clinic',
+  },
 };

@@ -973,18 +973,12 @@
     transform: scale(1.04);
   }
 
-  /* Outlined "RR Clinic": gold hairline letters, cut by the frame and faded towards the right */
+  /* Original outlined wordmark; its SVG carries the gold gradient. */
   .rr-foot__mark {
+    display: block;
+    width: 100%;
+    height: auto;
     margin-top: 28px;
-    font-family: var(--font-display);
-    font-size: 326px;
-    line-height: 0.82;
-    font-weight: 400;
-    letter-spacing: 0;
-    color: transparent;
-    -webkit-text-stroke: 1.2px #ecdcc0;
-    -webkit-mask-image: linear-gradient(90deg, #000 70%, rgb(0 0 0 / 0.35));
-    mask-image: linear-gradient(90deg, #000 70%, rgb(0 0 0 / 0.35));
     user-select: none;
   }
 
@@ -1009,8 +1003,6 @@
 
     .rr-foot__mark {
       margin-top: 12px;
-      font-size: 88px;
-      -webkit-text-stroke-width: 0.8px;
     }
   }
 }

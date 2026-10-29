@@ -16,7 +16,7 @@ function Arrow() {
 
 /**
  * Footer (design 2026-10-29): logo, tagline and socials; "Клиника" / "Популярные услуги" / "Контакты" columns
- * with the map card; legal row; the outlined "RR Clinic" wordmark running off the right edge below.
+ * with the map card; legal row; the designer's outlined "RR Clinic" SVG below.
  */
 export function Footer() {
   const { clinic } = heroData;
@@ -151,9 +151,17 @@ export function Footer() {
       </div>
       <span className="rr-rule rr-rule--warm pointer-events-none absolute inset-x-0" aria-hidden="true" />
 
-      {/* Outlined wordmark, cut by the frame's right edge */}
+      {/* Designer export includes the outline and gradient. */}
       <div className="mx-auto max-w-[1440px] px-(--sec-pad)" aria-hidden="true">
-        <div className="rr-foot__mark overflow-hidden whitespace-nowrap">{footer.wordmark}</div>
+        <img
+          src={asset(footer.wordmark.src)}
+          width={footer.wordmark.width}
+          height={footer.wordmark.height}
+          alt=""
+          loading="lazy"
+          decoding="async"
+          className="rr-foot__mark"
+        />
       </div>
     </footer>
   );
