@@ -1,4 +1,5 @@
-import { useEffect, useId, useMemo, useRef, useState, type KeyboardEvent, type ReactNode } from 'react';
+import { useEffect, useId, useMemo, useRef, useState, type KeyboardEvent } from 'react';
+import { asset } from '../../data/hero';
 import { operations, type OperationCategory, type OperationIcon } from '../../data/landing';
 import { revealItem, revealScope, useInView } from './useInView';
 import { useIsMobile } from '../../hooks/useIsMobile';
@@ -8,55 +9,15 @@ import './sections.css';
 /** window event (detail = category id): a "Пластическая хирургия" card asks the catalog to open its category. */
 export const OPEN_CATEGORY_EVENT = 'rr:open-operation-category';
 
-/** 20 px line icons for the category list. */
-const ICONS: Record<OperationIcon, ReactNode> = {
-  face: (
-    <path d="M11.5 2.5c-3.6 0-6 2.7-6 6.3 0 1 .2 1.9.5 2.6L4.5 14l1.8.4V16c0 .9.7 1.5 1.6 1.4l2-.2.4 2.3M11.5 2.5c2.6 0 4.5 1.6 5.2 3.8M14 9.5c.8.6 1.3 1.6 1.3 2.7 0 2.2-1.7 4-3.8 4.3M9 8.8h.01" />
-  ),
-  eye: (
-    <>
-      <path d="M2 10s3-5.5 8-5.5S18 10 18 10s-3 5.5-8 5.5S2 10 2 10Z" />
-      <circle cx="10" cy="10" r="2.6" />
-      <path d="M10 2v1.2M4.6 3.6l.7 1M15.4 3.6l-.7 1" />
-    </>
-  ),
-  nose: <path d="M9.5 2.5c0 4-1.2 7.5-3.6 10.4-1.2 1.4-.9 3.2.9 3.6 1 .2 1.7-.4 2.2-1.2.4.8 1.2 1.3 2 1.3s1.6-.5 2-1.3c.5.8 1.2 1.4 2.2 1.2 1.8-.4 2.1-2.2.9-3.6" />,
-  lips: (
-    <>
-      <path d="M2 10c2-.6 3.6-3.6 5.6-3.6 1 0 1.7.6 2.4.6s1.4-.6 2.4-.6c2 0 3.6 3 5.6 3.6-2.4 2.8-4.8 4.2-8 4.2s-5.6-1.4-8-4.2Z" />
-      <path d="M2 10h16" />
-    </>
-  ),
-  breast: (
-    <path d="M3 4.5c0 3-1 5.5-1 7.4 0 2.5 2 3.9 4.2 3.9 2 0 3.3-1.2 3.8-2.6.5 1.4 1.8 2.6 3.8 2.6 2.2 0 4.2-1.4 4.2-3.9 0-1.9-1-4.4-1-7.4M6.2 12.3h.01M13.8 12.3h.01" />
-  ),
-  body: (
-    <path d="M6.5 2c.3 3-.8 4.6-.8 6.6 0 1.6 1 2.4 1 4 0 1.4-1.5 2.9-1.5 5.4M13.5 2c-.3 3 .8 4.6.8 6.6 0 1.6-1 2.4-1 4 0 1.4 1.5 2.9 1.5 5.4M8.2 7.5c1.1.6 2.5.6 3.6 0M10 11.6v.4" />
-  ),
-  intimate: (
-    <>
-      <path d="M10 17c-3-1.6-4.2-4.5-4.2-7.2C5.8 7 7.6 4.6 10 3c2.4 1.6 4.2 4 4.2 6.8 0 2.7-1.2 5.6-4.2 7.2Z" />
-      <path d="M10 17c-3.6.1-6.8-1.8-8-5.6 1.6-.4 3-.3 4.2.2M10 17c3.6.1 6.8-1.8 8-5.6-1.6-.4-3-.3-4.2.2" />
-    </>
-  ),
-};
-
+/** Designer exports shared by the operations catalog and program points. */
 export function CategoryIcon({ name }: { name: OperationIcon }) {
+  const url = `url("${asset(`assets/icons/operation-${name}.svg`)}")`;
   return (
-    <svg
-      width="20"
-      height="20"
-      viewBox="0 0 20 20"
-      fill="none"
-      stroke="currentColor"
-      strokeWidth="1.2"
-      strokeLinecap="round"
-      strokeLinejoin="round"
+    <span
       aria-hidden="true"
-      className="shrink-0"
-    >
-      {ICONS[name]}
-    </svg>
+      className="rr-category-icon"
+      style={{ maskImage: url, WebkitMaskImage: url }}
+    />
   );
 }
 

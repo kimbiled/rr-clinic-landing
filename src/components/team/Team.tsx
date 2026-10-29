@@ -100,8 +100,7 @@ export function Team() {
           </div>
 
           <div ref={bodyRef} className={`team-reveal mt-[18px] flex items-center justify-between ${bodyIn ? 'is-in' : ''}`}>
-            {/* Phones (design 2026-10-29): the same capsule, scrolled sideways across the full width */}
-            <div className="team-tabs-scroll max-md:-mx-(--team-pad) max-md:min-w-0 max-md:flex-1 max-md:overflow-x-auto max-md:px-(--team-pad)">
+            <div className="team-tabs-scroll max-md:min-w-0 max-md:flex-1">
               <TeamTabs tabs={TEAM_TABS} value={tabId} onChange={setTabId} panelId={PANEL_ID} />
             </div>
             <div className="max-md:hidden">

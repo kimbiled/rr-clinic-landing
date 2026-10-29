@@ -46,10 +46,84 @@
     box-shadow: none;
   }
 
+  .team-tabs__label {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+  }
+
+  .team-tabs__icon {
+    display: grid;
+    flex: none;
+    width: 32px;
+    height: 32px;
+    place-items: center;
+    border-radius: 50%;
+    background: white;
+  }
+
   @media (max-width: 767px) {
+    .team-tabs.ant-segmented {
+      display: block;
+      width: 100%;
+      padding: 0;
+      border: 0;
+      background: transparent;
+    }
+
+    .team-tabs .ant-segmented-group {
+      gap: 12px;
+    }
+
+    .team-tabs .ant-segmented-item {
+      flex: 0 0 46px;
+      min-width: 0;
+      border: 1px solid #d5e5e3;
+    }
+
+    .team-tabs .ant-segmented-item-selected-text {
+      flex: 1 1 0;
+      border-color: #497f75;
+    }
+
     .team-tabs .ant-segmented-item-label {
-      padding: 0 16px;
+      display: flex;
+      height: 44px;
+      min-height: 44px;
+      align-items: center;
+      padding: 0;
       font-size: 14px;
+    }
+
+    .team-tabs__label {
+      width: 100%;
+      min-width: 0;
+      gap: 8px;
+    }
+
+    .team-tabs__icon {
+      width: 42px;
+      height: 42px;
+    }
+
+    .team-tabs__text {
+      position: absolute;
+      width: 1px;
+      height: 1px;
+      overflow: hidden;
+      clip-path: inset(50%);
+      white-space: nowrap;
+    }
+
+    .ant-segmented-item-selected-text .team-tabs__text {
+      position: static;
+      width: auto;
+      height: auto;
+      padding-right: 12px;
+      clip-path: none;
+      white-space: normal;
+      text-align: left;
+      line-height: 1.05;
     }
   }
 
@@ -173,7 +247,7 @@
     color: #2f4a44;
   }
 
-  /* Phones: the capsule tabs scroll sideways inside the gutter */
+  /* Keep the tab row aligned to the section gutter. */
   .team-tabs-scroll {
     scrollbar-width: none;
   }

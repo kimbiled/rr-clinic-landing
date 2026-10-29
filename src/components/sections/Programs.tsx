@@ -201,6 +201,7 @@ export function Programs() {
               >
                 {items.map((item, i) => {
                   const isActive = i === active;
+                  const image = item.mobileImage ?? item.image;
                   return (
                     <div
                       key={item.title}
@@ -211,16 +212,16 @@ export function Programs() {
                       aria-hidden={!isActive}
                       inert={!isActive}
                     >
-                      {/* TODO(design): the phone design uses a taller photo; until it is exported, the wide desktop
-                          photo sits under the panel and fades into the card colour */}
                       <img
-                        src={asset(item.image.src)}
-                        width={item.image.width}
-                        height={item.image.height}
-                        alt={item.image.alt}
+                        src={asset(image.src)}
+                        width={image.width}
+                        height={image.height}
+                        alt={image.alt}
                         loading="lazy"
                         decoding="async"
-                        className="rr-prog__img rr-mprog__img absolute inset-x-0 bottom-0 -z-10 h-[360px] w-full object-cover object-[92%_center]"
+                        className={item.mobileImage
+                          ? 'rr-prog__img absolute inset-0 -z-10 h-full w-full object-cover object-center'
+                          : 'rr-prog__img rr-mprog__img absolute inset-x-0 bottom-0 -z-10 h-[360px] w-full object-cover object-[92%_center]'}
                       />
                       <div className="absolute inset-x-[15px] top-[15px] rounded-[20px] bg-white px-4 pt-[18px] pb-5 text-[#1b1919]">
                         <p className="font-text text-[13px] leading-4 text-[#8c8784]">{item.kicker}</p>

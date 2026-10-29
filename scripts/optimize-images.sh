@@ -190,6 +190,23 @@ fit_wide "$SRC/bg-columns.png" bg-columns 1440
 # trust-card = Figma "Main content container" (trust-card-figma.svg) rendered at 2x: all its layers
 # (columns, founders, statue, grid, glows) flattened into one 2480x1120 photo.
 QUALITY=85 fit_wide "$SRC/trust-card.png" trust-card 1240
+# Portrait Mommy Makeover export: keep the designer's 370x595 viewport over the embedded photo.
+if (( HAS_CWEBP )); then
+  program_tmp="$(mktemp -t rr-program).jpg"
+  python3 - "$SRC/program-mommy-makeover-mobile.svg" "$program_tmp" <<'PY'
+import base64
+import pathlib
+import sys
+import xml.etree.ElementTree as ET
+
+root = ET.parse(sys.argv[1]).getroot()
+image = root.find('.//{http://www.w3.org/2000/svg}image')
+data = image.attrib['{http://www.w3.org/1999/xlink}href'].split(',', 1)[1]
+pathlib.Path(sys.argv[2]).write_bytes(base64.b64decode(data))
+PY
+  encode "$program_tmp" program-mommy-makeover-mobile 740 1190 "1350 0 1054 1696"
+  rm -f "$program_tmp"
+fi
 # Phone card: the founders only (x 990..2380 of the 2480 render), 357 CSS px wide @2x.
 encode "$SRC/trust-card.png" trust-card-mobile 714 0 "990 0 1390 1120"
 # statue-v2 = Figma "rr-statue-cool-marble-v2" (embedded 1678×937 PNG). The hero centrepiece is

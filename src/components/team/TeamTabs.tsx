@@ -1,4 +1,5 @@
 import { Segmented } from 'antd';
+import { asset } from '../../data/hero';
 import type { TeamTab, TeamTabId } from './teamData';
 
 interface TeamTabsProps {
@@ -8,7 +9,7 @@ interface TeamTabsProps {
   panelId: string;
 }
 
-/** Figma "Вкладки / капсула" 587×50 — antd Segmented restyled in team.css; one tab stop, ←/→ switch. */
+/** Capsule tabs; phones show the selected label and two icon buttons. */
 export function TeamTabs({ tabs, value, onChange, panelId }: TeamTabsProps) {
   return (
     <Segmented<TeamTabId>
@@ -25,7 +26,14 @@ export function TeamTabs({ tabs, value, onChange, panelId }: TeamTabsProps) {
       onChange={onChange}
       options={tabs.map((tab) => ({
         value: tab.id,
-        label: tab.label,
+        label: (
+          <span className="team-tabs__label">
+            <span className="team-tabs__icon">
+              <img src={asset(`assets/icons/team-tab-${tab.id}.svg`)} width={24} height={24} alt="" />
+            </span>
+            <span className="team-tabs__text">{tab.label}</span>
+          </span>
+        ),
         className: tab.widthClass,
       }))}
     />

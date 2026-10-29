@@ -66,6 +66,8 @@ export interface Program {
   icons: ProgramIcon[];
   /** Full-card photo (1176×356 card; the plain left side carries the text). */
   image: LandingImage;
+  /** Portrait export when supplied for the phone card. */
+  mobileImage?: LandingImage;
 }
 
 /** Category icons from the operations list, plus the program-only ones (Programs.tsx). */
@@ -158,6 +160,12 @@ export const programs: ProgramsContent = {
         width: 2349,
         height: 711,
         alt: 'Живот после беременности с растяжками, мама держит малыша',
+      },
+      mobileImage: {
+        src: 'assets/img/web/program-mommy-makeover-mobile.webp',
+        width: 740,
+        height: 1190,
+        alt: 'Мама держит ребёнка на руках',
       },
     },
     {
