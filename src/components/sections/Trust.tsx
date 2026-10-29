@@ -1,26 +1,25 @@
-import { useEffect, useState, type CSSProperties } from "react";
-import { asset } from "../../data/hero";
-import { trust, type RichText as RichTextValue } from "../../data/landing";
-import { CtaButton } from "../hero/CtaButton";
-import { RichText, withBreaks } from "./RichText";
-import { revealItem, revealScope, useInView } from "./useInView";
-import { WorldMap } from "./WorldMap";
-import { useIsMobile } from "../../hooks/useIsMobile";
-import "./sections.css";
+import { useEffect, useState, type CSSProperties } from 'react';
+import { asset } from '../../data/hero';
+import { trust, type RichText as RichTextValue } from '../../data/landing';
+import { CtaButton } from '../hero/CtaButton';
+import { RichText, withBreaks } from './RichText';
+import { revealItem, revealScope, useInView } from './useInView';
+import { WorldMap } from './WorldMap';
+import { useIsMobile } from '../../hooks/useIsMobile';
+import './sections.css';
 
 const COUNT_FROM = 0.1; // "1000+" starts at 100+
 const COUNT_DELAY_MS = 250;
 const COUNT_MS = 1800;
 const easeOutCubic = (t: number) => 1 - (1 - t) ** 3;
 const prefersReducedMotion = () =>
-  typeof window !== "undefined" &&
-  window.matchMedia("(prefers-reduced-motion: reduce)").matches;
+  typeof window !== 'undefined' && window.matchMedia('(prefers-reduced-motion: reduce)').matches;
 
 /** A "1000+"-style figure counts up from a tenth of its value once it scrolls into view; anything else renders as is. */
 function StatValue({ value }: { value: string }) {
   const match = /^(\d+)(\+?)$/.exec(value);
   const to = match ? Number(match[1]) : 0;
-  const suffix = match?.[2] ?? "";
+  const suffix = match?.[2] ?? '';
   const from = Math.round(to * COUNT_FROM);
   const { ref, inView } = useInView<HTMLSpanElement>();
   const [n, setN] = useState(() => (prefersReducedMotion() ? to : from));
@@ -31,10 +30,7 @@ function StatValue({ value }: { value: string }) {
     let start = 0;
     const tick = (now: number) => {
       if (!start) start = now;
-      const t = Math.min(
-        1,
-        Math.max(0, (now - start - COUNT_DELAY_MS) / COUNT_MS),
-      );
+      const t = Math.min(1, Math.max(0, (now - start - COUNT_DELAY_MS) / COUNT_MS));
       setN(Math.round(from + (to - from) * easeOutCubic(t)));
       if (t < 1) raf = requestAnimationFrame(tick);
     };
@@ -58,13 +54,10 @@ function StatValue({ value }: { value: string }) {
 function richLines(value: RichTextValue): RichTextValue[] {
   const lines: RichTextValue[number][][] = [[]];
   for (const part of value) {
-    const text = typeof part === "string" ? part : part.text;
-    text.split("\n").forEach((chunk, i) => {
+    const text = typeof part === 'string' ? part : part.text;
+    text.split('\n').forEach((chunk, i) => {
       if (i > 0) lines.push([]);
-      if (chunk)
-        lines[lines.length - 1].push(
-          typeof part === "string" ? chunk : { ...part, text: chunk },
-        );
+      if (chunk) lines[lines.length - 1].push(typeof part === 'string' ? chunk : { ...part, text: chunk });
     });
   }
   return lines;
@@ -96,10 +89,7 @@ export function Trust() {
             className="font-display text-[48px] leading-[1.1] font-normal tracking-[-0.03em] text-neutral-900 max-md:text-[32px]"
             {...revealItem(0)}
           >
-            {trust.title[0]}{" "}
-            <span className="text-[#5e8d7e] max-md:block">
-              {trust.title[1]}
-            </span>
+            {trust.title[0]} <span className="text-[#5e8d7e] max-md:block">{trust.title[1]}</span>
           </h2>
 
           <p
@@ -121,7 +111,7 @@ export function Trust() {
               key={stat.label}
               className="flex w-[244px] flex-col gap-5 border-l border-[#e3e0de] pl-6 max-md:w-auto max-md:gap-3 max-md:border-0 max-md:pl-0"
             >
-              <dt className="sr-only">{stat.label.replace("\n", " ")}</dt>
+              <dt className="sr-only">{stat.label.replace('\n', ' ')}</dt>
               <dd className="rr-trim-cap order-first font-display text-[72px] leading-none font-light tracking-[-0.04em] text-[#5e8d7e] max-md:text-[44px]">
                 <StatValue value={stat.value} />
                 {stat.unit && (
@@ -146,10 +136,7 @@ export function Trust() {
         >
           {/* Phones get the founders crop above the panel; the card's brown fills in behind the panel */}
           <picture>
-            <source
-              media="(max-width: 767px)"
-              srcSet={asset(card.photoMobile.src)}
-            />
+            <source media="(max-width: 767px)" srcSet={asset(card.photoMobile.src)} />
             <img
               src={asset(card.photo.src)}
               width={card.photo.width}
@@ -169,10 +156,10 @@ export function Trust() {
                 className="rr-trust__chip absolute top-(--top) left-(--left) inline-flex h-10 -translate-x-1/2 items-center gap-2 rounded-pill px-4 font-text text-[15px] leading-4 whitespace-nowrap text-white max-md:top-(--m-top) max-md:left-(--m-left) max-md:h-8 max-md:px-3 max-md:text-[13px]"
                 style={
                   {
-                    "--left": person.left,
-                    "--top": person.top,
-                    "--m-left": person.mobile.left,
-                    "--m-top": person.mobile.top,
+                    '--left': person.left,
+                    '--top': person.top,
+                    '--m-left': person.mobile.left,
+                    '--m-top': person.mobile.top,
                   } as CSSProperties
                 }
                 aria-hidden="true"
@@ -191,18 +178,11 @@ export function Trust() {
             {/* Each line rises out of its own mask once the panel is in view */}
             <h3
               className="rr-lines font-display text-[32px] leading-[1.1] font-normal tracking-[-0.02em] text-neutral-900 max-md:text-[20px]"
-              data-lines={panel.inView ? "in" : "out"}
+              data-lines={panel.inView ? 'in' : 'out'}
             >
               {richLines(card.title).map((line, i) => (
-                <span
-                  key={i}
-                  className="-mx-1 -mb-2 block overflow-hidden px-1 pb-2"
-                >
-                  <span
-                    className="block"
-                    data-line=""
-                    style={{ "--ln-i": i } as CSSProperties}
-                  >
+                <span key={i} className="-mx-1 -mb-2 block overflow-hidden px-1 pb-2">
+                  <span className="block" data-line="" style={{ '--ln-i': i } as CSSProperties}>
                     <RichText value={line} accentClassName="text-[#9b8c7e]" />
                   </span>
                 </span>
@@ -215,14 +195,12 @@ export function Trust() {
 
             <div className="mt-[22px] -ml-2 flex gap-[11px] max-md:mt-4 max-md:ml-0 max-md:grid max-md:grid-cols-2 max-md:gap-2">
               {card.ctas.map((cta) =>
-                cta.variant === "primary" ? (
+                cta.variant === 'primary' ? (
                   <CtaButton
                     key={cta.label}
                     variant="primary"
                     href={cta.href}
-                    label={
-                      isMobile ? (cta.mobileLabel ?? cta.label) : cta.label
-                    }
+                    label={isMobile ? (cta.mobileLabel ?? cta.label) : cta.label}
                     className="h-[55px]! w-[259px] rounded-pill! bg-none bg-[#c8a66b] font-display! text-[15px]! leading-6! font-normal! tracking-[-0.01em]! max-md:h-12! max-md:w-auto max-md:justify-center max-md:text-[14px]!"
                     data-arrow="hover"
                     data-flat=""

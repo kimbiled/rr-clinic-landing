@@ -62,9 +62,14 @@ export interface Program {
   kicker: string;
   title: string;
   points: string[];
+  /** Phone design: a gold line icon before each point (same order as `points`). */
+  icons: ProgramIcon[];
   /** Full-card photo (1176×356 card; the plain left side carries the text). */
   image: LandingImage;
 }
+
+/** Category icons from the operations list, plus the program-only ones (Programs.tsx). */
+export type ProgramIcon = OperationIcon | 'clipboard' | 'drip' | 'combo' | 'calendar' | 'car' | 'hotel' | 'nurse' | 'headset' | 'video';
 
 export interface ProgramsContent {
   id: string;
@@ -147,6 +152,7 @@ export const programs: ProgramsContent = {
         'Наблюдение команды в течение года',
         'Реабилитационные процедуры в клинике',
       ],
+      icons: ['body', 'breast', 'body', 'clipboard', 'drip'],
       image: {
         src: 'assets/img/web/program-mommy-makeover.webp',
         width: 2349,
@@ -164,6 +170,7 @@ export const programs: ProgramsContent = {
         'Комбинация под ваш индивидуальный запрос',
         'Наблюдение 1 год после операции',
       ],
+      icons: ['eye', 'intimate', 'nose', 'combo', 'calendar'],
       image: {
         src: 'assets/img/web/program-simultaneous.webp',
         width: 1710,
@@ -181,6 +188,7 @@ export const programs: ProgramsContent = {
         'Персональный менеджер 24/7',
         'Удалённые осмотры после возвращения домой',
       ],
+      icons: ['car', 'hotel', 'nurse', 'headset', 'video'],
       image: {
         src: 'assets/img/web/program-nonresident.webp',
         width: 2134,

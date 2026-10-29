@@ -41,7 +41,7 @@ const ICONS: Record<OperationIcon, ReactNode> = {
   ),
 };
 
-function CategoryIcon({ name }: { name: OperationIcon }) {
+export function CategoryIcon({ name }: { name: OperationIcon }) {
   return (
     <svg
       width="20"

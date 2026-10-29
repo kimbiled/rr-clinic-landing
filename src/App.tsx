@@ -16,10 +16,10 @@ import { Footer } from './components/sections/Footer';
 
 // Team is below the fold and is the only section using antd (Segmented). It is code-split AND only
 // requested when the visitor scrolls within ~800 px of it (R3-1), so antd never competes with the
-// first screen. The placeholder keeps the #doctors anchor and the section height (design 2026-10: 717), so
+// first screen. The placeholder keeps the #doctors anchor and the section height (design 2026-10-29: 824), so
 // nothing shifts when it arrives and nav "Врачи" still lands in the right place.
 const Team = lazy(() => import('./components/team/Team').then((m) => ({ default: m.Team })));
-const TEAM_HEIGHT = 717;
+const TEAM_HEIGHT = 824;
 
 function TeamPlaceholder({ sectionRef }: { sectionRef?: Ref<HTMLElement> }) {
   return <section ref={sectionRef} id="doctors" aria-label="Наша команда" style={{ minHeight: TEAM_HEIGHT, background: '#fff' }} />;

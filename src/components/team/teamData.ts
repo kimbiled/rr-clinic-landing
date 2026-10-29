@@ -34,26 +34,26 @@ const SURGEON_ORDER = [
 const card = (id: string): ImageAsset => ({ src: `assets/img/web/team-${id}.webp`, width: 600, height: 1124 });
 export const TEAM_PHOTOS: Record<string, ImageAsset> = Object.fromEntries(SURGEON_ORDER.map((id) => [id, card(id)]));
 
-/**
- * Team-card copy from the design: the card shows "Фамилия / Имя Отчество" and a short note, which
- * differ from the hero data (no patronymics there). Missing entries fall back to the doctor data.
- */
+/** Team-card copy: the card shows "Фамилия / Имя Отчество" (no patronymics in the hero data) and the lines below. */
 export interface CardText {
   patronymic?: string;
-  note?: string;
-  /** Phone card extras (design 2026-10-29), shown when present: operation tags over the photo, a role line
-   *  above the name, a longer bio instead of `note`, and up to two figures. */
-  tags?: string[];
-  role?: string;
-  bio?: string;
+  /** Operation tags over the photo. */
+  tags: string[];
+  /** Line above the name, e.g. "Пластический хирург • Стаж 10 лет". */
+  role: string;
+  /** One line with ⌄ on the card; the full text (and `stats`) when expanded. */
+  bio: string;
   stats?: { value: string; label: string }[];
 }
 
-// TODO(content): the phone design fills tags / role / bio / stats for Курманбаев only — ask the clinic for the rest.
+/**
+ * Team-card copy (design 2026-10-29). The design shows each bio cut to one line; where the rest is not in
+ * the design it is completed from the hero data / the doctor's page.
+ * TODO(content): confirm the full bios with the clinic.
+ */
 export const CARD_TEXT: Record<string, CardText> = {
   'kurmanbaev-rustam': {
     patronymic: 'Амангельдыевич',
-    note: 'Абдоминопластика с ушиванием диастаза',
     tags: ['Липоабдоминопластика', 'Маммопластика', 'Липофилинг ягодиц'],
     role: 'Основатель • Стаж 15 лет',
     bio: 'Специалист по абдоминопластике с ушиванием диастаза. Возвращает форму живота и контуры тела после родов и похудения.',
@@ -62,18 +62,60 @@ export const CARD_TEXT: Record<string, CardText> = {
       { value: '400', label: 'операций на теле в год' },
     ],
   },
-  'romanovskaya-tatyana': { patronymic: 'Владимировна', note: 'Автор методики «Голливудский фейслифтинг»' },
-  'musa-baurzhan': { patronymic: 'Жаннатович', note: 'Пластика век, увеличение и подтяжка груди' },
-  'temirkhanov-amir': { patronymic: 'Багдатович', note: 'Абдоминопластика, липомоделирование' },
-  'chatinyan-garik': { patronymic: 'Артурович', note: 'Челюстно-лицевой хирург, открытая и закрытая ринопластика' },
-  'kodzoeva-leyla': { patronymic: 'Магомедовна', note: 'Интимная пластика и пластика груди' },
-  'ulagasheva-alina': { patronymic: 'Ибрагимовна', note: 'Эстетическая хирургия груди и лица' },
-  'savelyev-evgeniy': { patronymic: 'Игоревич', note: 'Восстановление фигуры и сложные повторные операции' },
+  'romanovskaya-tatyana': {
+    patronymic: 'Владимировна',
+    tags: ['Фейслифтинг', 'Блефаропластика', 'Маммопластика'],
+    role: 'Основатель • Стаж 27 лет',
+    bio: 'Автор запатентованной методики «Голливудский фейслифтинг» — авторской подтяжки лица и шеи на основе Deep Plane Facelift.',
+  },
+  'musa-baurzhan': {
+    patronymic: 'Жаннатович',
+    tags: ['Блефаропластика', 'Маммопластика', 'Подтяжка груди'],
+    role: 'Пластический хирург • Стаж 10 лет',
+    bio: 'Специалист по пластике век, увеличению и подтяжке груди.',
+  },
+  'temirkhanov-amir': {
+    patronymic: 'Багдатович',
+    tags: ['Абдоминопластика', 'Липомоделирование', 'Подтяжка груди'],
+    role: 'Пластический хирург • Стаж 4 года',
+    bio: 'Специалист по абдоминопластике и липомоделированию, комплексной коррекции фигуры.',
+  },
+  'chatinyan-garik': {
+    patronymic: 'Артурович',
+    tags: ['Ринопластика', 'Подтяжка лица', 'Маммопластика'],
+    role: 'Пластический хирург • Стаж 11 лет',
+    bio: 'Пластический и челюстно-лицевой хирург. Выполняет открытую и закрытую ринопластику.',
+  },
+  'kodzoeva-leyla': {
+    patronymic: 'Магомедовна',
+    tags: ['Интимная пластика', 'Маммопластика', 'Подтяжка груди'],
+    role: 'Пластический хирург • Стаж 14 лет',
+    bio: 'Специалист по интимной пластике и пластике груди.',
+  },
+  'ulagasheva-alina': {
+    patronymic: 'Ибрагимовна',
+    tags: ['Пластика груди', 'Пластика лица', 'Пластика век'],
+    role: 'Пластический хирург • Стаж 8+ лет',
+    bio: 'Эстетическая хирургия груди и лица.',
+  },
+  'savelyev-evgeniy': {
+    patronymic: 'Игоревич',
+    tags: ['Увеличение груди', 'Подтяжка груди', 'Повторные операции'],
+    role: 'Кандидат мед. наук • Стаж 15+ лет',
+    bio: 'Специализируется на пластике груди, восстановлении фигуры и сложных повторных операциях.',
+  },
   'tulepbergenova-tomiris': {
     patronymic: 'Арыстанбековна',
-    note: 'Хирург-резидент, отделение пластической хирургии RR Clinic',
+    tags: ['Блефаропластика'],
+    role: 'Хирург-резидент • RR Clinic',
+    bio: 'Хирург-резидент отделения пластической хирургии RR Clinic.',
   },
-  'temirkhan-anar': { patronymic: 'Нурланкызы', note: 'Хирург-резидент, отделение пластической хирургии RR Clinic' },
+  'temirkhan-anar': {
+    patronymic: 'Нурланкызы',
+    tags: ['Блефаропластика'],
+    role: 'Хирург-резидент • Практика 8+ лет',
+    bio: 'Резидент отделения пластической хирургии RR Clinic.',
+  },
 };
 
 function orderedSurgeons(doctors: Doctor[]): Doctor[] {
