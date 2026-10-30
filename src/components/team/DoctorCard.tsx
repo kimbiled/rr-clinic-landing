@@ -1,4 +1,4 @@
-import { useId, useState, type CSSProperties, type MouseEvent } from 'react';
+import { type CSSProperties, type MouseEvent } from 'react';
 import { asset } from '../../data/hero';
 import type { Doctor } from '../../data/types';
 import { whatsappLink } from '../sections/whatsapp';
@@ -22,13 +22,11 @@ function Silhouette() {
 }
 
 /**
- * Design 2026-10-29 (desktop and phones): the Figma card photo fills the card, operation tags on top, and a
- * frosted panel at the bottom — role line, name, a one-line bio that ⌄ expands (with the doctor's figures),
- * then "Записаться" (WhatsApp) / "Подробнее" (the doctor's page).
+ * Design 2026-10-30: the Figma card photo fills the card, operation tags on top, and a frosted panel at the
+ * bottom — role line, name, the full bio, two figures, then "Записаться" (WhatsApp, or a closed state) /
+ * "Подробнее" (the doctor's page).
  */
 export function DoctorCard({ doctor, index, onMore }: DoctorCardProps) {
-  const [expanded, setExpanded] = useState(false);
-  const bioId = useId();
   const photo = TEAM_PHOTOS[doctor.id] ?? null;
   const nameId = `team-doctor-${doctor.id}`;
   const text = CARD_TEXT[doctor.id];
@@ -42,7 +40,7 @@ export function DoctorCard({ doctor, index, onMore }: DoctorCardProps) {
 
   return (
     <li
-      className="team-card relative h-[466px] w-[300px] shrink-0 snap-start overflow-hidden rounded-[24px] bg-[#f5f2f0] max-md:h-[509px] max-md:w-[calc(100vw-45px)]"
+      className="team-card relative h-[544px] w-[340px] shrink-0 snap-start overflow-hidden rounded-[24px] bg-[#f5f2f0] max-md:w-[calc(100vw-45px)]"
       style={{ '--i': index } as CSSProperties}
       aria-labelledby={nameId}
     >
@@ -62,11 +60,11 @@ export function DoctorCard({ doctor, index, onMore }: DoctorCardProps) {
       )}
 
       {text && text.tags.length > 0 && (
-        <ul className="absolute inset-x-3 top-3 flex gap-1 overflow-hidden" aria-label="Операции">
+        <ul className="absolute inset-x-[16px] top-[16px] flex gap-1.5 overflow-hidden" aria-label="Операции">
           {text.tags.map((tag) => (
             <li
               key={tag}
-              className="team-card__tag shrink-0 rounded-pill px-[7px] py-1 font-text text-[9px] leading-3 whitespace-nowrap text-[#625f5e]"
+              className="team-card__tag shrink-0 rounded-pill px-2 py-1 font-text text-[10px] leading-3 whitespace-nowrap text-[#4f7468]"
             >
               {tag}
             </li>
@@ -74,42 +72,23 @@ export function DoctorCard({ doctor, index, onMore }: DoctorCardProps) {
         </ul>
       )}
 
-      <div className="team-card__panel absolute inset-x-3 bottom-3 rounded-[20px] p-4">
+      <div className="team-card__panel absolute inset-x-[16px] bottom-[16px] rounded-[20px] p-4">
         {text?.role && <p className="font-text text-[12px] leading-4 text-[#5e8b7b]">{text.role}</p>}
-        <h3 id={nameId} className="mt-1.5 font-display text-[16px] leading-[1.2] font-normal tracking-[-0.02em] text-[#1b1919]">
+        <h3 id={nameId} className="mt-2 font-display text-[17px] leading-[20px] font-normal tracking-[-0.01em] text-[#1b1919]">
           {doctor.lastName}
           <br />
           {given}
         </h3>
 
-        <div className="mt-2.5 flex items-start gap-2">
-          <p
-            id={bioId}
-            className={`min-w-0 flex-1 font-text text-[12px] leading-[1.35] text-[#625f5e] ${expanded ? '' : 'truncate'}`}
-          >
-            {bio}
-          </p>
-          <button
-            type="button"
-            className="team-card__toggle -mt-0.5 grid size-5 shrink-0 place-items-center rounded-full text-[#8c8784]"
-            aria-expanded={expanded}
-            aria-controls={bioId}
-            aria-label={expanded ? 'Свернуть описание' : 'Показать описание полностью'}
-            onClick={() => setExpanded((v) => !v)}
-          >
-            <svg width="10" height="6" viewBox="0 0 10 6" fill="none" aria-hidden="true">
-              <path d="M1 1l4 4 4-4" stroke="currentColor" strokeWidth="1.2" strokeLinecap="round" strokeLinejoin="round" />
-            </svg>
-          </button>
-        </div>
+        <p className="mt-2.5 h-[48px] overflow-hidden font-text text-[12px] leading-4 text-[#625f5e]">{bio}</p>
 
-        {expanded && text?.stats && (
-          <dl className="mt-3 flex gap-5">
+        {text?.stats && (
+          <dl className="mt-2.5 flex gap-5">
             {text.stats.map((stat) => (
-              <div key={stat.label} className="flex flex-col">
+              <div key={stat.label} className="flex min-w-0 flex-col">
                 <dt className="sr-only">{stat.label}</dt>
-                <dd className="order-first font-display text-[16px] leading-5 text-[#1b1919]">{stat.value}</dd>
-                <dd className="font-text text-[11px] leading-4 text-[#7c7876]" aria-hidden="true">
+                <dd className="order-first font-display text-[15px] leading-5 text-[#1b1919]">{stat.value}</dd>
+                <dd className="font-text text-[11px] leading-[14px] whitespace-nowrap text-[#7c7876]" aria-hidden="true">
                   {stat.label}
                 </dd>
               </div>
@@ -117,23 +96,20 @@ export function DoctorCard({ doctor, index, onMore }: DoctorCardProps) {
           </dl>
         )}
 
-        <div className="mt-3.5 grid grid-cols-2 gap-2">
-          <a
-            {...whatsappLink(`Здравствуйте! Хочу записаться на консультацию к врачу: ${fullName}`)}
-            draggable={false}
-            className="team-card__btn team-card__btn--primary gap-1.5"
-            aria-label={`Записаться к врачу: ${fullName}`}
-          >
-            <svg width="14" height="14" viewBox="0 0 18 18" fill="none" aria-hidden="true">
-              <path
-                d="M9 1.6a7.4 7.4 0 0 0-6.4 11.1L1.6 16.4l3.8-1a7.4 7.4 0 1 0 3.6-13.8Z"
-                stroke="currentColor"
-                strokeWidth="1.5"
-                strokeLinejoin="round"
-              />
-            </svg>
-            Записаться
-          </a>
+        <div className="mt-3 grid grid-cols-2 gap-2">
+          {text?.bookingClosed ? (
+            <span className="team-card__btn team-card__btn--closed">Запись закрыта</span>
+          ) : (
+            <a
+              {...whatsappLink(`Здравствуйте! Хочу записаться на консультацию к врачу: ${fullName}`)}
+              data-analytics-id={`doctor_booking_${doctor.id}`}
+              draggable={false}
+              className="team-card__btn team-card__btn--primary"
+              aria-label={`Записаться к врачу: ${fullName}`}
+            >
+              Записаться
+            </a>
+          )}
           <a
             href={doctor.href || '#doctors'}
             onClick={handleMore}

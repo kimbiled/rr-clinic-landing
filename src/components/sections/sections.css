@@ -351,8 +351,7 @@
     transform: none;
   }
 
-  .rr-prog__text,
-  .rr-prog__ctas {
+  .rr-prog__panel {
     opacity: 0;
     translate: 0 12px;
     transition:
@@ -360,15 +359,38 @@
       translate 600ms var(--ease-out);
   }
 
-  .rr-prog__slide[data-active] .rr-prog__text,
-  .rr-prog__slide[data-active] .rr-prog__ctas {
+  .rr-prog__slide[data-active] .rr-prog__panel {
     opacity: 1;
     translate: none;
     transition-delay: 200ms;
   }
 
-  .rr-prog__slide[data-active] .rr-prog__ctas {
-    transition-delay: 300ms;
+  .rr-prog__gold {
+    background: #c7a56e;
+    transition:
+      background-color 220ms var(--ease-out),
+      transform 220ms var(--ease-out);
+  }
+
+  .rr-prog__gold:hover {
+    background: #b8945a;
+  }
+
+  .rr-prog__light {
+    background: #f5f2ef;
+    box-shadow: inset 0 0 0 1px #e3ded9;
+    transition:
+      background-color 220ms var(--ease-out),
+      transform 220ms var(--ease-out);
+  }
+
+  .rr-prog__light:hover {
+    background: #ece7e2;
+  }
+
+  .rr-prog__gold:active,
+  .rr-prog__light:active {
+    transform: scale(0.98);
   }
 
   .rr-prog__consult {
@@ -426,6 +448,10 @@
 
   .rr-prog :focus-visible {
     outline-color: #fff;
+  }
+
+  .rr-prog__panel :focus-visible {
+    outline-color: #8f6526;
   }
 
   /* Autoplay progress: the ring draws itself over one slide period */
@@ -518,8 +544,7 @@
     .rr-pill-light,
     .rr-prog__slide,
     .rr-prog__img,
-    .rr-prog__text,
-    .rr-prog__ctas {
+    .rr-prog__panel {
       transition: none;
     }
 
@@ -531,7 +556,7 @@
   }
 }
 
-/* ---- Journey / Surgery / Operations (design 2026-10-27): light grey grid frame, full-bleed rules between them ---- */
+/* ---- Journey, Operations, Works, Reviews (design 2026-10-30) ---- */
 @layer components {
   .rr-frame {
     --frame-line: #efebe7;
@@ -556,6 +581,15 @@
     right: 0;
   }
 
+  /* The frame stands 34 px outside the 1240 px content */
+  .rr-frame--wide::before {
+    left: -34px;
+  }
+
+  .rr-frame--wide::after {
+    right: -34px;
+  }
+
   .rr-rule {
     height: 1px;
     background: #efebe7;
@@ -569,19 +603,18 @@
     }
   }
 
-  /* "Для жителей Астаны / Для иногородних": gold outline pill, the gold thumb slides under the chosen tab */
+  /* "Для жителей Астаны / Для иногородних": green outline pill, the green thumb slides under the chosen tab */
   .rr-toggle {
-    box-shadow: inset 0 0 0 1px #e7d6b8;
+    box-shadow: inset 0 0 0 1px #c5d7d2; /* RR Clinic/Green/200 */
   }
 
   .rr-toggle__thumb {
-    background: #c39b62;
-    box-shadow: 0 4px 12px rgb(158 118 62 / 0.25);
+    background: #557a6f;
     transition: translate 450ms var(--ease-out);
   }
 
   .rr-toggle__tab {
-    color: #9a7442;
+    color: #2f4a44;
     transition: color 300ms var(--ease-out);
   }
 
@@ -590,36 +623,166 @@
   }
 
   .rr-toggle__tab[aria-selected='false']:hover {
-    color: #6f5534;
+    color: #1f3631;
   }
 
-  /* Step number: thin gold digits sitting on a short rule, their lower part cut off by it */
-  .rr-journey__num {
+  /* Round outline button (← → of the journey, reviews and the surgeon row) */
+  .rr-round-btn {
+    display: grid;
+    width: 48px;
+    height: 48px;
+    place-items: center;
+    border-radius: 50%;
+    background: #fff;
+    box-shadow: inset 0 0 0 1px #dfe6e3;
+    color: #2e2c2c;
+    cursor: pointer;
+    transition:
+      background-color 220ms var(--ease-out),
+      box-shadow 220ms var(--ease-out),
+      color 220ms var(--ease-out),
+      opacity 220ms var(--ease-out),
+      transform 220ms var(--ease-out);
+  }
+
+  .rr-round-btn--sm {
+    width: 42px;
+    height: 42px;
+  }
+
+  .rr-round-btn:hover:not(:disabled) {
+    background: #557a6f;
+    box-shadow: inset 0 0 0 1px #557a6f;
+    color: #fff;
+  }
+
+  .rr-round-btn:active:not(:disabled) {
+    transform: scale(0.95);
+  }
+
+  .rr-round-btn:disabled {
+    opacity: 0.4;
+    cursor: default;
+  }
+
+  /* ---- Journey cards: the current step is white and lifted, the others are dimmed ---- */
+  .rr-path__card {
+    background: #f5f3f1;
+    cursor: pointer;
+    transition:
+      background-color 450ms var(--ease-out),
+      box-shadow 450ms var(--ease-out);
+  }
+
+  .rr-path__card[aria-current='step'] {
+    background: #fff;
+    box-shadow: 0 14px 34px -10px rgb(70 90 84 / 0.2), 0 0 0 1px rgb(46 44 44 / 0.03);
+  }
+
+  .rr-path__img {
+    opacity: 0.8;
+    transition: opacity 450ms var(--ease-out);
+  }
+
+  .rr-path__card:hover .rr-path__img,
+  .rr-path__card[aria-current='step'] .rr-path__img {
+    opacity: 1;
+  }
+
+  .rr-path__num {
+    background: rgb(233 230 227 / 0.72);
+    -webkit-backdrop-filter: blur(6px);
+    backdrop-filter: blur(6px);
+    color: #625f5e;
+    transition: background-color 450ms var(--ease-out);
+  }
+
+  .rr-path__card[aria-current='step'] .rr-path__num {
+    background: #fff;
+    color: #2f4a44;
+  }
+
+  .rr-path__title {
+    color: #8c8784;
+    transition: color 450ms var(--ease-out);
+  }
+
+  .rr-path__text {
+    color: #a4a09d;
+    transition: color 450ms var(--ease-out);
+  }
+
+  .rr-path__card[aria-current='step'] .rr-path__title {
+    color: #1b1919;
+  }
+
+  .rr-path__card[aria-current='step'] .rr-path__text {
+    color: #625f5e;
+  }
+
+  .rr-path__bar {
     display: block;
-    width: 58px;
-    height: 30px;
+    height: 5px;
     overflow: hidden;
-    border-bottom: 1px solid #e7d6b8;
-    font-family: var(--font-display);
-    font-size: 48px;
-    font-weight: 200;
-    line-height: 48px;
-    letter-spacing: -0.02em;
-    color: #e2cfaa;
+    border-radius: 3px;
+    background: #e3e1df;
   }
 
-  /* A switch re-mounts the list: steps fade up again, one after another */
-  @media (prefers-reduced-motion: no-preference) {
-    [data-rv='in'] .rr-journey__step {
-      animation: rr-step-in 600ms var(--ease-out) both;
-      animation-delay: calc((var(--rv-i, 3) - 3) * 70ms);
+  .rr-path__bar > span {
+    display: block;
+    height: 100%;
+    border-radius: 3px;
+    background: #557a6f;
+    transform: scaleX(0);
+    transform-origin: left;
+  }
+
+  .rr-path__bar[data-state='done'] > span {
+    transform: none;
+  }
+
+  .rr-path__bar[data-state='active'] > span {
+    animation: rr-path-fill var(--step-ms, 6000ms) linear forwards paused;
+  }
+
+  .rr-path__bar[data-state='active'] > [data-running] {
+    animation-play-state: running;
+  }
+
+  @keyframes rr-path-fill {
+    to {
+      transform: none;
     }
+  }
+
+  /* A toggle switch re-mounts the list: the cards fade up one after another */
+  @media (prefers-reduced-motion: no-preference) {
+    .rr-path > li,
+    .rr-op-grid > li {
+      animation: rr-step-in 450ms var(--ease-out) both;
+    }
+
+    .rr-path > li:nth-child(2),
+    .rr-op-grid > li:nth-child(2) { animation-delay: 50ms; }
+    .rr-path > li:nth-child(3),
+    .rr-op-grid > li:nth-child(3) { animation-delay: 100ms; }
+    .rr-path > li:nth-child(4),
+    .rr-op-grid > li:nth-child(4) { animation-delay: 150ms; }
+    .rr-path > li:nth-child(5),
+    .rr-op-grid > li:nth-child(n + 5) { animation-delay: 200ms; }
   }
 
   @keyframes rr-step-in {
     from {
       opacity: 0;
       translate: 0 10px;
+    }
+  }
+
+  @media (prefers-reduced-motion: reduce) {
+    .rr-path__bar[data-state='active'] > span {
+      animation: none;
+      transform: none;
     }
   }
 
@@ -634,7 +797,7 @@
   }
 
   .rr-ba__shade {
-    background: linear-gradient(180deg, rgb(0 0 0 / 0.12), transparent 22%, transparent 62%, rgb(46 30 18 / 0.55));
+    background: linear-gradient(180deg, rgb(0 0 0 / 0.16), transparent 20%, transparent 60%, rgb(36 24 16 / 0.72));
   }
 
   .rr-ba__label {
@@ -681,134 +844,322 @@
   .rr-ba__range::-webkit-slider-thumb {
     appearance: none;
     width: 42px;
-    height: 446px;
+    height: 1000px;
   }
 
   .rr-ba__range::-moz-range-thumb {
     width: 42px;
-    height: 446px;
+    height: 1000px;
     border: 0;
   }
 
-  .rr-ba__title {
-    text-shadow: 0 1px 10px rgb(0 0 0 / 0.2);
-    transition: opacity 200ms var(--ease-out);
+  /* ---- Works: filter panel, card caption (opens the large view), large view ---- */
+  .rr-work__consent {
+    background: #fff;
+    box-shadow: inset 0 0 0 1px #e8e3de;
   }
 
-  .rr-ba__title:hover {
-    opacity: 0.85;
+  .rr-work__filters {
+    box-shadow: 0 10px 30px -18px rgb(70 60 50 / 0.18);
   }
 
-  .rr-ba__title::after {
-    content: ' →';
-    display: inline-block;
-    opacity: 0;
-    translate: -6px 0;
+  .rr-work__row {
+    scrollbar-width: none;
+  }
+
+  .rr-work__row::-webkit-scrollbar {
+    display: none;
+  }
+
+  .rr-work__pill {
+    background: #fff;
+    box-shadow: inset 0 0 0 1px #e3e0de;
+    color: #2e2c2c;
+    cursor: pointer;
     transition:
-      opacity 250ms var(--ease-out),
-      translate 250ms var(--ease-out);
+      background-color 220ms var(--ease-out),
+      box-shadow 220ms var(--ease-out),
+      color 220ms var(--ease-out);
   }
 
-  .rr-ba__title:hover::after,
-  .rr-ba__title:focus-visible::after {
-    opacity: 1;
-    translate: 0 0;
+  .rr-work__pill:hover {
+    box-shadow: inset 0 0 0 1px #9db8b0;
   }
 
-  .rr-ba .rr-ba__title:focus-visible {
+  .rr-work__pill[aria-pressed='true'] {
+    background: #557a6f;
+    box-shadow: inset 0 0 0 1px #557a6f;
+    color: #fff;
+  }
+
+  .rr-work__open {
+    cursor: zoom-in;
+  }
+
+  .rr-ba .rr-work__open:focus-visible {
+    outline-color: #fff;
+    outline-offset: -4px;
+  }
+
+  .rr-work__title {
+    text-shadow: 0 1px 10px rgb(0 0 0 / 0.25);
+  }
+
+  .rr-work__more {
+    box-shadow: inset 0 0 0 1px #c5d7d2;
+    cursor: pointer;
+    transition:
+      background-color 220ms var(--ease-out),
+      transform 220ms var(--ease-out);
+  }
+
+  .rr-work__more:hover {
+    background: #fff;
+  }
+
+  .rr-work__more:active {
+    transform: scale(0.98);
+  }
+
+  .rr-work-box {
+    margin: auto;
+    border: 0;
+    background: transparent;
+    overflow: visible;
+  }
+
+  .rr-work-box::backdrop {
+    background: rgb(28 24 22 / 0.72);
+    -webkit-backdrop-filter: blur(8px);
+    backdrop-filter: blur(8px);
+  }
+
+  .rr-work-box__btn {
+    display: grid;
+    width: 42px;
+    height: 42px;
+    place-items: center;
+    border-radius: 50%;
+    background: rgb(255 255 255 / 0.14);
+    font-size: 18px;
+    line-height: 1;
+    color: #fff;
+    cursor: pointer;
+    transition: background-color 200ms var(--ease-out);
+  }
+
+  .rr-work-box__btn:hover {
+    background: rgb(255 255 255 / 0.28);
+  }
+
+  .rr-work-box :focus-visible {
     outline-color: #fff;
   }
 
   /* ---- Operations catalog ---- */
   .rr-search {
-    box-shadow: inset 0 0 0 1px #e9e4df;
+    box-shadow: inset 0 0 0 1px #e3e0de;
     cursor: text;
     transition: box-shadow 220ms var(--ease-out);
   }
 
   .rr-search:hover {
-    box-shadow: inset 0 0 0 1px #d8d0c8;
+    box-shadow: inset 0 0 0 1px #cfd8d4;
   }
 
   .rr-search:focus-within {
     box-shadow:
-      inset 0 0 0 1px #c39b62,
-      0 0 0 4px rgb(195 155 98 / 0.12);
+      inset 0 0 0 1px #557a6f,
+      0 0 0 4px rgb(85 122 111 / 0.12);
   }
 
   .rr-search__input::placeholder {
-    color: #a0896b;
+    color: #a4a09d;
   }
 
   .rr-search__input::-webkit-search-cancel-button {
     cursor: pointer;
   }
 
-  .rr-cat {
-    color: #625f5e;
+  .rr-optabs {
+    box-shadow: inset 0 0 0 1px #dfe6e3;
+    scrollbar-width: none;
+  }
+
+  .rr-optabs::-webkit-scrollbar {
+    display: none;
+  }
+
+  .rr-optab {
+    color: #2f4a44;
+    cursor: pointer;
+    transition:
+      background-color 250ms var(--ease-out),
+      color 250ms var(--ease-out);
+  }
+
+  .rr-optab:hover {
+    background: rgb(86 126 117 / 0.08);
+  }
+
+  .rr-optab[aria-selected='true'] {
+    background: #557a6f;
+    color: #fff;
+  }
+
+  .rr-optab__icon {
+    background: #eef3f1;
+    color: #557a6f;
+  }
+
+  .rr-optab[aria-selected='true'] .rr-optab__icon {
+    background: #fff;
+  }
+
+  .rr-optab__count {
+    background: #f1efed;
+    color: #8c8784;
+  }
+
+  .rr-optab[aria-selected='true'] .rr-optab__count {
+    background: rgb(255 255 255 / 0.22);
+    color: #fff;
+  }
+
+  .rr-oplink .rr-opcard__arrow {
+    transition: translate 220ms var(--ease-out);
+  }
+
+  .rr-oplink:hover .rr-opcard__arrow {
+    translate: 3px 0;
+  }
+
+  .rr-opcard {
+    background: #f5f2ef;
+  }
+
+  .rr-opcard__blank {
+    background: url('/assets/img/web/programs-request-bg.svg') center / cover no-repeat, #efe9e2;
+    color: #c39b62;
+  }
+
+  .rr-opcard__blank .rr-category-icon {
+    width: 52px;
+    height: 52px;
+  }
+
+  .rr-opcard__btn {
+    box-shadow: inset 0 0 0 1px #c9a973;
+    color: #8b6a3e;
     transition:
       background-color 220ms var(--ease-out),
       color 220ms var(--ease-out);
   }
 
-  .rr-cat:hover {
-    background: #faf8f6;
+  .rr-opcard__btn:hover {
+    background: #c7a56e;
+    color: #fff;
   }
 
-  .rr-cat[data-active] {
-    background: #f5f1ed;
-    color: #2e2c2c;
+  .rr-opcard__btn .rr-opcard__arrow {
+    transition: translate 220ms var(--ease-out);
   }
 
-  .rr-op {
-    transition: color 200ms var(--ease-out);
+  .rr-opcard__btn:hover .rr-opcard__arrow {
+    translate: 3px 0;
   }
 
-  .rr-op__arrow {
-    color: #8c8784;
-    transition:
-      translate 250ms var(--ease-out),
-      color 250ms var(--ease-out);
+  .rr-opcta {
+    background: url('/assets/img/web/arches-light.svg') center / 300px auto repeat, #5a8478;
   }
 
-  .rr-op:hover .rr-op__arrow,
-  .rr-op:focus-visible .rr-op__arrow {
-    translate: 4px 0;
-    color: #9a7442;
+  .rr-opcta__icon {
+    background: rgb(255 255 255 / 0.14);
+    box-shadow: inset 0 0 0 1px rgb(255 255 255 / 0.3);
   }
 
-  @media (prefers-reduced-motion: no-preference) {
-    .rr-op-list > li {
-      animation: rr-step-in 450ms var(--ease-out) both;
-    }
-
-    .rr-op-list > li:nth-child(2) { animation-delay: 40ms; }
-    .rr-op-list > li:nth-child(3) { animation-delay: 80ms; }
-    .rr-op-list > li:nth-child(4) { animation-delay: 120ms; }
-    .rr-op-list > li:nth-child(5) { animation-delay: 160ms; }
-    .rr-op-list > li:nth-child(6) { animation-delay: 200ms; }
-    .rr-op-list > li:nth-child(7) { animation-delay: 240ms; }
-    .rr-op-list > li:nth-child(n + 8) { animation-delay: 280ms; }
-  }
-
-  /* "Не знаете, с чего начать?": warm bar with the arches pattern, taupe pill */
-  .rr-start {
-    background: url('/assets/img/web/programs-request-bg.svg') right center / auto 100% repeat-x, #f5f0eb;
-  }
-
-  .rr-start__btn {
-    background: #a99a8b;
+  .rr-opcta__btn {
     transition:
       background-color 220ms var(--ease-out),
       transform 220ms var(--ease-out);
   }
 
-  .rr-start__btn:hover {
-    background: #968676;
+  .rr-opcta__btn:hover {
+    background-color: #f1efed;
   }
 
-  .rr-start__btn:active {
+  .rr-opcta__btn:active {
     transform: scale(0.98);
+  }
+
+  .rr-opcta :focus-visible {
+    outline-color: #fff;
+  }
+
+  /* ---- Reviews ---- */
+  .rr-rating {
+    background: url('/assets/img/web/programs-request-bg.svg') center / cover no-repeat, #f5f2ef;
+    transition: background-color 220ms var(--ease-out);
+  }
+
+  .rr-rating:hover {
+    background-color: #efeae5;
+  }
+
+  .rr-license {
+    background: url('/assets/img/web/programs-request-bg.svg') center / cover no-repeat, #d9e8e4;
+  }
+
+  .rr-reviews {
+    scroll-snap-type: x proximity;
+    scrollbar-width: none;
+  }
+
+  .rr-reviews::-webkit-scrollbar {
+    display: none;
+  }
+
+  .rr-reviews > li {
+    scroll-snap-align: start;
+  }
+
+  .rr-review__img {
+    transition: transform 700ms var(--ease-out);
+  }
+
+  .rr-review:hover .rr-review__img {
+    transform: scale(1.03);
+  }
+
+  .rr-review__shade {
+    background: linear-gradient(180deg, rgb(0 0 0 / 0.14), transparent 22%, transparent 52%, rgb(30 20 14 / 0.82));
+  }
+
+  .rr-review__chip,
+  .rr-review__play {
+    background: rgb(255 255 255 / 0.18);
+    -webkit-backdrop-filter: blur(var(--glass-blur));
+    backdrop-filter: blur(var(--glass-blur));
+    box-shadow: inset 0 0 0 1px rgb(255 255 255 / 0.55);
+  }
+
+  .rr-review__play {
+    box-shadow: inset 0 0 0 1.5px rgb(255 255 255 / 0.9);
+    transition: scale 250ms var(--ease-out), background-color 250ms var(--ease-out);
+  }
+
+  .rr-review:hover .rr-review__play {
+    scale: 1.08;
+    background: rgb(255 255 255 / 0.3);
+  }
+
+  .rr-review:focus-visible {
+    outline-color: #fff;
+    outline-offset: -4px;
+  }
+
+  .rr-reviews__fill {
+    transition: width 300ms var(--ease-out);
   }
 
   /* ---- FAQ: capsule tabs, accordion rows, green "Не нашли ответ" bar ---- */

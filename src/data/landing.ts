@@ -1,4 +1,4 @@
-// Copy + content for the sections below the hero (Trust, Programs, Journey, Surgery, Operations).
+// Copy + content for the sections below the hero (Trust, Programs, Journey, Operations, Works, Reviews).
 // Edit texts here; components in src/components/sections/ only handle layout.
 // Image paths are relative to /public (resolve with `asset()` from ./hero).
 
@@ -62,16 +62,19 @@ export interface Program {
   kicker: string;
   title: string;
   points: string[];
-  /** Phone design: a gold line icon before each point (same order as `points`). */
+  /** Gold line icon before each point (same order as `points`). */
   icons: ProgramIcon[];
-  /** Full-card photo (1176×356 card; the plain left side carries the text). */
+  /** Full-card photo (1240×460 card; the white panel covers its left side). */
   image: LandingImage;
   /** Portrait export when supplied for the phone card. */
   mobileImage?: LandingImage;
 }
 
-/** Category icons from the operations list, plus the program-only ones (Programs.tsx). */
-export type ProgramIcon = OperationIcon | 'clipboard' | 'drip' | 'combo' | 'calendar' | 'car' | 'hotel' | 'nurse' | 'headset' | 'video';
+/** Designer exports in /public/assets/icons/program-<name>.svg. */
+export type ProgramIcon =
+  | 'abdomen' | 'breast' | 'waist' | 'clipboard' | 'drip'
+  | 'eye' | 'intimate' | 'nose' | 'combo'
+  | 'plane' | 'bed' | 'nurse' | 'headset' | 'video';
 
 export interface ProgramsContent {
   id: string;
@@ -154,7 +157,7 @@ export const programs: ProgramsContent = {
         'Наблюдение команды в течение года',
         'Реабилитационные процедуры в клинике',
       ],
-      icons: ['body', 'breast', 'body', 'clipboard', 'drip'],
+      icons: ['abdomen', 'breast', 'waist', 'clipboard', 'drip'],
       image: {
         src: 'assets/img/web/program-mommy-makeover.webp',
         width: 2349,
@@ -178,7 +181,7 @@ export const programs: ProgramsContent = {
         'Комбинация под ваш индивидуальный запрос',
         'Наблюдение 1 год после операции',
       ],
-      icons: ['eye', 'intimate', 'nose', 'combo', 'calendar'],
+      icons: ['eye', 'intimate', 'nose', 'combo', 'clipboard'],
       image: {
         src: 'assets/img/web/program-simultaneous.webp',
         width: 1710,
@@ -196,7 +199,7 @@ export const programs: ProgramsContent = {
         'Персональный менеджер 24/7',
         'Удалённые осмотры после возвращения домой',
       ],
-      icons: ['car', 'hotel', 'nurse', 'headset', 'video'],
+      icons: ['plane', 'bed', 'nurse', 'headset', 'video'],
       image: {
         src: 'assets/img/web/program-nonresident.webp',
         width: 2134,
@@ -207,128 +210,181 @@ export const programs: ProgramsContent = {
   ],
 };
 
-// ---- "Ваш путь к преображению", "Пластическая хирургия", "Все операции" (design 2026-10-27) ----
+// ---- "Ваш путь", "Каталог операций", "Работы хирургов", "Отзывы" (design 2026-10-30) ----
 
 export interface JourneyStep {
   title: string;
   text: string;
+  image: LandingImage;
 }
 
 export interface JourneyContent {
   id: string;
-  title: string;
+  /** Dark, then green. */
+  title: [string, string];
   text: string;
-  /** Toggle at the right of the heading; the first variant is shown by default. */
+  /** Toggle under the heading; the first variant is shown by default. */
   variants: { id: string; label: string; steps: JourneyStep[] }[];
-}
-
-export interface SurgeryCase {
-  title: string;
-  /** Category in `operations` the card's title opens. */
-  categoryId: string;
-  before: LandingImage;
-  after: LandingImage;
-}
-
-export interface SurgeryContent {
-  id: string;
-  eyebrow: string;
-  title: string;
-  text: string;
-  cases: SurgeryCase[];
 }
 
 export type OperationIcon = 'face' | 'eye' | 'nose' | 'lips' | 'breast' | 'body' | 'intimate';
 
+export interface Operation {
+  name: string;
+  description?: string;
+  /** "от 10 500 000 ₸"; without it the card shows `OperationsContent.noPrice`. */
+  price?: string;
+  image?: LandingImage;
+}
+
 export interface OperationCategory {
   id: string;
-  /** Short name in the list on the left. */
+  /** Short name on the tab. */
   label: string;
-  /** Heading of the list on the right. */
+  /** Heading above the cards. */
   title: string;
   icon: OperationIcon;
   /** Extra words the search should match for every operation in the category. */
   keywords: string[];
-  items: string[];
+  /** "Смотреть результаты …" link: the matching filter in the works section. */
+  results?: { label: string; filter: WorkCategory };
+  items: Operation[];
 }
 
 export interface OperationsContent {
   id: string;
-  title: string;
+  eyebrow: string;
+  /** Dark, then green. */
+  title: [string, string];
+  /** "\n" = forced line break. */
+  text: string;
   searchPlaceholder: string;
+  /** After the operations count. */
+  note: string;
+  priceLabel: string;
+  noPrice: string;
+  moreLabel: string;
   /** Shown when the search finds nothing. */
   empty: string;
-  /** WhatsApp message for an operation row; `{name}` is replaced with the operation. */
+  /** WhatsApp message for an operation; `{name}` is replaced with the operation. */
   message: string;
   categories: OperationCategory[];
-  cta: { title: string; text: string; label: string; mobileLabel?: string; message: string };
+  cta: { title: string; text: string; label: string; message: string };
+  disclaimer: string;
 }
+
+export type WorkCategory = 'face' | 'eyelids' | 'nose' | 'breast' | 'body' | 'intimate';
+
+export interface WorksContent {
+  id: string;
+  eyebrow: string;
+  /** Dark, then green. */
+  title: [string, string];
+  /** "\n" = forced line break. */
+  text: string;
+  consent: string;
+  hint: string;
+  operationFilters: { id: WorkCategory | 'all'; label: string }[];
+  /** Order of the surgeon filter. */
+  surgeons: string[];
+  moreLabel: string;
+  pageSize: number;
+}
+
+export interface Review {
+  /** Above the operation. */
+  title: string;
+  operation: string;
+  doctorId: string;
+  poster: LandingImage;
+  href: string;
+}
+
+export interface ReviewsContent {
+  id: string;
+  eyebrow: string;
+  /** Dark, then green. */
+  title: [string, string];
+  /** "\n" = forced line break. */
+  text: string;
+  /** Hidden until the clinic gives the real number, date and scan. */
+  license: { number: string; date: string; image: LandingImage } | null;
+  videosTitle: string;
+  videosHint: string;
+  items: Review[];
+  disclaimer: string;
+}
+
+const journeyPhoto = (name: string, alt: string): LandingImage => ({
+  src: `assets/img/web/journey-${name}.webp`,
+  width: 720,
+  height: 788,
+  alt,
+});
+
+const journeyPhotos = {
+  consultation: journeyPhoto('consultation', 'Хирург беседует с пациенткой в кабинете'),
+  tests: journeyPhoto('tests', 'Пробирка с анализом крови в руке врача'),
+  arrival: journeyPhoto('arrival', 'Зона ожидания в холле клиники'),
+  surgery: journeyPhoto('surgery', 'Хирург и ассистент во время операции'),
+  ward: journeyPhoto('ward', 'Пациентка отдыхает в палате, рядом медсестра'),
+  checkup: journeyPhoto('checkup', 'Врач осматривает лицо пациентки'),
+};
 
 export const journey: JourneyContent = {
   id: 'journey',
-  title: 'Ваш путь к преображению',
-  text: 'От первой консультации до полного восстановления',
+  title: ['Ваш путь к ', 'преображению'],
+  text: 'От первой консультации до полного восстановления — 5 шагов с командой RR Clinic',
   variants: [
     {
       id: 'local',
       label: 'Для жителей Астаны',
       steps: [
-        { title: 'Очная консультация', text: 'Встреча с хирургом, осмотр и\nобсуждение плана операции' },
-        { title: 'Подготовка', text: 'Сдача анализов, консультация\nанестезиолога, рекомендации' },
-        { title: 'Палата', text: 'Стационарное пребывание с полным\nуходом и питанием' },
-        { title: 'Операция', text: 'Безопасная процедура с опытной\nкомандой под контролем' },
-        { title: 'Осмотры', text: 'Контроль результата, перевязки и\nреабилитация в течение года' },
+        { title: 'Очная консультация', text: 'Встреча с хирургом, осмотр и обсуждение плана операции', image: journeyPhotos.consultation },
+        { title: 'Подготовка', text: 'Сдача анализов, консультация анестезиолога, рекомендации', image: journeyPhotos.tests },
+        { title: 'Операция', text: 'Безопасная процедура с опытной командой под контролем', image: journeyPhotos.surgery },
+        { title: 'Палата', text: 'Стационарное пребывание с полным уходом и питанием', image: journeyPhotos.ward },
+        { title: 'Осмотры', text: 'Контроль результата, перевязки и реабилитация в течение года', image: journeyPhotos.checkup },
       ],
     },
     {
       id: 'visitors',
       label: 'Для иногородних',
       steps: [
-        { title: 'Онлайн консультация', text: 'Фото и видео по инструкции,\nконсультация хирурга в WhatsApp' },
-        { title: 'Анализы', text: 'Сдача в своём городе, результаты\nотправляют онлайн' },
-        { title: 'Прилет', text: 'Минимум за день до операции, по\nпрограмме «Забота под ключ»' },
-        { title: 'Операция', text: 'Безопасная процедура с полным\nнаблюдением операционной бригады' },
-        { title: 'Пребывание', text: 'В Астане, перевязки и снятие швов,\nдальнейшие осмотры онлайн' },
+        { title: 'Онлайн-консультация', text: 'Хирург оценит запрос по видеосвязи или по фото и составит план до вашего приезда', image: journeyPhotos.consultation },
+        { title: 'Приезд и размещение', text: 'Трансфер аэропорт — клиника — отель, проживание рядом с клиникой', image: journeyPhotos.arrival },
+        { title: 'Подготовка и операция', text: 'Анализы, очная встреча с хирургом и операция с опытной командой', image: journeyPhotos.surgery },
+        { title: 'Палата и сопровождение', text: 'Закреплённая медсестра и персональный менеджер 24/7', image: journeyPhotos.ward },
+        { title: 'Удалённые осмотры', text: 'Контроль результата онлайн после возвращения домой', image: journeyPhotos.checkup },
       ],
     },
   ],
 };
 
-export const surgery: SurgeryContent = {
-  id: 'surgery',
-  eyebrow: 'Услуги',
-  title: 'Пластическая хирургия',
-  text: 'Операции для лица и тела — выберите интересующее направление.',
-  cases: [
-    {
-      title: 'Увеличение груди',
-      categoryId: 'breast',
-      before: { src: 'assets/img/web/surgery-breast-before.webp', width: 800, height: 1410, alt: 'Грудь до увеличения' },
-      after: { src: 'assets/img/web/surgery-breast-after.webp', width: 800, height: 1410, alt: 'Грудь после увеличения' },
-    },
-    {
-      title: 'Голливудский фейслифтинг',
-      categoryId: 'face',
-      before: { src: 'assets/img/web/surgery-facelift-before.webp', width: 765, height: 1024, alt: 'Лицо до фейслифтинга' },
-      after: { src: 'assets/img/web/surgery-facelift-after.webp', width: 765, height: 1024, alt: 'Лицо после фейслифтинга' },
-    },
-    {
-      title: 'Абдоминопластика',
-      categoryId: 'body',
-      before: { src: 'assets/img/web/surgery-abdominoplasty-before.webp', width: 800, height: 1600, alt: 'Живот до абдоминопластики' },
-      after: { src: 'assets/img/web/surgery-abdominoplasty-after.webp', width: 800, height: 1600, alt: 'Живот после абдоминопластики' },
-    },
-  ],
-};
+const operationPhoto = (name: string, width: number, height: number, alt: string): LandingImage => ({
+  src: `assets/img/web/operation-${name}.webp`,
+  width,
+  height,
+  alt,
+});
+
+/** Categories the design has no cards for yet: names only, no photo, description or price. */
+const names = (...items: string[]): Operation[] => items.map((name) => ({ name }));
 
 export const operations: OperationsContent = {
   id: 'operations',
-  title: 'Все операции',
+  eyebrow: 'Услуги',
+  title: ['Каталог ', 'операций'],
+  text: 'Выберите направление — покажем операции, стоимость «от»\nи результаты наших хирургов.',
   searchPlaceholder: 'Найти операцию, например «пластика век»',
+  note: 'точную стоимость хирург назовёт на консультации',
+  priceLabel: 'Стоимость',
+  noPrice: 'на консультации',
+  moreLabel: 'Подробнее',
   empty: 'Такой операции нет в списке — напишите нам, хирург подскажет, что подойдёт.',
   message: 'Здравствуйте! Хочу записаться на консультацию: {name}',
-  // TODO(content): only "Лицо" is spelled out in the design; the other lists follow the counts in it and the
-  // operations on the doctors' pages — confirm with the client.
+  // TODO(content): only "Лицо" has photos, descriptions and prices in the design; the other lists follow the
+  // counts in it and the operations on the doctors' pages — get their cards from the client.
   categories: [
     {
       id: 'face',
@@ -336,7 +392,39 @@ export const operations: OperationsContent = {
       title: 'Подтяжка и пластика лица',
       icon: 'face',
       keywords: ['лифтинг', 'омоложение'],
-      items: ['Голливудский фейслифтинг', 'Пластика лба', 'СМАС-подтяжка лица', 'Эндоскопическая подтяжка', 'Круговая подтяжка лица'],
+      results: { label: 'Смотреть результаты по лицу', filter: 'face' },
+      items: [
+        {
+          name: 'Голливудский фейслифтинг',
+          description: 'Авторская подтяжка лица и шеи: чёткий овал и естественный результат без «натянутости».',
+          price: 'от 10 500 000 ₸',
+          image: operationPhoto('hollywood', 940, 650, 'Лицо женщины со стрелками направлений подтяжки'),
+        },
+        {
+          name: 'Пластика лба',
+          description: 'Разглаживает горизонтальные морщины и приподнимает брови — взгляд становится открытым.',
+          price: 'от 1 000 000 ₸',
+          image: operationPhoto('forehead', 847, 586, 'Женщина приподнимает кожу лба'),
+        },
+        {
+          name: 'СМАС-подтяжка лица',
+          description: 'Подтяжка глубокого мышечного слоя: возвращает контур скул, щёк и линии подбородка.',
+          price: 'от 2 500 000 ₸',
+          image: operationPhoto('smas', 940, 650, 'Врач проводит осмотр лица пациентки'),
+        },
+        {
+          name: 'Эндоскопическая подтяжка',
+          description: 'Подтяжка через небольшие проколы: минимум следов и короткое восстановление.',
+          price: 'от 1 500 000 ₸',
+          image: operationPhoto('endoscopic', 858, 593, 'Мужчина с отмеченными точками проколов на висках'),
+        },
+        {
+          name: 'Круговая подтяжка лица',
+          description: 'Комплексное омоложение лица и шеи за одну операцию.',
+          price: 'от 5 500 000 ₸',
+          image: operationPhoto('circular', 940, 650, 'Профиль женщины с линией разреза у уха'),
+        },
+      ],
     },
     {
       id: 'eyelids',
@@ -344,13 +432,14 @@ export const operations: OperationsContent = {
       title: 'Пластика век',
       icon: 'eye',
       keywords: ['блефаропластика', 'глаза'],
-      items: [
+      results: { label: 'Смотреть результаты по векам', filter: 'eyelids' },
+      items: names(
         'Верхняя блефаропластика',
         'Нижняя блефаропластика',
         'Круговая блефаропластика',
         'Трансконъюнктивальная блефаропластика',
         'Кантопексия',
-      ],
+      ),
     },
     {
       id: 'nose',
@@ -358,7 +447,8 @@ export const operations: OperationsContent = {
       title: 'Пластика носа',
       icon: 'nose',
       keywords: ['ринопластика'],
-      items: ['Ринопластика', 'Септопластика'],
+      results: { label: 'Смотреть результаты по носу', filter: 'nose' },
+      items: names('Ринопластика', 'Септопластика'),
     },
     {
       id: 'ears-lips',
@@ -366,7 +456,7 @@ export const operations: OperationsContent = {
       title: 'Пластика ушей и губ',
       icon: 'lips',
       keywords: ['отопластика', 'хейлопластика'],
-      items: ['Отопластика', 'Хейлопластика', 'Липлифтинг'],
+      items: names('Отопластика', 'Хейлопластика', 'Липлифтинг'),
     },
     {
       id: 'breast',
@@ -374,7 +464,8 @@ export const operations: OperationsContent = {
       title: 'Пластика груди',
       icon: 'breast',
       keywords: ['маммопластика', 'импланты'],
-      items: ['Увеличение груди', 'Подтяжка груди', 'Уменьшение груди', 'Замена имплантов', 'Коррекция асимметрии груди'],
+      results: { label: 'Смотреть результаты по груди', filter: 'breast' },
+      items: names('Увеличение груди', 'Подтяжка груди', 'Уменьшение груди', 'Замена имплантов', 'Коррекция асимметрии груди'),
     },
     {
       id: 'body',
@@ -382,7 +473,8 @@ export const operations: OperationsContent = {
       title: 'Пластика тела',
       icon: 'body',
       keywords: ['фигура', 'живот', 'липосакция'],
-      items: [
+      results: { label: 'Смотреть результаты по телу', filter: 'body' },
+      items: names(
         'Абдоминопластика',
         'Липоабдоминопластика',
         'Абдоминопластика с ушиванием диастаза',
@@ -391,7 +483,7 @@ export const operations: OperationsContent = {
         'Брахиопластика',
         'Подтяжка бёдер',
         'Mommy Makeover',
-      ],
+      ),
     },
     {
       id: 'intimate',
@@ -399,16 +491,128 @@ export const operations: OperationsContent = {
       title: 'Интимная пластика',
       icon: 'intimate',
       keywords: ['лабиопластика'],
-      items: ['Лабиопластика', 'Пластика больших половых губ', 'Вагинопластика', 'Перинеопластика', 'Липофилинг половых губ'],
+      results: { label: 'Смотреть результаты по интимной пластике', filter: 'intimate' },
+      items: names('Лабиопластика', 'Пластика больших половых губ', 'Вагинопластика', 'Перинеопластика', 'Липофилинг половых губ'),
     },
   ],
   cta: {
-    title: 'Не знаете, с чего начать?',
-    text: 'Обсудите свой запрос с хирургом.',
-    label: 'Записаться на очную консультацию',
-    mobileLabel: 'Записаться на консультацию',
-    message: 'Здравствуйте! Хочу записаться на очную консультацию',
+    title: 'Не знаете, какая операция вам нужна?',
+    text: 'Опишите, что хочется изменить, — хирург на консультации предложит подходящий вариант и назовёт точную стоимость.',
+    label: 'Записаться на консультацию',
+    message: 'Здравствуйте! Хочу записаться на консультацию',
   },
+  disclaimer: 'Имеются противопоказания. Необходима консультация специалиста.',
+};
+
+export const works: WorksContent = {
+  id: 'works',
+  eyebrow: 'Результаты',
+  title: ['Работы наших ', 'хирургов'],
+  text: 'Фотографии до и после реальных пациентов RR Clinic. Выберите операцию\nили хирурга — нажмите на работу, чтобы рассмотреть её крупно.',
+  consent: 'Публикуем с согласия пациентов',
+  hint: 'Перетащите ползунок, чтобы сравнить «до» и «после»',
+  operationFilters: [
+    { id: 'all', label: 'Все работы' },
+    { id: 'face', label: 'Лицо' },
+    { id: 'eyelids', label: 'Веки' },
+    { id: 'nose', label: 'Нос' },
+    { id: 'breast', label: 'Грудь' },
+    { id: 'body', label: 'Тело' },
+    { id: 'intimate', label: 'Интимная пластика' },
+  ],
+  surgeons: [
+    'kurmanbaev-rustam',
+    'musa-baurzhan',
+    'temirkhanov-amir',
+    'kodzoeva-leyla',
+    'savelyev-evgeniy',
+    'chatinyan-garik',
+    'romanovskaya-tatyana',
+    'tulepbergenova-tomiris',
+    'ulagasheva-alina',
+    'temirkhan-anar',
+  ],
+  moreLabel: 'Показать ещё работы',
+  pageSize: 8,
+};
+
+const reviewPoster = (name: string, width: number, height: number, alt: string): LandingImage => ({
+  src: `assets/img/web/reviews/${name}.webp`,
+  width,
+  height,
+  alt,
+});
+
+export const reviews: ReviewsContent = {
+  id: 'reviews',
+  eyebrow: 'Отзывы',
+  title: ['Пациенты о ', 'RR Clinic'],
+  text: 'Настоящие истории пациентов — смотрите видео и проверяйте нас\nв независимых источниках.',
+  // TODO(content): the design has "№ 00000000 от 00.00.0000" — the card appears once the clinic gives the real data.
+  license: null,
+  videosTitle: 'Видеоотзывы',
+  videosHint: 'Ролики открываются в Instagram',
+  // Links, titles and posters: the doctors' pages (public/<slug>/).
+  items: [
+    {
+      title: 'Интервью с Ольгой',
+      operation: 'Голливудский фейслифтинг',
+      doctorId: 'romanovskaya-tatyana',
+      poster: { src: 'assets/img/web/case8-interview.webp', width: 1024, height: 1024, alt: 'Пациентка Ольга' },
+      // TODO(content): the interview's own link; for now the clinic's profile.
+      href: 'https://www.instagram.com/rr.clinic.kz/',
+    },
+    {
+      title: 'Анна: 5 лет после увеличения груди',
+      operation: 'Увеличение груди',
+      doctorId: 'kodzoeva-leyla',
+      poster: reviewPoster('anna', 740, 740, 'Пациентка Анна'),
+      href: 'https://www.instagram.com/reel/DbfjTBcIBTO/',
+    },
+    {
+      title: 'Отзыв о ринопластике',
+      operation: 'Ринопластика',
+      doctorId: 'chatinyan-garik',
+      poster: reviewPoster('rhinoplasty', 740, 840, 'Пациентка после ринопластики'),
+      href: 'https://www.instagram.com/p/DV0l86hCGgI/',
+    },
+    {
+      title: 'Впечатления после операции',
+      operation: 'Верхняя блефаропластика',
+      doctorId: 'tulepbergenova-tomiris',
+      poster: reviewPoster('blepharoplasty', 585, 1000, 'Пациентка после блефаропластики'),
+      href: 'https://www.instagram.com/p/Dc1j1zSMR_v/',
+    },
+    {
+      title: 'Отзыв об увеличении груди',
+      operation: 'Увеличение груди',
+      doctorId: 'savelyev-evgeniy',
+      poster: reviewPoster('breast', 585, 1000, 'Пациентка после увеличения груди'),
+      href: 'https://www.instagram.com/reel/DcIYo_tML6K/',
+    },
+    {
+      title: 'Интервью с Юлией',
+      operation: 'Голливудский фейслифтинг',
+      doctorId: 'romanovskaya-tatyana',
+      poster: reviewPoster('yulia', 740, 740, 'Пациентка Юлия'),
+      href: 'https://www.instagram.com/reel/DPd6MMRiia0/',
+    },
+    {
+      title: 'Интервью с Аэлитой',
+      operation: '1,5 месяца после операции',
+      doctorId: 'temirkhanov-amir',
+      poster: reviewPoster('aelita', 740, 840, 'Пациентка Аэлита'),
+      href: 'https://www.instagram.com/reel/DXGwQ6xCKe3/',
+    },
+    {
+      title: 'Интервью с Евгенией',
+      operation: 'Операция на груди',
+      doctorId: 'kurmanbaev-rustam',
+      poster: reviewPoster('evgenia', 585, 1000, 'Пациентка Евгения'),
+      href: 'https://www.instagram.com/p/Dd_LT1BCJkA/',
+    },
+  ],
+  disclaimer: 'Ролики публикуются с согласия пациентов. Имеются противопоказания, необходима консультация специалиста.',
 };
 
 export type FaqTopic = 'safety' | 'prep' | 'prices' | 'after' | 'visitors';
@@ -545,7 +749,7 @@ export const footer: FooterContent = {
         { label: 'О клинике', href: '#trust' },
         { label: 'Врачи', href: '#doctors' },
         { label: 'Услуги', href: '#services' },
-        { label: 'До/после', href: '#surgery' },
+        { label: 'До/после', href: '#works' },
         { label: 'Цены', href: '#operations' },
         { label: 'Контакты', href: '#contacts' },
       ],
