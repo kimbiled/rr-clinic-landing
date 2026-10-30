@@ -94,6 +94,7 @@ export function HeroContent() {
               label={primary.label}
               idle={idle}
               data-cta={primary.id}
+              data-analytics-id="hero_consultation"
               // "Подобрать специалиста" is a WhatsApp chat now; the surgeon menu lives behind the navbar "Меню".
               href={clinic.whatsappHref || primary.href}
               target={clinic.whatsappHref ? '_blank' : undefined}

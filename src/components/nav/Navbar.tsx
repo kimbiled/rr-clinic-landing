@@ -372,7 +372,7 @@ export function Navbar() {
         </div>
 
         <div className="mr-6 ml-auto flex-none" data-reveal="nav">
-          <a href={clinic.phoneHref} className="rr-nav__phone pointer-events-auto block font-normal whitespace-nowrap">
+          <a href={clinic.phoneHref} data-analytics-id="header_phone" className="rr-nav__phone pointer-events-auto block font-normal whitespace-nowrap">
             {clinic.phone}
           </a>
         </div>
@@ -385,6 +385,7 @@ export function Navbar() {
               target="_blank"
               rel="noopener noreferrer"
               aria-label="Связаться в WhatsApp"
+              data-analytics-id="header_contact"
               className="rr-nav__contact flex h-10 items-center font-medium whitespace-nowrap text-neutral-900"
             >
               <span className="rr-nav__contact-pill flex h-full items-center rounded-[14px] pr-[18px] pl-4">Связаться</span>

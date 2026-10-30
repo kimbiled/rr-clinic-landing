@@ -50,6 +50,7 @@ export function Footer() {
               </a>
               <a
                 {...whatsappLink('Здравствуйте!')}
+                data-analytics-id="footer_whatsapp"
                 aria-label="WhatsApp RR Clinic"
                 className="rr-foot__social grid size-10 place-items-center rounded-full"
               >
@@ -89,7 +90,7 @@ export function Footer() {
             <ul className="mt-7 flex flex-col gap-[15px] max-md:mt-4 max-md:gap-3">
               {services.items.map((name) => (
                 <li key={name}>
-                  <a {...whatsappLink(operations.message.replace('{name}', name))} className="rr-foot__link">
+                  <a {...whatsappLink(operations.message.replace('{name}', name))} data-analytics-id="footer_service_enquiry" className="rr-foot__link">
                     {name}
                   </a>
                 </li>
@@ -102,12 +103,12 @@ export function Footer() {
             <address className="mt-7 flex flex-col items-start gap-[15px] not-italic">
               <span className="rr-foot__text">{contacts.address}</span>
               {clinic.phone && (
-                <a href={clinic.phoneHref} className="rr-foot__link inline-flex items-center gap-2">
+                <a href={clinic.phoneHref} data-analytics-id="footer_phone" className="rr-foot__link inline-flex items-center gap-2">
                   {clinic.phone}
                   <Arrow />
                 </a>
               )}
-              <a href={`mailto:${contacts.email}`} className="rr-foot__link inline-flex items-center gap-2">
+              <a href={`mailto:${contacts.email}`} data-analytics-id="footer_email" className="rr-foot__link inline-flex items-center gap-2">
                 {contacts.email}
                 <Arrow />
               </a>
