@@ -1,0 +1,195 @@
+/* Shared additions live outside Framer's zoomed/hydrated page root. */
+@font-face {
+  font-family: 'RR Offer Futura';
+  src: url('/assets/fonts/futura-pt-book.woff2') format('woff2');
+  font-style: normal;
+  font-weight: 400;
+  font-display: swap;
+}
+
+@font-face {
+  font-family: 'RR Offer Futura';
+  src: url('/assets/fonts/futura-pt-medium.woff2') format('woff2');
+  font-style: normal;
+  font-weight: 500;
+  font-display: swap;
+}
+
+html { -webkit-text-size-adjust: 100%; text-size-adjust: 100%; }
+
+/* Framer positioned the mobile address, headline, biography, tags and education
+   independently. Wrapped text then painted over its neighbours. Let those blocks
+   participate in layout so both real fonts and fallback fonts reserve their height. */
+@media (max-width: 809.98px) {
+  #main [data-framer-name="hero_mobile-01"] {
+    display: flex;
+    flex-direction: column;
+    align-items: stretch;
+    height: auto;
+    min-height: 764px;
+    padding-top: 287px;
+    background-color: #183f39;
+  }
+  #main [data-framer-name="hero_mobile-01"] > [data-framer-name="Location container"] {
+    position: relative;
+    inset: auto;
+    order: 0;
+    align-self: flex-start;
+    max-width: calc(100% - 32px);
+    margin: 0 16px 16px;
+  }
+  #main [data-framer-name="hero_mobile-01"] > div:has(> [data-framer-name="Stats container"]) {
+    position: relative;
+    inset: auto;
+    order: 1;
+    align-self: stretch;
+    width: auto;
+    height: auto;
+    margin: 0 16px 24px;
+    transform: none !important;
+  }
+  #main [data-framer-name="hero_mobile-01"] > [data-framer-name="Review container"] {
+    position: relative;
+    inset: auto;
+    order: 2;
+    width: 100%;
+    margin-top: auto;
+    transform: none !important;
+  }
+  #main [data-framer-name="03_About the Doctor"] {
+    display: flex;
+    flex-direction: column;
+    align-items: stretch;
+    gap: 24px;
+    height: auto;
+    padding: 80px 16px 0;
+  }
+  #main [data-framer-name="03_About the Doctor"] [data-framer-name="Doctor Overview"],
+  #main [data-framer-name="03_About the Doctor"] [data-framer-name="Frame 2147259199"],
+  #main [data-framer-name="03_About the Doctor"] [data-framer-name="Doctor's Information"] {
+    position: relative;
+    inset: auto;
+    flex: none;
+    width: 100%;
+    max-width: 100%;
+    height: auto;
+    margin: 0;
+    padding: 0;
+    transform: none !important;
+  }
+  #main [data-framer-name="03_About the Doctor"] [data-framer-name="Doctor Overview"] { order: 0; }
+  #main [data-framer-name="03_About the Doctor"] [data-framer-name="Frame 2147259199"] { order: 1; }
+  #main [data-framer-name="03_About the Doctor"] [data-framer-name="Doctor's Information"] { order: 2; }
+  #main [data-framer-name="03_About the Doctor"] [data-framer-name="Doctor Overview"] [data-framer-component-type="RichTextContainer"] {
+    width: 100%;
+    max-width: 100%;
+  }
+  #main [data-framer-name="03_About the Doctor"] [data-framer-name="dr"] {
+    position: relative;
+    inset: auto;
+    order: 3;
+    align-self: center;
+    flex: none;
+    max-width: 100%;
+    transform: none !important;
+  }
+}
+
+#rr-surgeon-offer {
+  box-sizing: border-box;
+  position: fixed;
+  inset: 0;
+  width: min(1020px, calc(100% - 40px));
+  max-width: none;
+  max-height: calc(100vh - 40px);
+  max-height: calc(100dvh - 40px - env(safe-area-inset-top, 0px) - env(safe-area-inset-bottom, 0px));
+  margin: auto;
+  padding: 0;
+  overflow: auto;
+  overscroll-behavior: contain;
+  border: 0;
+  border-radius: 56px;
+  color: #fff;
+  background: #2e6861 url('/assets/icons/offer-pattern.svg') repeat;
+  font: 400 18px/1.3 'RR Offer Futura', 'Futura PT', Arial, sans-serif;
+  box-shadow: 0 24px 80px #0002;
+}
+
+#rr-surgeon-offer::backdrop { background: rgb(0 0 0 / 30%); }
+#rr-surgeon-offer * { box-sizing: border-box; }
+#rr-surgeon-offer .rr-offer-layout {
+  position: relative;
+  display: grid;
+  grid-template-columns: 1.06fr 1fr;
+  align-items: end;
+  min-height: 324px;
+}
+#rr-surgeon-offer .rr-offer-copy { padding: 48px 0 48px 48px; z-index: 1; }
+#rr-surgeon-offer .rr-offer-title {
+  margin: 0 0 4px;
+  color: #fff;
+  font: 400 clamp(28px, 3.4vw, 36px)/1.12 'RR Offer Futura', 'Futura PT', Arial, sans-serif;
+  letter-spacing: -1px;
+}
+#rr-surgeon-offer .rr-offer-title span { display: block; color: #d6ad68; }
+#rr-surgeon-offer .rr-offer-description { margin: 0; color: #d6e4e1; font: inherit; }
+#rr-surgeon-offer .rr-offer-link {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  min-height: 64px;
+  margin-top: 36px;
+  padding: 16px 32px;
+  border-radius: 100px;
+  color: #2e2c2c;
+  background: #fff;
+  font: 500 17px/1.2 'RR Offer Futura', 'Futura PT', Arial, sans-serif;
+  text-align: center;
+  text-decoration: none;
+  -webkit-tap-highlight-color: transparent;
+}
+#rr-surgeon-offer .rr-offer-link:hover { background: #f1efed; }
+#rr-surgeon-offer .rr-offer-books {
+  display: block;
+  width: 100%;
+  height: auto;
+  aspect-ratio: 570 / 350;
+  object-fit: cover;
+  object-position: center bottom;
+  align-self: end;
+  pointer-events: none;
+}
+#rr-surgeon-offer .rr-offer-close {
+  position: absolute;
+  top: 12px;
+  right: 12px;
+  z-index: 2;
+  display: grid;
+  place-items: center;
+  width: 48px;
+  height: 48px;
+  padding: 0;
+  border: 0;
+  border-radius: 50%;
+  color: #8f8f8f;
+  background: #f1efed;
+  cursor: pointer;
+}
+#rr-surgeon-offer .rr-offer-close svg { width: 18px; height: 18px; }
+#rr-surgeon-offer :focus-visible { outline: 3px solid #d6ad68; outline-offset: -5px; }
+
+@media (max-width: 699px) {
+  #rr-surgeon-offer { width: calc(100% - 32px); border-radius: 28px; }
+  #rr-surgeon-offer .rr-offer-layout { grid-template-columns: minmax(0, 1fr); min-height: 0; }
+  #rr-surgeon-offer .rr-offer-copy { padding: 56px 24px 0; }
+  #rr-surgeon-offer .rr-offer-title { font-size: clamp(27px, 7.4vw, 36px); letter-spacing: -.6px; }
+  #rr-surgeon-offer .rr-offer-description { margin-top: 12px; font-size: 17px; }
+  #rr-surgeon-offer .rr-offer-link { width: 100%; margin-top: 24px; min-height: 56px; padding-inline: 12px; }
+  #rr-surgeon-offer .rr-offer-books { width: 100%; max-height: 250px; object-fit: contain; margin-top: 12px; }
+  #rr-surgeon-offer .rr-offer-close { width: 44px; height: 44px; top: 8px; right: 8px; }
+}
+
+@media (max-height: 500px) and (min-width: 700px) {
+  #rr-surgeon-offer { border-radius: 28px; }
+  #rr-surgeon-offer .rr-offer-copy { padding-block: 28px; }
+}
