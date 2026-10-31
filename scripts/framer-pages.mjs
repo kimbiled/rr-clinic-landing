@@ -32,29 +32,20 @@
 //   6. In-site <a href="https://rr-clinic.kz/..."> become relative, so they stay on this host.
 //   7. Framer's JS (~340 KB: main bundle + modulepreloads) starts after the load event, or at the first touch, key,
 //      wheel or scroll. The page is already complete without it; it brings the menu, sliders and animations. Until
-//      then, entrance-animated blocks are shown as they scroll into view, so nothing stays blank.import { mkdir, rm, writeFile } from 'node:fs/promises';
-import { dirname, join } from 'node:path';
+//      then, entrance-animated blocks are shown as they scroll into view, so nothing stays blank.
+import { mkdir, readFile, writeFile } from 'node:fs/promises';
+import { dirname, join, resolve } from 'node:path';
 import { fileURLToPath } from 'node:url';
+import { SURGEONS, SURGEON_ROUTES, consultationLink, escapeAttribute, isConsultationLink } from './surgeon-pages.mjs';
 
 const ORIGIN = 'https://rr-clinic.kz';
 const PUBLIC = join(dirname(fileURLToPath(import.meta.url)), '..', 'public');
-const SLUGS = [
-  'chatinyan-garik',
-  'kodzoeva-leila',
-  'kurmanbayev-rustam',
-  'mussa-baurzhan',
-  'privacy-policy',
-  'romanovskaya-tatyana',
-  'savelyev-evgeniy',
-  'temirkhan-anar',
-  'temirkhanov-amir',
-  'tulepbergenova-tomiris',
-  'ulagasheva-alina',
-];
+const SLUGS = [...SURGEON_ROUTES, 'privacy-policy'];
 
 const HEAD = `
 <!-- RR landing: show the page before Framer's JS runs (scripts/framer-pages.mjs) -->
 <style>
+  html { -webkit-text-size-adjust: 100%; text-size-adjust: 100%; }
   html.rr-wait #main { visibility: hidden; }
   #main > div:first-of-type { opacity: 1 !important; zoom: var(--rr-zoom, 1) !important; min-height: calc(100vh / var(--rr-zoom, 1)) !important; }
   [data-rr-shown] { opacity: 1 !important; }
@@ -68,7 +59,8 @@ const HEAD = `
     setTimeout(function () { root.classList.remove('rr-wait'); }, 4000);
     function zoom() {
       var w = window.innerWidth;
-      document.documentElement.style.setProperty('--rr-zoom', String(w / (w < 768 ? 393 : 1440)));
+      // Match Framer's phone media query, including phone landscape and small tablets.
+      document.documentElement.style.setProperty('--rr-zoom', String(w / (w < 810 ? 393 : 1440)));
     }
     zoom();
     window.addEventListener('resize', zoom);
@@ -329,7 +321,8 @@ function deferBundle(html, slug) {
   return { html: out, bundle: { attrs, preload } };
 }
 
-function patch(html, slug) {
+export function patch(html, slug) {
+  html = html.replaceAll('\r\n', '\n').replace(/[ \t]+$/gm, '');
   const wrapper = /<div style="width:100%;min-height:100vh;overflow-x:hidden;zoom:1;opacity:0;/;
   if (!wrapper.test(html)) throw new Error(`${slug}: zoom wrapper not found — check patch 1 against the new Framer markup`);
   if (!html.includes('</head>') || !html.includes('</body>')) throw new Error(`${slug}: no </head> or </body>`);
@@ -340,22 +333,50 @@ function patch(html, slug) {
       (images.preload ? ', phone hero photo preloaded' : '') +
       (deferred.bundle ? `; bundle + ${deferred.bundle.preload.length} modules after load` : ''),
   );
-  return deferPixel(deferred.html)
+  const surgeon = SURGEONS[slug.split('/')[0]];
+  const href = surgeon ? consultationLink(html, slug) : null;
+  // Some cloned Framer blocks still book Rustam. Correct their SSR links as well as hydrated clicks.
+  const linked = href ? deferred.html.replace(/(<a\b[^>]*\bhref=")([^"]+)(")/g, (tag, before, link, after) =>
+    isConsultationLink(link) ? before + escapeAttribute(href) + after : tag) : deferred.html;
+  const assets = surgeon ? `
+<!-- RR landing: surgeon consultation offer and mobile safeguards -->
+<link rel="stylesheet" href="/assets/surgeon-pages.css">
+<script defer src="/assets/surgeon-pages.js" data-rr-surgeon="${slug.split('/')[0]}" data-doctor="${escapeAttribute(surgeon.name)}" data-consultation="${escapeAttribute(href)}"></script>
+` : '';
+  return deferPixel(linked)
     .replace(/(<a\b[^>]*\bhref=")https:\/\/rr-clinic\.kz\/?/g, '$1/')
+    .replace(/<html\b([^>]*)>/, (tag, attrs) => /\blang=/.test(attrs) ? tag : `<html lang="ru"${attrs}>`)
     .replace(/<head\b[^>]*>/, (head) => `${head}${images.preload}`)
-    .replace('</head>', `${HEAD}</head>`)
+    .replace('</head>', `${HEAD}${assets}</head>`)
     .replace('</body>', `${BODY.replace('__RR_BUNDLE__', JSON.stringify(deferred.bundle))}</body>`);
 }
 
-const slugs = process.argv.length > 2 ? process.argv.slice(2) : SLUGS;
-for (const slug of slugs) {
-  const res = await fetch(`${ORIGIN}/${slug}`, { headers: { 'user-agent': 'Mozilla/5.0 (RR landing page sync)' } });
-  if (!res.ok) throw new Error(`${slug}: HTTP ${res.status}`);
-  const html = patch(await res.text(), slug);
-  const dir = join(PUBLIC, slug);
-  await mkdir(dir, { recursive: true });
-  await writeFile(join(dir, 'index.html'), html);
-  // Images, styles and scripts now come from Framer's CDN, as on the live site; the saved copies are unused.
-  await rm(join(dir, 'files'), { recursive: true, force: true });
-  console.log(`${slug}: ${(html.length / 1024).toFixed(0)} KB`);
+async function main() {
+  // --source-dir replays previously downloaded, unpatched SSR HTML for offline work.
+  const args = process.argv.slice(2);
+  const sourceAt = args.indexOf('--source-dir');
+  const sourceDir = sourceAt >= 0 ? args.splice(sourceAt, 2)[1] : null;
+  if (sourceAt >= 0 && !sourceDir) throw new Error('--source-dir requires a directory');
+  const slugs = args.length ? args : SLUGS;
+  for (const slug of slugs) {
+    if (!SLUGS.includes(slug)) throw new Error(`Unsupported page: ${slug}`);
+    let source;
+    if (sourceDir) source = await readFile(join(sourceDir, slug.replaceAll('/', '__') + '.html'), 'utf8');
+    else {
+      // Framer occasionally caches a 200 response containing only an empty #main shell.
+      for (const suffix of ['', '?rrsync=1']) {
+        const res = await fetch(`${ORIGIN}/${slug}${suffix}`, { headers: { 'user-agent': 'Mozilla/5.0 (RR landing page sync)' } });
+        if (!res.ok) throw new Error(`${slug}: HTTP ${res.status}`);
+        source = await res.text();
+        if (source.includes('data-framer-root')) break;
+      }
+    }
+    const html = patch(source, slug);
+    const dir = join(PUBLIC, slug);
+    await mkdir(dir, { recursive: true });
+    await writeFile(join(dir, 'index.html'), html);
+    console.log(`${slug}: ${(html.length / 1024).toFixed(0)} KB`);
+  }
 }
+
+if (process.argv[1] && fileURLToPath(import.meta.url) === resolve(process.argv[1])) await main();
