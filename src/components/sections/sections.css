@@ -912,8 +912,7 @@
     box-shadow: inset 0 0 0 1px #9db8b0;
   }
 
-  .rr-work__pill[aria-pressed='true'],
-  .rr-work__pill--on {
+  .rr-work__pill[aria-pressed='true'] {
     background: #557a6f;
     box-shadow: inset 0 0 0 1px #557a6f;
     color: #fff;
