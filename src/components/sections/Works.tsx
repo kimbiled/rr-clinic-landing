@@ -205,8 +205,40 @@ function Lightbox({ list, index, onIndex, onClose }: { list: Work[]; index: numb
   );
 }
 
-/** Phone filter: a pill that opens its options in a popup; picking one, a tap outside or Esc closes it. */
-function FilterMenu({ label, trigger, filled, children }: { label: string; trigger: ReactNode; filled?: boolean; children: ReactNode }) {
+const ScalpelIcon = (
+  <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="#5e8b7b" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round" aria-hidden="true" className="shrink-0">
+    <path d="m3 18.5 8-8 3 3-8 8a1 1 0 0 1-1.4 0L3 19.9a1 1 0 0 1 0-1.4Z" />
+    <path d="M11 10.5 20.5 3c.8 4.5-1.5 8-6.5 10.5" />
+  </svg>
+);
+
+const SurgeonIcon = (
+  <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="#5e8b7b" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round" aria-hidden="true" className="shrink-0">
+    <path d="M7 8.5V7a5 5 0 0 1 10 0v1.5M6 8.5h12" />
+    <path d="M8 8.5V10a4 4 0 0 0 8 0V8.5" />
+    <path d="M4 21c0-3.6 3.6-6 8-6s8 2.4 8 6" />
+  </svg>
+);
+
+/** Phone filter: an icon and a pill that opens its options in a popup; picking one, a tap outside or Esc closes it. */
+function FilterMenu({
+  label,
+  icon,
+  value,
+  avatar,
+  filled,
+  alignEnd,
+  children,
+}: {
+  label: string;
+  icon: ReactNode;
+  value?: string;
+  avatar?: ReactNode;
+  filled?: boolean;
+  /** Last in the row: the popup grows to the left so it stays on screen. */
+  alignEnd?: boolean;
+  children: ReactNode;
+}) {
   const [open, setOpen] = useState(false);
   const box = useRef<HTMLDivElement>(null);
 
@@ -227,24 +259,25 @@ function FilterMenu({ label, trigger, filled, children }: { label: string; trigg
   }, [open]);
 
   return (
-    <div className="flex items-center gap-5 py-3 first:border-b first:border-[#ebe7e3]">
-      <span className="w-[72px] shrink-0 font-text text-[15px] leading-5 text-[#a4a09d]">{label}</span>
-      <div ref={box} className="relative">
+    <div className="flex min-w-0 flex-auto items-center gap-1.5">
+      {icon}
+      <div ref={box} className="relative min-w-0 flex-auto">
         <button
           type="button"
-          className={`rr-work__pill flex h-[42px] min-w-[170px] items-center justify-center gap-2 rounded-pill px-4 font-text text-[15px] leading-5 font-medium whitespace-nowrap ${filled ? 'rr-work__pill--on' : ''}`}
+          className={`rr-work__pill flex h-[42px] w-full items-center justify-center gap-1.5 rounded-pill px-3 font-text text-[14px] leading-5 font-medium whitespace-nowrap ${filled ? 'rr-work__pill--on' : ''}`}
           aria-expanded={open}
           aria-label={label}
           onClick={() => setOpen((v) => !v)}
         >
-          {trigger}
-          <svg width="10" height="6" viewBox="0 0 12 8" aria-hidden="true" className={open ? 'rotate-180' : undefined}>
+          {avatar}
+          <span className="min-w-0 truncate">{value}</span>
+          <svg width="10" height="6" viewBox="0 0 12 8" aria-hidden="true" className={`shrink-0 ${open ? 'rotate-180' : ''}`}>
             <path d="M1 1.5 6 6.5l5-5" fill="none" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round" />
           </svg>
         </button>
         {open && (
           <div
-            className="rr-work__menu absolute top-[calc(100%+8px)] -left-2.5 z-20 flex max-h-[440px] w-max flex-col items-start gap-1.5 overflow-y-auto rounded-[20px] bg-white p-2.5"
+            className={`rr-work__menu absolute top-[calc(100%+8px)] z-20 flex ${alignEnd ? '-right-2.5' : '-left-2.5'} max-h-[440px] w-max flex-col items-start gap-1.5 overflow-y-auto rounded-[20px] bg-white p-2.5`}
             role="group"
             aria-label={label}
             onClick={() => setOpen(false)}
@@ -383,22 +416,16 @@ export function Works() {
         </div>
 
         {isMobile ? (
-          <div className="mt-5" {...revealItem(3)}>
-            <FilterMenu label="Операция" filled trigger={works.operationFilters.find((f) => f.id === category)?.label}>
+          <div className="mt-5 flex items-center gap-2.5" {...revealItem(3)}>
+            <FilterMenu label="Операция" icon={ScalpelIcon} filled value={works.operationFilters.find((f) => f.id === category)?.label}>
               {operationPills}
             </FilterMenu>
             <FilterMenu
               label="Хирург"
-              trigger={
-                pickedDoctor ? (
-                  <>
-                    <DoctorAvatar doctor={pickedDoctor} size={28} />
-                    {shortName(pickedDoctor)}
-                  </>
-                ) : (
-                  'Все хирурги'
-                )
-              }
+              icon={SurgeonIcon}
+              alignEnd
+              value={pickedDoctor ? shortName(pickedDoctor) : 'Все хирурги'}
+              avatar={pickedDoctor && <DoctorAvatar doctor={pickedDoctor} size={24} />}
             >
               {allSurgeonsPill}
               {surgeonPills}
