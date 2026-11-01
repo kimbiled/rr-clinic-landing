@@ -796,6 +796,18 @@
     user-select: none;
   }
 
+  /* Photo cards in the design: the photo stays sharp in the middle and melts into blur at the top and under the text */
+  .rr-edge-blur {
+    -webkit-backdrop-filter: blur(6px);
+    backdrop-filter: blur(6px);
+    -webkit-mask-image: linear-gradient(180deg, #000, transparent 26%, transparent 58%, #000 88%);
+    mask-image: linear-gradient(180deg, #000, transparent 26%, transparent 58%, #000 88%);
+  }
+
+  .rr-work-box .rr-ba__blur {
+    display: none;
+  }
+
   .rr-ba__shade {
     background: linear-gradient(180deg, rgb(0 0 0 / 0.16), transparent 20%, transparent 60%, rgb(36 24 16 / 0.72));
   }
@@ -869,6 +881,12 @@
 
   .rr-work__row::-webkit-scrollbar {
     display: none;
+  }
+
+  /* More surgeons to the right: the last pill fades out */
+  .rr-work__row--more {
+    -webkit-mask-image: linear-gradient(90deg, #000 calc(100% - 72px), transparent);
+    mask-image: linear-gradient(90deg, #000 calc(100% - 72px), transparent);
   }
 
   .rr-work__pill {
@@ -1244,17 +1262,21 @@
 
   /* ---- Footer ---- */
   .rr-rule--warm {
-    background: #f3ebdf;
+    background: linear-gradient(90deg, transparent, #eedebf 50%, transparent);
   }
 
-  .rr-frame--warm {
-    --frame-line: #f3ebdf;
+  /* Frame verticals: run past the rules and fade out at both ends */
+  .rr-foot__lines {
+    --line: linear-gradient(180deg, transparent, #eedebf 52%, transparent);
+    background:
+      var(--line) left / 1px 100% no-repeat,
+      var(--line) right / 1px 100% no-repeat;
   }
 
   .rr-foot__title {
     font-family: var(--font-display);
-    font-size: 18px;
-    line-height: 22px;
+    font-size: 16px;
+    line-height: 20px;
     font-weight: 400;
     letter-spacing: -0.01em;
     color: #2e2c2c;
@@ -1263,7 +1285,7 @@
   .rr-foot__link,
   .rr-foot__text {
     font-family: var(--font-text);
-    font-size: 16px;
+    font-size: 15px;
     line-height: 20px;
     color: #625f5e;
   }
@@ -1329,7 +1351,6 @@
     display: block;
     width: 100%;
     height: auto;
-    margin-top: 28px;
     user-select: none;
   }
 

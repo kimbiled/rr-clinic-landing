@@ -16,9 +16,9 @@
 //      The page also stays hidden until the parser reaches the end of #main: the phone hero sits near the end of the
 //      HTML and is moved to the top with CSS `order`, so painting the document as it streams in showed the sections
 //      below first and then pushed them down when the hero arrived (mobile CLS ~1.0 on a real network).
-//   2. Entrance animations in the first screen. Appear-animated elements start at opacity 0 until the bundle runs; the
-//      ones already in the viewport are shown straight away (their transform still settles when Framer animates).
-//      Elements further down keep their scroll animations.
+//   2. Entrance animations. Appear-animated elements start at opacity 0 and Framer keeps them there until they are well
+//      inside the viewport, so blocks looked broken while scrolling. The ones already in the viewport are shown straight
+//      away, the rest fade in with a short CSS transition as they arrive; Framer's own trigger no longer decides.
 //   3. Images. The HTML holds every breakpoint's variant and only hides the others with display:none, which does not
 //      stop their images from downloading (a phone fetched the 3720 px desktop hero). In the first screen (everything up
 //      to the end of the hero, plus any section named "...hero", wherever it sits in the HTML) an image's `sizes` is set
@@ -31,8 +31,7 @@
 //   5. The header logo leads to our home page (Framer links it to the top of the same page).
 //   6. In-site <a href="https://rr-clinic.kz/..."> become relative, so they stay on this host.
 //   7. Framer's JS (~340 KB: main bundle + modulepreloads) starts after the load event, or at the first touch, key,
-//      wheel or scroll. The page is already complete without it; it brings the menu, sliders and animations. Until
-//      then, entrance-animated blocks are shown as they scroll into view, so nothing stays blank.
+//      wheel or scroll. The page is already complete without it; it brings the menu, sliders and animations.
 import { mkdir, readFile, writeFile } from 'node:fs/promises';
 import { dirname, join, resolve } from 'node:path';
 import { fileURLToPath } from 'node:url';
@@ -48,7 +47,9 @@ const HEAD = `
   html { -webkit-text-size-adjust: 100%; text-size-adjust: 100%; }
   html.rr-wait #main { visibility: hidden; }
   #main > div:first-of-type { opacity: 1 !important; zoom: var(--rr-zoom, 1) !important; min-height: calc(100vh / var(--rr-zoom, 1)) !important; }
-  [data-rr-shown] { opacity: 1 !important; }
+  [data-rr-shown] { opacity: 1 !important; transform: var(--rr-end, none) !important; }
+  [data-rr-shown="fade"] { transition: opacity 450ms cubic-bezier(0.22, 1, 0.36, 1), transform 450ms cubic-bezier(0.22, 1, 0.36, 1); }
+  [data-framer-name="Before/After"] > [data-framer-name="Текст кнопки"] { opacity: 1 !important; transform: none !important; }
   [data-framer-name$="[Vectorized]"] { cursor: pointer; }
 </style>
 <script>
@@ -98,23 +99,31 @@ const HEAD = `
 
 const BODY = `
 <script>
-  /* RR landing: entrance-animated elements already on screen are shown at once instead of after hydration; the ones
-     scrolled into view before Framer's JS has started are shown as they appear (patch 7), later ones animate as usual. */
+  /* RR landing: entrance-animated elements no longer wait for Framer, which keeps them blank until they are ~40 % up the
+     screen (up to 1.7 s of empty blocks while scrolling). The ones on screen are shown at once, the rest fade in as they
+     arrive, before and after hydration alike. */
   (function () {
     var vh = window.innerHeight;
     var els = document.querySelectorAll('#main [style*="will-change:transform"][style*="opacity:0"]');
+    function show(el, value) {
+      // The element's resting transform: its inline one without the entrance offset Framer appended.
+      var t = /(?:^|;)transform:([^;]*)/.exec(el.getAttribute('style'));
+      el.style.setProperty('--rr-end', (t ? t[1].replace(/ ?translateY\\(\\d+px\\)$/, '') : '') || 'none');
+      el.setAttribute('data-rr-shown', value);
+    }
     var io = 'IntersectionObserver' in window ? new IntersectionObserver(function (entries) {
       for (var j = 0; j < entries.length; j++) {
         if (!entries[j].isIntersecting) continue;
-        entries[j].target.setAttribute('data-rr-shown', '');
+        show(entries[j].target, 'fade');
         io.unobserve(entries[j].target);
       }
-    }) : null;
+    }, { rootMargin: '0px 0px 100px 0px' }) : null;
     for (var i = 0; i < els.length; i++) {
       if (!/opacity:0(;|$)/.test(els[i].getAttribute('style'))) continue;
       var r = els[i].getBoundingClientRect();
-      if (r.bottom > 0 && r.top < vh && r.width > 0) els[i].setAttribute('data-rr-shown', '');
+      if (r.bottom > 0 && r.top < vh && r.width > 0) show(els[i], '');
       else if (io) io.observe(els[i]);
+      else show(els[i], '');
     }
     document.documentElement.classList.remove('rr-wait');
 
@@ -133,7 +142,6 @@ const BODY = `
       }
       var s = document.createElement('script');
       for (var name in bundle.attrs) s.setAttribute(name, bundle.attrs[name]);
-      s.onload = s.onerror = function () { if (io) io.disconnect(); };
       document.body.appendChild(s);
     }
     var triggers = ['pointerdown', 'keydown', 'touchstart', 'wheel', 'scroll'];

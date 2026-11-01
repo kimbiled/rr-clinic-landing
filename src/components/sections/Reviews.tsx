@@ -69,7 +69,7 @@ export function Reviews() {
             </p>
             <h2
               id="reviews-title"
-              className="mt-3 font-display text-[40px] leading-[48px] font-normal tracking-[-0.02em] text-[#1b1919] max-md:text-[28px] max-md:leading-[34px]"
+              className="mt-3 font-display text-[40px] leading-[48px] font-normal text-[#1b1919] max-md:text-[28px] max-md:leading-[34px]"
               {...revealItem(1)}
             >
               {reviews.title[0]}
@@ -90,12 +90,12 @@ export function Reviews() {
             >
               <img src={asset(rating.logo.src)} width={64} height={64} alt="" loading="lazy" decoding="async" className="size-16 shrink-0" />
               <span className="min-w-0">
-                <span className="block font-text text-[14px] leading-[18px] text-[#625f5e]">Рейтинг RR Clinic в 2ГИС</span>
+                <span className="block font-text text-[15px] leading-[18px] text-[#625f5e]">Рейтинг RR Clinic в 2ГИС</span>
                 <span className="mt-1 flex items-center gap-3">
-                  <span className="font-display text-[36px] leading-[42px] text-[#2e2c2c]">{String(rating.value).replace('.', ',')}</span>
+                  <span className="font-display text-[40px] leading-[46px] text-[#2e2c2c]">{String(rating.value).replace('.', ',')}</span>
                   <span className="flex flex-col gap-1">
                     <Stars />
-                    <span className="font-text text-[14px] leading-4 text-[#8c8784]">{ratingsLabel(rating.count)}</span>
+                    <span className="font-text text-[15px] leading-4 text-[#8c8784]">{ratingsLabel(rating.count)}</span>
                   </span>
                 </span>
               </span>
@@ -122,7 +122,7 @@ export function Reviews() {
 
         <div className="mt-10 flex items-center justify-between gap-6 max-md:mt-7" {...revealItem(3)}>
           <div className="flex min-w-0 items-baseline gap-3 max-md:flex-col max-md:gap-0.5">
-            <h3 className="font-display text-[28px] leading-9 font-normal tracking-[-0.01em] text-[#1b1919] max-md:text-[22px] max-md:leading-7">
+            <h3 className="font-display text-[28px] leading-9 font-normal text-[#1b1919] max-md:text-[22px] max-md:leading-7">
               {reviews.videosTitle}
             </h3>
             <p className="font-text text-[15px] leading-5 text-[#a4a09d] max-md:text-[13px]">{reviews.videosHint}</p>
@@ -145,7 +145,7 @@ export function Reviews() {
           </div>
         </div>
 
-        <ul ref={row} className="rr-reviews mt-6 flex gap-5 overflow-x-auto max-md:mt-4 max-md:gap-3" onScroll={measure} {...revealItem(4)}>
+        <ul ref={row} className="rr-reviews mt-10 flex gap-5 overflow-x-auto max-md:mt-4 max-md:gap-3" onScroll={measure} {...revealItem(4)}>
           {reviews.items.map((item) => {
             const doctor = getDoctor(item.doctorId);
             return (
@@ -160,8 +160,9 @@ export function Reviews() {
                     decoding="async"
                     className="rr-review__img absolute inset-0 size-full object-cover object-[50%_25%]"
                   />
+                  <span className="rr-edge-blur absolute inset-0" aria-hidden="true" />
                   <span className="rr-review__shade absolute inset-0" aria-hidden="true" />
-                  <span className="rr-review__chip absolute top-4 left-4 inline-flex h-8 items-center gap-2 rounded-pill px-3 font-text text-[14px] leading-none" aria-hidden="true">
+                  <span className="rr-review__chip absolute top-4 left-4 inline-flex h-8 items-center gap-2 rounded-pill px-3 font-text text-[15px] leading-none" aria-hidden="true">
                     Instagram
                     <svg width="9" height="9" viewBox="0 0 9 9" fill="none" stroke="currentColor" strokeWidth="1.2" strokeLinecap="round" strokeLinejoin="round">
                       <path d="M1 8 8 1M2.5 1H8v5.5" />
@@ -173,10 +174,10 @@ export function Reviews() {
                     </svg>
                   </span>
                   <span className="absolute inset-x-5 bottom-5 block">
-                    <span className="block font-display text-[20px] leading-6 font-medium tracking-[-0.01em]">{item.title}</span>
-                    <span className="mt-2 block font-text text-[15px] leading-5 text-white/85">{item.operation}</span>
+                    <span className="block font-text text-[20px] leading-6 font-medium">{item.title}</span>
+                    <span className="mt-2 block font-text text-[14px] leading-5 text-white/85">{item.operation}</span>
                     {doctor && (
-                      <span className="mt-2 flex items-center gap-2 font-text text-[15px] leading-5 text-white/85">
+                      <span className="mt-2 flex items-center gap-2 font-text text-[14px] leading-5 text-white/85">
                         <DoctorAvatar doctor={doctor} size={24} />
                         {doctor.lastName} {doctor.firstName[0]}.
                       </span>
@@ -188,11 +189,11 @@ export function Reviews() {
           })}
         </ul>
 
-        <span className="mt-8 block h-1 overflow-hidden rounded-full bg-[#e6e3e0] max-md:mt-5" aria-hidden="true">
+        <span className="mt-10 block h-1 overflow-hidden rounded-full bg-[#e6e3e0] max-md:mt-5" aria-hidden="true">
           <span className="rr-reviews__fill block h-full rounded-full bg-[#5a8478]" style={{ width: `${progress * 100}%` }} />
         </span>
 
-        <p className="mt-6 font-text text-[13px] leading-4 text-[#a4a09d]">{reviews.disclaimer}</p>
+        <p className="mt-10 font-text text-[13px] leading-4 text-[#a4a09d] max-md:mt-6">{reviews.disclaimer}</p>
       </div>
     </section>
   );

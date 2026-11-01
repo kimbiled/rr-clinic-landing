@@ -24,6 +24,8 @@ interface Work {
   category: WorkCategory;
   /** Time since the operation; shown only when known. */
   months?: number;
+  /** A designer's side-by-side pair: both photos meet at the divider instead of lying on top of each other. */
+  split?: boolean;
 }
 
 const allWorks = rawWorks as Work[];
@@ -47,7 +49,11 @@ export function DoctorAvatar({ doctor, size }: { doctor: Doctor; size: number })
   ) : null;
 }
 
-/** "After" fills the frame, "before" is clipped to the left of the divider; a transparent range input moves it. */
+/**
+ * "After" fills the frame, "before" is clipped to the left of the divider; a transparent range input moves it.
+ * A split work gives each photo its own side of the divider, inner edge at the divider, so at 50 % it matches the pair
+ * in the design and at either end one photo fills the card.
+ */
 function Compare({ work, nudgeDelay }: { work: Work; nudgeDelay?: number }) {
   const reducedMotion = useReducedMotion();
   const [pos, setPos] = useState(50);
@@ -69,15 +75,23 @@ function Compare({ work, nudgeDelay }: { work: Work; nudgeDelay?: number }) {
 
   return (
     <>
-      <img src={photo(work.id, 'after')} alt={`${work.title}: после`} loading="lazy" decoding="async" className="absolute inset-0 size-full object-cover" />
+      <img
+        src={photo(work.id, 'after')}
+        alt={`${work.title}: после`}
+        loading="lazy"
+        decoding="async"
+        className={`absolute top-0 h-full object-cover ${work.split ? 'object-left' : ''}`}
+        style={work.split ? { left: `${pos}%`, width: `${100 - pos}%` } : { left: 0, width: '100%' }}
+      />
       <img
         src={photo(work.id, 'before')}
         alt={`${work.title}: до`}
         loading="lazy"
         decoding="async"
-        className="absolute inset-0 size-full object-cover"
-        style={{ clipPath: `inset(0 ${100 - pos}% 0 0)` }}
+        className={`absolute top-0 left-0 h-full object-cover ${work.split ? 'object-right' : ''}`}
+        style={work.split ? { width: `${pos}%` } : { width: '100%', clipPath: `inset(0 ${100 - pos}% 0 0)` }}
       />
+      <span className="rr-ba__blur rr-edge-blur pointer-events-none absolute inset-0" aria-hidden="true" />
       <span className="rr-ba__shade pointer-events-none absolute inset-0" aria-hidden="true" />
 
       <span className="rr-ba__label absolute top-5 left-5" aria-hidden="true">
@@ -116,7 +130,7 @@ function Compare({ work, nudgeDelay }: { work: Work; nudgeDelay?: number }) {
 
 function WorkMeta({ work, doctor }: { work: Work; doctor?: Doctor }) {
   return (
-    <span className="mt-2 flex items-center justify-between gap-3 font-text text-[15px] leading-5 text-white/85">
+    <span className="mt-2 flex items-center justify-between gap-3 font-text text-[14px] leading-5 text-white/85">
       {doctor && (
         <span className="flex min-w-0 items-center gap-2">
           <DoctorAvatar doctor={doctor} size={24} />
@@ -133,7 +147,7 @@ function WorkCard({ work, nudgeDelay, onOpen }: { work: Work; nudgeDelay?: numbe
     <li className="rr-ba relative h-[400px] overflow-hidden rounded-[24px] bg-[#b4a294] max-md:h-[424px]">
       <Compare work={work} nudgeDelay={nudgeDelay} />
       <button type="button" className="rr-work__open absolute inset-x-0 bottom-0 z-[1] px-5 pt-4 pb-4 text-left text-white" onClick={onOpen} aria-label={`Рассмотреть крупно: ${work.title}`}>
-        <span className="rr-work__title block font-display text-[19px] leading-6 font-medium tracking-[-0.01em]">{work.title}</span>
+        <span className="rr-work__title block font-text text-[20px] leading-6 font-medium">{work.title}</span>
         <WorkMeta work={work} doctor={getDoctor(work.doctorId)} />
       </button>
     </li>
@@ -167,7 +181,7 @@ function Lightbox({ list, index, onIndex, onClose }: { list: Work[]; index: numb
       <div className="rr-ba relative h-[min(78vh,760px)] w-[min(92vw,600px)] overflow-hidden rounded-[24px] bg-[#b4a294]">
         <Compare key={work.id} work={work} />
         <div className="pointer-events-none absolute inset-x-0 bottom-0 z-[1] px-6 pb-5 text-white">
-          <p className="rr-work__title font-display text-[22px] leading-7 font-medium">{work.title}</p>
+          <p className="rr-work__title font-text text-[22px] leading-7 font-medium">{work.title}</p>
           <WorkMeta work={work} doctor={getDoctor(work.doctorId)} />
         </div>
       </div>
@@ -253,7 +267,7 @@ export function Works() {
             </p>
             <h2
               id="works-title"
-              className="mt-3 font-display text-[40px] leading-[48px] font-normal tracking-[-0.02em] text-[#1b1919] max-md:text-[28px] max-md:leading-[34px]"
+              className="mt-3 font-display text-[40px] leading-[48px] font-normal text-[#1b1919] max-md:text-[28px] max-md:leading-[34px]"
               {...revealItem(1)}
             >
               {works.title[0]}
@@ -263,7 +277,7 @@ export function Works() {
               {works.text}
             </p>
           </div>
-          <p className="rr-work__consent inline-flex h-10 shrink-0 items-center gap-2.5 rounded-pill px-4 font-text text-[15px] leading-5 text-[#625f5e] max-md:text-[13px]" {...revealItem(2)}>
+          <p className="rr-work__consent inline-flex h-10 shrink-0 items-center gap-2.5 rounded-pill px-4 font-text text-[14px] leading-5 text-[#625f5e] max-md:text-[13px]" {...revealItem(2)}>
             <svg width="16" height="18" viewBox="0 0 16 18" fill="none" stroke="#5e8b7b" strokeWidth="1.3" strokeLinecap="round" strokeLinejoin="round" aria-hidden="true">
               <path d="M8 1 2 3v5.5C2 12.6 4.6 15.6 8 17c3.4-1.4 6-4.4 6-8.5V3L8 1Z" />
               <path d="m5.5 9 2 2 3-3.5" />
@@ -274,13 +288,13 @@ export function Works() {
 
         <div className="rr-work__filters mt-8 rounded-[24px] bg-white px-6 max-md:mt-5 max-md:rounded-[20px] max-md:px-3" {...revealItem(3)}>
           <div className="flex items-center gap-6 border-b border-[#ebe7e3] py-[16px] max-md:gap-3">
-            <span className="w-[70px] shrink-0 font-text text-[15px] leading-5 text-[#a4a09d] max-md:hidden">Операция</span>
+            <span className="w-[70px] shrink-0 font-text text-[14px] leading-5 text-[#a4a09d] max-md:hidden">Операция</span>
             <div className="rr-work__row flex min-w-0 gap-2 overflow-x-auto" role="group" aria-label="Операция">
               {works.operationFilters.map((f) => (
                 <button
                   key={f.id}
                   type="button"
-                  className="rr-work__pill h-[42px] shrink-0 rounded-pill px-[18px] font-display text-[14px] leading-5 font-medium whitespace-nowrap"
+                  className="rr-work__pill h-[42px] shrink-0 rounded-pill px-[18px] font-text text-[15px] leading-5 font-medium whitespace-nowrap"
                   aria-pressed={category === f.id}
                   onClick={() => {
                     setCategory(f.id);
@@ -293,11 +307,17 @@ export function Works() {
             </div>
           </div>
           <div className="flex items-center gap-6 py-[16px] max-md:gap-3">
-            <span className="w-[70px] shrink-0 font-text text-[15px] leading-5 text-[#a4a09d] max-md:hidden">Хирург</span>
-            <div ref={surgeonRow} className="rr-work__row flex min-w-0 flex-1 gap-2 overflow-x-auto" role="group" aria-label="Хирург" onScroll={onRowScroll}>
+            <span className="w-[70px] shrink-0 font-text text-[14px] leading-5 text-[#a4a09d] max-md:hidden">Хирург</span>
+            <div
+              ref={surgeonRow}
+              className={`rr-work__row flex min-w-0 flex-1 items-center gap-2 overflow-x-auto ${atEnd ? '' : 'rr-work__row--more'}`}
+              role="group"
+              aria-label="Хирург"
+              onScroll={onRowScroll}
+            >
               <button
                 type="button"
-                className="rr-work__pill h-[46px] shrink-0 rounded-pill px-[18px] font-display text-[14px] leading-5 font-medium whitespace-nowrap"
+                className="rr-work__pill h-[42px] shrink-0 rounded-pill px-[18px] font-text text-[15px] leading-5 font-medium whitespace-nowrap"
                 aria-pressed={doctorId === null}
                 onClick={() => {
                   setDoctorId(null);
@@ -310,14 +330,14 @@ export function Works() {
                 <button
                   key={doctor.id}
                   type="button"
-                  className="rr-work__pill flex h-[46px] shrink-0 items-center gap-2 rounded-pill pr-[18px] pl-1 font-display text-[14px] leading-5 font-medium whitespace-nowrap"
+                  className="rr-work__pill flex h-[46px] shrink-0 items-center gap-2 rounded-pill pr-[18px] pl-[7px] font-text text-[15px] leading-5 font-medium whitespace-nowrap"
                   aria-pressed={doctorId === doctor.id}
                   onClick={() => {
                     setDoctorId(doctor.id);
                     resetPaging();
                   }}
                 >
-                  <DoctorAvatar doctor={doctor} size={36} />
+                  <DoctorAvatar doctor={doctor} size={32} />
                   {shortName(doctor)}
                 </button>
               ))}
@@ -336,15 +356,15 @@ export function Works() {
           </div>
         </div>
 
-        <div className="mt-9 flex items-baseline justify-between gap-6 max-md:mt-6 max-md:flex-col max-md:gap-1" aria-live="polite">
-          <h3 className="font-display text-[26px] leading-8 font-normal tracking-[-0.01em] text-[#2e2c2c] max-md:text-[20px] max-md:leading-6">{filterTitle}</h3>
-          <p className="font-text text-[15px] leading-5 text-[#a4a09d] max-md:text-[13px]">{works.hint}</p>
+        <div className="mt-8 flex items-baseline justify-between gap-6 max-md:mt-6 max-md:flex-col max-md:gap-1" aria-live="polite">
+          <h3 className="font-display text-[22px] leading-7 font-normal text-[#2e2c2c] max-md:text-[20px] max-md:leading-6">{filterTitle}</h3>
+          <p className="font-text text-[14px] leading-5 text-[#a4a09d] max-md:text-[13px]">{works.hint}</p>
         </div>
 
         {list.length === 0 ? (
           <p className="mt-6 font-text text-[17px] leading-[22px] text-[#625f5e]">Таких работ пока нет — выберите другую операцию или хирурга.</p>
         ) : (
-          <ul key={`${category}-${doctorId}`} className="rr-op-grid mt-6 grid grid-cols-4 gap-5 max-md:mt-4 max-md:grid-cols-1">
+          <ul key={`${category}-${doctorId}`} className="rr-op-grid mt-8 grid grid-cols-4 gap-5 max-md:mt-4 max-md:grid-cols-1">
             {visible.map((work, i) => (
               <WorkCard
                 key={work.id}
@@ -368,10 +388,10 @@ export function Works() {
               />
             )
           : shown < list.length && (
-              <div className="mt-10 flex justify-center">
+              <div className="mt-8 flex justify-center">
                 <button
                   type="button"
-                  className="rr-work__more inline-flex h-[54px] items-center gap-3 rounded-pill px-8 font-display text-[15px] leading-5 font-medium text-[#2f4a44]"
+                  className="rr-work__more inline-flex h-[54px] items-center gap-3 rounded-pill px-8 font-text text-[16px] leading-5 font-medium text-[#2f4a44]"
                   onClick={() => setShown((n) => n + works.pageSize)}
                 >
                   {works.moreLabel}

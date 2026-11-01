@@ -764,10 +764,10 @@ export const footer: FooterContent = {
     address: 'Астана, ул. Орынбор, 12, н.п. 68',
     email: 'info@rr-clinic.com',
     map: {
-      // OpenStreetMap tiles around Орынбор 12, tinted (assets-src/img/footer-map.png); the card opens 2GIS.
+      // The designer's map with its pin and label, cropped from the footer design; the card opens 2GIS.
       src: 'assets/img/web/footer-map.webp',
-      width: 590,
-      height: 304,
+      width: 471,
+      height: 244,
       alt: 'RR Clinic на карте: Астана, ул. Орынбор, 12',
       href: 'https://2gis.kz/astana/firm/70000001066801836',
     },
