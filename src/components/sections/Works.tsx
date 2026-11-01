@@ -226,7 +226,6 @@ function FilterMenu({
   icon,
   value,
   avatar,
-  filled,
   alignEnd,
   children,
 }: {
@@ -234,7 +233,6 @@ function FilterMenu({
   icon: ReactNode;
   value?: string;
   avatar?: ReactNode;
-  filled?: boolean;
   /** Last in the row: the popup grows to the left so it stays on screen. */
   alignEnd?: boolean;
   children: ReactNode;
@@ -264,7 +262,7 @@ function FilterMenu({
       <div ref={box} className="relative min-w-0 flex-auto">
         <button
           type="button"
-          className={`rr-work__pill flex h-[42px] w-full items-center justify-center gap-1.5 rounded-pill px-3 font-text text-[14px] leading-5 font-medium whitespace-nowrap ${filled ? 'rr-work__pill--on' : ''}`}
+          className="rr-work__pill flex h-[42px] w-full items-center justify-center gap-1.5 rounded-pill px-3 font-text text-[14px] leading-5 font-medium whitespace-nowrap"
           aria-expanded={open}
           aria-label={label}
           onClick={() => setOpen((v) => !v)}
@@ -406,7 +404,7 @@ export function Works() {
               {works.text}
             </p>
           </div>
-          <p className="rr-work__consent inline-flex h-10 shrink-0 items-center gap-2.5 rounded-pill px-4 font-text text-[14px] leading-5 text-[#625f5e] max-md:text-[13px]" {...revealItem(2)}>
+          <p className="rr-work__consent inline-flex h-10 shrink-0 items-center gap-2.5 rounded-pill px-4 font-text text-[14px] leading-5 text-[#625f5e] max-md:order-first max-md:text-[13px]" {...revealItem(2)}>
             <svg width="16" height="18" viewBox="0 0 16 18" fill="none" stroke="#5e8b7b" strokeWidth="1.3" strokeLinecap="round" strokeLinejoin="round" aria-hidden="true">
               <path d="M8 1 2 3v5.5C2 12.6 4.6 15.6 8 17c3.4-1.4 6-4.4 6-8.5V3L8 1Z" />
               <path d="m5.5 9 2 2 3-3.5" />
@@ -417,7 +415,7 @@ export function Works() {
 
         {isMobile ? (
           <div className="mt-5 flex items-center gap-2.5" {...revealItem(3)}>
-            <FilterMenu label="Операция" icon={ScalpelIcon} filled value={works.operationFilters.find((f) => f.id === category)?.label}>
+            <FilterMenu label="Операция" icon={ScalpelIcon} value={works.operationFilters.find((f) => f.id === category)?.label}>
               {operationPills}
             </FilterMenu>
             <FilterMenu
