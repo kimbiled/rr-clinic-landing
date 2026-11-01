@@ -27,6 +27,16 @@ test('all 24 requested pages contain complete SSR, the shared offer, and their o
   }
 });
 
+test('inline scripts parse: a syntax error here keeps the page hidden until the 4 s guard', async () => {
+  for (const route of [...SURGEON_ROUTES, 'privacy-policy']) {
+    const html = await readFile(new URL(`${route}/index.html`, publicRoot), 'utf8');
+    for (const [, attrs, code] of html.matchAll(/<script\b([^>]*)>([\s\S]*?)<\/script>/g)) {
+      if (/\bsrc=|type="(?:application|framer)/.test(attrs) || !code.trim()) continue;
+      assert.doesNotThrow(() => new Function(code), `${route}: broken inline script`);
+    }
+  }
+});
+
 test('unrelated pages have no surgeon offer and its local assets exist', async () => {
   for (const page of ['../index.html', 'privacy-policy/index.html']) {
     const html = await readFile(new URL(page, publicRoot), 'utf8');

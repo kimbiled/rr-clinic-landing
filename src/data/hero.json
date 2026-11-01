@@ -78,7 +78,7 @@
       {
         "id": "see-works",
         "label": "Смотреть работы",
-        "href": "#cases",
+        "href": "#works",
         "variant": "secondary",
         "icon": null
       }

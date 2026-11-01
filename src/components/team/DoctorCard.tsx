@@ -60,11 +60,11 @@ export function DoctorCard({ doctor, index, onMore }: DoctorCardProps) {
       )}
 
       {text && text.tags.length > 0 && (
-        <ul className="absolute inset-x-[16px] top-[16px] flex gap-1.5 overflow-hidden" aria-label="Операции">
+        <ul className="absolute inset-x-[16px] top-[16px] flex flex-wrap gap-1.5 overflow-hidden max-md:flex-nowrap" aria-label="Операции">
           {text.tags.map((tag) => (
             <li
               key={tag}
-              className="team-card__tag shrink-0 rounded-pill px-2 py-1 font-text text-[10px] leading-3 whitespace-nowrap text-[#4f7468]"
+              className="team-card__tag shrink-0 rounded-pill px-2 py-1 font-text text-[12px] leading-4 whitespace-nowrap text-[#4f7468] max-md:text-[10px] max-md:leading-3"
             >
               {tag}
             </li>
@@ -73,22 +73,22 @@ export function DoctorCard({ doctor, index, onMore }: DoctorCardProps) {
       )}
 
       <div className="team-card__panel absolute inset-x-[16px] bottom-[16px] rounded-[20px] p-4">
-        {text?.role && <p className="font-text text-[12px] leading-4 text-[#5e8b7b] max-md:text-[14px] max-md:leading-[18px]">{text.role}</p>}
-        <h3 id={nameId} className="mt-2 font-display text-[17px] leading-[20px] font-normal tracking-[-0.01em] text-[#1b1919] max-md:text-[18px] max-md:leading-[22px]">
+        {text?.role && <p className="font-text text-[14px] leading-[18px] text-[#5e8b7b]">{text.role}</p>}
+        <h3 id={nameId} className="mt-2 font-display text-[19px] leading-[23px] font-normal tracking-[-0.01em] text-[#1b1919] max-md:text-[18px] max-md:leading-[22px]">
           {doctor.lastName}
           <br />
           {given}
         </h3>
 
-        <p className="mt-2.5 h-[48px] overflow-hidden font-text text-[12px] leading-4 text-[#625f5e] max-md:line-clamp-3 max-md:h-[54px] max-md:text-[14px] max-md:leading-[18px]">{bio}</p>
+        <p className="mt-2.5 min-h-[54px] overflow-hidden font-text text-[14px] leading-[18px] text-[#625f5e] max-md:line-clamp-3 max-md:h-[54px]">{bio}</p>
 
         {text?.stats && (
-          <dl className="mt-2.5 flex gap-5">
+          <dl className="mt-2.5 flex gap-3 max-md:gap-5">
             {text.stats.map((stat) => (
               <div key={stat.label} className="flex min-w-0 flex-col">
                 <dt className="sr-only">{stat.label}</dt>
-                <dd className="order-first font-display text-[15px] leading-5 text-[#1b1919] max-md:text-[17px]">{stat.value}</dd>
-                <dd className="font-text text-[11px] leading-[14px] whitespace-nowrap text-[#7c7876] max-md:text-[13px] max-md:leading-4" aria-hidden="true">
+                <dd className="order-first font-display text-[17px] leading-5 text-[#1b1919]">{stat.value}</dd>
+                <dd className="font-text text-[13px] leading-4 whitespace-nowrap text-[#7c7876]" aria-hidden="true">
                   {stat.label}
                 </dd>
               </div>

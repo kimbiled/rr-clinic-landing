@@ -209,6 +209,7 @@ export function Trust() {
                   <a
                     key={cta.label}
                     href={cta.href}
+                    {...(cta.href.startsWith('http') ? { target: '_blank', rel: 'noopener noreferrer' } : {})}
                     className="rr-pill-light inline-flex h-[55px] w-[141px] items-center justify-center rounded-pill font-display text-[15px] leading-6 font-normal tracking-[-0.01em] text-[#2e2c2c] max-md:h-12 max-md:w-auto max-md:text-[14px]"
                   >
                     {cta.label}

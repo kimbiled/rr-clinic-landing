@@ -111,9 +111,9 @@ export const trust: TrustContent = {
       'Рустам Курманбаев и Татьяна Романовская —\nоснователи RR Clinic. Команда профильных врачей\n' +
       'сопровождает пациента от первой консультации\nдо восстановления после операции.',
     ctas: [
-      // TODO(content): confirm targets with the client — no "about" page / licences viewer exists yet.
+      // TODO(content): confirm the target with the client — no "about" page exists yet.
       { label: 'Узнать больше о клинике', mobileLabel: 'О клинике', href: '#doctors', variant: 'primary' },
-      { label: 'Лицензии', href: '#licenses', variant: 'secondary' },
+      { label: 'Лицензии', href: 'https://drive.google.com/file/d/1fixGxJX3GIo-xLjsyjLxcy3mydZ11tiD/view', variant: 'secondary' },
     ],
     photo: {
       // Figma "Main content container" rendered at 2x (scripts/optimize-images.sh → trust-card).
@@ -777,8 +777,8 @@ export const footer: FooterContent = {
   },
   copyright: '© 2026 RR Clinic. Все права защищены.',
   legal: [
-    // TODO(content): no licences page / data-processing consent yet — confirm targets with the client.
-    { label: 'Лицензии клиники', href: '#licenses' },
+    // TODO(content): no data-processing consent yet — confirm the target with the client.
+    { label: 'Лицензии клиники', href: 'https://drive.google.com/file/d/1fixGxJX3GIo-xLjsyjLxcy3mydZ11tiD/view' },
     { label: 'Политика конфиденциальности', href: '/privacy-policy' },
     { label: 'Согласие на обработку данных', href: '/privacy-policy' },
   ],

@@ -12,6 +12,17 @@ export const SURGEONS = {
   'temirkhan-anar': { name: 'Анар Темирхан', recipient: 'Анар Темирхан', procedures: [] },
 };
 
+// Operation names for the page <title> and <h1> of /<surgeon>/<procedure>.
+export const PROCEDURES = {
+  mammoplasty: 'Маммопластика',
+  abdominoplasty: 'Абдоминопластика',
+  blepharoplasty: 'Блефаропластика',
+  rhinoplasty: 'Ринопластика',
+  facelift: 'Фейслифтинг',
+  otoplasty: 'Отопластика',
+  'intimate-surgery': 'Интимная пластика',
+};
+
 export const SURGEON_ROUTES = Object.entries(SURGEONS).flatMap(([slug, { procedures }]) => [
   slug, ...procedures.map((procedure) => `${slug}/${procedure}`),
 ]);
