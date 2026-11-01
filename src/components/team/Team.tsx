@@ -90,11 +90,11 @@ export function Team() {
             <p className="font-text text-[18px] leading-none tracking-[0.1em] text-[#a4a09d] uppercase max-md:text-[11px]">Команда</p>
             <h2
               id="team-title"
-              className="mt-[22px] font-display text-[40px] leading-[48px] font-normal text-[#1b1919] max-md:mt-3 max-md:text-[28px] max-md:leading-[34px]"
+              className="mt-[22px] font-display text-[40px] leading-[48px] font-normal text-[#1b1919] max-md:mt-3 max-md:text-[30px] max-md:leading-9"
             >
-              Наша <span className="text-[#9bb4ae]">команда</span>
+              Наша <span className="text-[#9bb4ae] max-md:text-[#5e8b7b]">команда</span>
             </h2>
-            <p className="mt-4 max-w-[800px] font-text text-[18px] leading-[1.1] text-[#625f5e] max-md:mt-2 max-md:text-[14px] max-md:leading-[1.3]">
+            <p className="mt-4 max-w-[800px] font-text text-[18px] leading-[1.1] text-[#625f5e] max-md:mt-2 max-md:text-[18px] max-md:leading-[25px] max-md:text-[#8c8784]">
               Квалифицированные специалисты, которые сопровождают вас от первой консультации до полного восстановления
             </p>
           </div>

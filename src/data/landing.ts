@@ -40,6 +40,8 @@ export interface TrustContent {
   title: [string, string];
   /** "\n" = forced line break. */
   text: string;
+  /** Shorter wording that keeps to two lines on phones. */
+  textMobile: string;
   stats: TrustStat[];
   /** Founders card under the figures. */
   card: {
@@ -93,6 +95,7 @@ export const trust: TrustContent = {
   id: 'trust',
   title: ['Нам доверяют пациенты', 'из 14 стран'],
   text: 'К нам летят из Германии, ОАЭ, США и Израиля — и возвращаются\nс результатом, который говорит сам за себя',
+  textMobile: 'К нам летят из Германии, ОАЭ, США и Израиля —\nи возвращаются с результатом, говорящим сам за себя',
   stats: [
     { value: '10', label: 'узких специалистов\nпод одной крышей' },
     { value: '4', label: 'анестезиолога в\nштате' },
@@ -220,8 +223,8 @@ export interface JourneyStep {
 
 export interface JourneyContent {
   id: string;
-  /** Dark, then green. */
-  title: [string, string];
+  /** Dark, then green; the middle part is dark on desktop and starts the green line on phones. */
+  title: [string, string, string];
   text: string;
   /** Toggle under the heading; the first variant is shown by default. */
   variants: { id: string; label: string; steps: JourneyStep[] }[];
@@ -333,7 +336,7 @@ const journeyPhotos = {
 
 export const journey: JourneyContent = {
   id: 'journey',
-  title: ['Ваш путь к ', 'преображению'],
+  title: ['Ваш путь ', 'к ', 'преображению'],
   text: 'От первой консультации до полного восстановления — 5 шагов с командой RR Clinic',
   variants: [
     {

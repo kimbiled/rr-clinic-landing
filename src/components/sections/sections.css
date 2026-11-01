@@ -199,9 +199,9 @@
 
   @media (max-width: 767px) {
     .rr-map__label {
-      padding: 4px 8px;
-      font-size: 11px;
-      line-height: 12px;
+      padding: 5px 10px;
+      font-size: 12px;
+      line-height: 14px;
     }
 
     .rr-map__dot {
@@ -666,6 +666,14 @@
   }
 
   /* ---- Journey cards: the current step is white and lifted, the others are dimmed ---- */
+  .rr-path {
+    scrollbar-width: none;
+  }
+
+  .rr-path::-webkit-scrollbar {
+    display: none;
+  }
+
   .rr-path__card {
     background: #f5f3f1;
     cursor: pointer;
@@ -904,10 +912,17 @@
     box-shadow: inset 0 0 0 1px #9db8b0;
   }
 
-  .rr-work__pill[aria-pressed='true'] {
+  .rr-work__pill[aria-pressed='true'],
+  .rr-work__pill--on {
     background: #557a6f;
     box-shadow: inset 0 0 0 1px #557a6f;
     color: #fff;
+  }
+
+  /* Phones: operation and surgeon filters as dropdowns */
+  .rr-work__menu {
+    box-shadow: 0 14px 40px -12px rgb(70 60 50 / 0.28), 0 0 0 1px rgb(46 44 44 / 0.04);
+    scrollbar-width: none;
   }
 
   .rr-work__open {

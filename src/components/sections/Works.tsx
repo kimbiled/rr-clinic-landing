@@ -1,4 +1,4 @@
-import { useEffect, useMemo, useRef, useState } from 'react';
+import { useEffect, useMemo, useRef, useState, type ReactNode } from 'react';
 import { asset, getDoctor } from '../../data/hero';
 import { works, type WorkCategory } from '../../data/landing';
 import type { Doctor } from '../../data/types';
@@ -205,6 +205,58 @@ function Lightbox({ list, index, onIndex, onClose }: { list: Work[]; index: numb
   );
 }
 
+/** Phone filter: a pill that opens its options in a popup; picking one, a tap outside or Esc closes it. */
+function FilterMenu({ label, trigger, filled, children }: { label: string; trigger: ReactNode; filled?: boolean; children: ReactNode }) {
+  const [open, setOpen] = useState(false);
+  const box = useRef<HTMLDivElement>(null);
+
+  useEffect(() => {
+    if (!open) return undefined;
+    const onDown = (e: PointerEvent) => {
+      if (!box.current?.contains(e.target as Node)) setOpen(false);
+    };
+    const onKey = (e: KeyboardEvent) => {
+      if (e.key === 'Escape') setOpen(false);
+    };
+    document.addEventListener('pointerdown', onDown);
+    document.addEventListener('keydown', onKey);
+    return () => {
+      document.removeEventListener('pointerdown', onDown);
+      document.removeEventListener('keydown', onKey);
+    };
+  }, [open]);
+
+  return (
+    <div className="flex items-center gap-5 py-3 first:border-b first:border-[#ebe7e3]">
+      <span className="w-[72px] shrink-0 font-text text-[15px] leading-5 text-[#a4a09d]">{label}</span>
+      <div ref={box} className="relative">
+        <button
+          type="button"
+          className={`rr-work__pill flex h-[42px] min-w-[170px] items-center justify-center gap-2 rounded-pill px-4 font-text text-[15px] leading-5 font-medium whitespace-nowrap ${filled ? 'rr-work__pill--on' : ''}`}
+          aria-expanded={open}
+          aria-label={label}
+          onClick={() => setOpen((v) => !v)}
+        >
+          {trigger}
+          <svg width="10" height="6" viewBox="0 0 12 8" aria-hidden="true" className={open ? 'rotate-180' : undefined}>
+            <path d="M1 1.5 6 6.5l5-5" fill="none" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round" />
+          </svg>
+        </button>
+        {open && (
+          <div
+            className="rr-work__menu absolute top-[calc(100%+8px)] -left-2.5 z-20 flex max-h-[440px] w-max flex-col items-start gap-1.5 overflow-y-auto rounded-[20px] bg-white p-2.5"
+            role="group"
+            aria-label={label}
+            onClick={() => setOpen(false)}
+          >
+            {children}
+          </div>
+        )}
+      </div>
+    </div>
+  );
+}
+
 /**
  * "Работы наших хирургов" (design 2026-10-30): filters by operation and by surgeon, a 4-column grid of before/after
  * cards, "Показать ещё работы". The photos and titles come from the doctors' pages (public/<slug>/).
@@ -247,6 +299,50 @@ export function Works() {
     if (el) setAtEnd(el.scrollLeft + el.clientWidth >= el.scrollWidth - 2);
   };
 
+  const pickCategory = (id: WorkCategory | 'all') => {
+    setCategory(id);
+    resetPaging();
+  };
+  const pickDoctor = (id: string | null) => {
+    setDoctorId(id);
+    resetPaging();
+  };
+
+  const operationPills = works.operationFilters.map((f) => (
+    <button
+      key={f.id}
+      type="button"
+      className="rr-work__pill h-[42px] shrink-0 rounded-pill px-[18px] font-text text-[15px] leading-5 font-medium whitespace-nowrap"
+      aria-pressed={category === f.id}
+      onClick={() => pickCategory(f.id)}
+    >
+      {f.label}
+    </button>
+  ));
+  const allSurgeonsPill = (
+    <button
+      type="button"
+      className="rr-work__pill h-[42px] shrink-0 rounded-pill px-[18px] font-text text-[15px] leading-5 font-medium whitespace-nowrap"
+      aria-pressed={doctorId === null}
+      onClick={() => pickDoctor(null)}
+    >
+      Все хирурги
+    </button>
+  );
+  const surgeonPills = surgeons.map((doctor) => (
+    <button
+      key={doctor.id}
+      type="button"
+      className="rr-work__pill flex h-[46px] shrink-0 items-center gap-2 rounded-pill pr-[18px] pl-[7px] font-text text-[15px] leading-5 font-medium whitespace-nowrap"
+      aria-pressed={doctorId === doctor.id}
+      onClick={() => pickDoctor(doctor.id)}
+    >
+      <DoctorAvatar doctor={doctor} size={32} />
+      {shortName(doctor)}
+    </button>
+  ));
+  const pickedDoctor = doctorId ? getDoctor(doctorId) : undefined;
+
   const filterTitle = `${works.operationFilters.find((f) => f.id === category)?.label} · ${
     doctorId ? shortName(getDoctor(doctorId) as Doctor) : 'все хирурги'
   }`;
@@ -256,24 +352,24 @@ export function Works() {
       ref={ref}
       id={works.id}
       aria-labelledby="works-title"
-      className="rr-section relative bg-[#f5f2ef] text-neutral-900"
+      className="rr-section relative bg-[#f5f2ef] text-neutral-900 max-md:bg-white"
       {...revealScope(inView)}
     >
       <div className="mx-auto max-w-[1440px] px-(--sec-pad) pt-[52px] pb-[52px] max-md:pt-10 max-md:pb-10">
         <div className="flex items-end justify-between gap-10 max-md:flex-col max-md:items-start max-md:gap-4">
           <div>
-            <p className="rr-eyebrow !text-[14px] max-md:!text-[11px]" {...revealItem(0)}>
+            <p className="rr-eyebrow !text-[14px] max-md:hidden" {...revealItem(0)}>
               {works.eyebrow}
             </p>
             <h2
               id="works-title"
-              className="mt-3 font-display text-[40px] leading-[48px] font-normal text-[#1b1919] max-md:text-[28px] max-md:leading-[34px]"
+              className="mt-3 font-display text-[40px] leading-[48px] font-normal text-[#1b1919] max-md:mt-0 max-md:text-[30px] max-md:leading-9"
               {...revealItem(1)}
             >
               {works.title[0]}
-              <span className="text-[#5e8b7b]">{works.title[1]}</span>
+              <span className="text-[#5e8b7b] max-md:text-inherit">{works.title[1]}</span>
             </h2>
-            <p className="mt-3 font-text text-[18px] leading-[22px] whitespace-pre-line text-[#625f5e] max-md:text-[14px] max-md:leading-[18px] max-md:whitespace-normal" {...revealItem(2)}>
+            <p className="mt-3 font-text text-[18px] leading-[22px] whitespace-pre-line text-[#625f5e] max-md:text-[17px] max-md:whitespace-normal max-md:text-[#8c8784]" {...revealItem(2)}>
               {works.text}
             </p>
           </div>
@@ -286,75 +382,62 @@ export function Works() {
           </p>
         </div>
 
-        <div className="rr-work__filters mt-8 rounded-[24px] bg-white px-6 max-md:mt-5 max-md:rounded-[20px] max-md:px-3" {...revealItem(3)}>
-          <div className="flex items-center gap-6 border-b border-[#ebe7e3] py-[16px] max-md:gap-3">
-            <span className="w-[70px] shrink-0 font-text text-[14px] leading-5 text-[#a4a09d] max-md:hidden">Операция</span>
-            <div className="rr-work__row flex min-w-0 gap-2 overflow-x-auto" role="group" aria-label="Операция">
-              {works.operationFilters.map((f) => (
-                <button
-                  key={f.id}
-                  type="button"
-                  className="rr-work__pill h-[42px] shrink-0 rounded-pill px-[18px] font-text text-[15px] leading-5 font-medium whitespace-nowrap"
-                  aria-pressed={category === f.id}
-                  onClick={() => {
-                    setCategory(f.id);
-                    resetPaging();
-                  }}
-                >
-                  {f.label}
-                </button>
-              ))}
-            </div>
-          </div>
-          <div className="flex items-center gap-6 py-[16px] max-md:gap-3">
-            <span className="w-[70px] shrink-0 font-text text-[14px] leading-5 text-[#a4a09d] max-md:hidden">Хирург</span>
-            <div
-              ref={surgeonRow}
-              className={`rr-work__row flex min-w-0 flex-1 items-center gap-2 overflow-x-auto ${atEnd ? '' : 'rr-work__row--more'}`}
-              role="group"
-              aria-label="Хирург"
-              onScroll={onRowScroll}
+        {isMobile ? (
+          <div className="mt-5" {...revealItem(3)}>
+            <FilterMenu label="Операция" filled trigger={works.operationFilters.find((f) => f.id === category)?.label}>
+              {operationPills}
+            </FilterMenu>
+            <FilterMenu
+              label="Хирург"
+              trigger={
+                pickedDoctor ? (
+                  <>
+                    <DoctorAvatar doctor={pickedDoctor} size={28} />
+                    {shortName(pickedDoctor)}
+                  </>
+                ) : (
+                  'Все хирурги'
+                )
+              }
             >
+              {allSurgeonsPill}
+              {surgeonPills}
+            </FilterMenu>
+          </div>
+        ) : (
+          <div className="rr-work__filters mt-8 rounded-[24px] bg-white px-6" {...revealItem(3)}>
+            <div className="flex items-center gap-6 border-b border-[#ebe7e3] py-[16px]">
+              <span className="w-[70px] shrink-0 font-text text-[14px] leading-5 text-[#a4a09d]">Операция</span>
+              <div className="rr-work__row flex min-w-0 gap-2 overflow-x-auto" role="group" aria-label="Операция">
+                {operationPills}
+              </div>
+            </div>
+            <div className="flex items-center gap-6 py-[16px]">
+              <span className="w-[70px] shrink-0 font-text text-[14px] leading-5 text-[#a4a09d]">Хирург</span>
+              <div
+                ref={surgeonRow}
+                className={`rr-work__row flex min-w-0 flex-1 items-center gap-2 overflow-x-auto ${atEnd ? '' : 'rr-work__row--more'}`}
+                role="group"
+                aria-label="Хирург"
+                onScroll={onRowScroll}
+              >
+                {allSurgeonsPill}
+                {surgeonPills}
+              </div>
               <button
                 type="button"
-                className="rr-work__pill h-[42px] shrink-0 rounded-pill px-[18px] font-text text-[15px] leading-5 font-medium whitespace-nowrap"
-                aria-pressed={doctorId === null}
-                onClick={() => {
-                  setDoctorId(null);
-                  resetPaging();
-                }}
+                className="rr-round-btn rr-round-btn--sm shrink-0"
+                aria-label="Показать других хирургов"
+                disabled={atEnd}
+                onClick={() => surgeonRow.current?.scrollBy({ left: 320, behavior: 'smooth' })}
               >
-                Все хирурги
+                <svg width="8" height="12" viewBox="0 0 8 12" aria-hidden="true">
+                  <path d="M2 1.5 6.2 6 2 10.5" fill="none" stroke="currentColor" strokeWidth="1.4" strokeLinecap="round" strokeLinejoin="round" />
+                </svg>
               </button>
-              {surgeons.map((doctor) => (
-                <button
-                  key={doctor.id}
-                  type="button"
-                  className="rr-work__pill flex h-[46px] shrink-0 items-center gap-2 rounded-pill pr-[18px] pl-[7px] font-text text-[15px] leading-5 font-medium whitespace-nowrap"
-                  aria-pressed={doctorId === doctor.id}
-                  onClick={() => {
-                    setDoctorId(doctor.id);
-                    resetPaging();
-                  }}
-                >
-                  <DoctorAvatar doctor={doctor} size={32} />
-                  {shortName(doctor)}
-                </button>
-              ))}
             </div>
-            <button
-              type="button"
-              className="rr-round-btn rr-round-btn--sm shrink-0 max-md:hidden"
-              aria-label="Показать других хирургов"
-              disabled={atEnd}
-              onClick={() => surgeonRow.current?.scrollBy({ left: 320, behavior: 'smooth' })}
-            >
-              <svg width="8" height="12" viewBox="0 0 8 12" aria-hidden="true">
-                <path d="M2 1.5 6.2 6 2 10.5" fill="none" stroke="currentColor" strokeWidth="1.4" strokeLinecap="round" strokeLinejoin="round" />
-              </svg>
-            </button>
           </div>
-        </div>
+        )}
 
         <div className="mt-8 flex items-baseline justify-between gap-6 max-md:mt-6 max-md:flex-col max-md:gap-1" aria-live="polite">
           <h3 className="font-display text-[22px] leading-7 font-normal text-[#2e2c2c] max-md:text-[20px] max-md:leading-6">{filterTitle}</h3>

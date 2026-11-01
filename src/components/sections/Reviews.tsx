@@ -64,18 +64,18 @@ export function Reviews() {
       <div className="mx-auto max-w-[1440px] px-(--sec-pad) pt-[52px] pb-[60px] max-md:pt-10 max-md:pb-10">
         <div className="flex items-start justify-between gap-6 max-md:flex-col">
           <div className="min-w-0">
-            <p className="rr-eyebrow !text-[14px] max-md:!text-[11px]" {...revealItem(0)}>
+            <p className="rr-eyebrow !text-[14px] max-md:hidden" {...revealItem(0)}>
               {reviews.eyebrow}
             </p>
             <h2
               id="reviews-title"
-              className="mt-3 font-display text-[40px] leading-[48px] font-normal text-[#1b1919] max-md:text-[28px] max-md:leading-[34px]"
+              className="mt-3 font-display text-[40px] leading-[48px] font-normal text-[#1b1919] max-md:mt-0 max-md:text-[30px] max-md:leading-9"
               {...revealItem(1)}
             >
               {reviews.title[0]}
-              <span className="text-[#5e8b7b]">{reviews.title[1]}</span>
+              <span className="text-[#5e8b7b] max-md:text-inherit">{reviews.title[1]}</span>
             </h2>
-            <p className="mt-3 font-text text-[18px] leading-[22px] whitespace-pre-line text-[#625f5e] max-md:text-[14px] max-md:leading-[18px] max-md:whitespace-normal" {...revealItem(2)}>
+            <p className="mt-3 font-text text-[18px] leading-[22px] whitespace-pre-line text-[#625f5e] max-md:text-[17px] max-md:whitespace-normal max-md:text-[#8c8784]" {...revealItem(2)}>
               {reviews.text}
             </p>
           </div>
@@ -85,7 +85,7 @@ export function Reviews() {
               href={rating.url ?? undefined}
               target="_blank"
               rel="noopener noreferrer"
-              className="rr-rating flex h-[134px] w-[343px] items-center gap-5 rounded-[24px] px-7 max-md:h-[116px] max-md:w-full max-md:px-5"
+              className="rr-rating flex h-[134px] w-[343px] items-center gap-5 rounded-[24px] px-7 max-md:h-[124px] max-md:w-full max-md:px-5"
               aria-label={`Рейтинг RR Clinic в 2ГИС: ${String(rating.value).replace('.', ',')} из ${rating.max}, ${ratingsLabel(rating.count)}`}
             >
               <img src={asset(rating.logo.src)} width={64} height={64} alt="" loading="lazy" decoding="async" className="size-16 shrink-0" />
@@ -127,7 +127,7 @@ export function Reviews() {
             </h3>
             <p className="font-text text-[15px] leading-5 text-[#a4a09d] max-md:text-[13px]">{reviews.videosHint}</p>
           </div>
-          <div className="flex shrink-0 gap-3">
+          <div className="flex shrink-0 gap-3 max-md:hidden">
             {[-1, 1].map((dir) => (
               <button
                 key={dir}
@@ -149,7 +149,7 @@ export function Reviews() {
           {reviews.items.map((item) => {
             const doctor = getDoctor(item.doctorId);
             return (
-              <li key={item.title} className="relative h-[500px] w-[280px] shrink-0 overflow-hidden rounded-[24px] bg-[#7d6f63] max-md:h-[460px] max-md:w-[258px]">
+              <li key={item.title} className="relative h-[500px] w-[280px] shrink-0 overflow-hidden rounded-[24px] bg-[#7d6f63] max-md:h-[441px] max-md:w-[270px]">
                 <a href={item.href} target="_blank" rel="noopener noreferrer" className="rr-review block size-full text-white" aria-label={`${item.title}: смотреть в Instagram`}>
                   <img
                     src={asset(item.poster.src)}
@@ -189,11 +189,11 @@ export function Reviews() {
           })}
         </ul>
 
-        <span className="mt-10 block h-1 overflow-hidden rounded-full bg-[#e6e3e0] max-md:mt-5" aria-hidden="true">
+        <span className="mt-10 block h-1 overflow-hidden rounded-full bg-[#e6e3e0] max-md:hidden" aria-hidden="true">
           <span className="rr-reviews__fill block h-full rounded-full bg-[#5a8478]" style={{ width: `${progress * 100}%` }} />
         </span>
 
-        <p className="mt-10 font-text text-[13px] leading-4 text-[#a4a09d] max-md:mt-6">{reviews.disclaimer}</p>
+        <p className="mt-10 font-text text-[13px] leading-4 text-[#a4a09d] max-md:mt-4">{reviews.disclaimer}</p>
       </div>
     </section>
   );

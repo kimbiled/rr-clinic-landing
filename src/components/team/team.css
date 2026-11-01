@@ -82,7 +82,7 @@
     }
 
     .team-tabs .ant-segmented-item-selected-text {
-      flex: 1 1 0;
+      flex: 0 0 205px;
       border-color: #497f75;
     }
 
@@ -121,7 +121,10 @@
       height: auto;
       padding-right: 12px;
       clip-path: none;
-      white-space: normal;
+      font-family: var(--font-text);
+      font-size: 15px;
+      font-weight: 500;
+      white-space: nowrap;
       text-align: left;
       line-height: 1.05;
     }
@@ -204,6 +207,16 @@
       box-shadow 250ms var(--ease-out),
       color 250ms var(--ease-out),
       transform 250ms var(--ease-out);
+  }
+
+  @media (max-width: 767px) {
+    .team-card__btn {
+      height: 38px;
+      font-family: var(--font-text);
+      font-size: 15px;
+      font-weight: 500;
+      letter-spacing: 0;
+    }
   }
 
   .team-card__btn:active {
