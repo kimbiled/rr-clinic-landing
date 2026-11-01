@@ -21,7 +21,9 @@ function scrollPaddingTop(): number {
 
 function targetY(target: HTMLElement | number): number {
   const max = document.documentElement.scrollHeight - window.innerHeight;
-  const y = typeof target === 'number' ? target : target.getBoundingClientRect().top + window.scrollY - scrollPaddingTop();
+  // A lazy section replaces its placeholder mid-scroll: a detached element reports top 0, so look it up again by id.
+  const el = typeof target === 'number' || target.isConnected || !target.id ? target : (document.getElementById(target.id) ?? target);
+  const y = typeof el === 'number' ? el : el.getBoundingClientRect().top + window.scrollY - scrollPaddingTop();
   return Math.max(0, Math.min(max, y));
 }
 

@@ -1289,7 +1289,7 @@
 
   .rr-foot__title {
     font-family: var(--font-display);
-    font-size: 16px;
+    font-size: 17px;
     line-height: 20px;
     font-weight: 400;
     letter-spacing: -0.01em;
@@ -1299,7 +1299,7 @@
   .rr-foot__link,
   .rr-foot__text {
     font-family: var(--font-text);
-    font-size: 15px;
+    font-size: 16px;
     line-height: 20px;
     color: #625f5e;
   }
@@ -1336,7 +1336,7 @@
   .rr-foot__muted,
   .rr-foot__legal {
     font-family: var(--font-text);
-    font-size: 15px;
+    font-size: 16px;
     line-height: 20px;
     color: #8c8784;
   }

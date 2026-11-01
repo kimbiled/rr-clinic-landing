@@ -19,7 +19,7 @@
       '<p id="rr-offer-description" class="rr-offer-description">После консультации со мной вы получите материалы хирургов RR Clinic о подготовке к операции, наркозе и восстановлении</p>' +
       '<a class="rr-offer-link">Записаться на консультацию</a>' +
     '</div>' +
-    '<img class="rr-offer-books" src="/assets/img/web/consultation-books.webp" width="1200" height="760" alt="Три PDF о подготовке к операции, наркозе и восстановлении" decoding="async">' +
+    '<img class="rr-offer-books" src="/assets/img/web/consultation-books.webp" width="1200" height="760" alt="Три PDF о подготовке к операции, наркозе и восстановлении" decoding="async" loading="lazy">' +
   '</div>';
   var cta = dialog.querySelector('.rr-offer-link');
   cta.href = consultation;
@@ -27,6 +27,10 @@
   cta.rel = 'noopener noreferrer';
   cta.setAttribute('aria-label', 'Записаться на консультацию: ' + doctor);
   document.body.appendChild(dialog);
+  // The illustration waits in the closed dialog: fetch it after the page, so it never competes with the first screen.
+  window.addEventListener('load', function () {
+    setTimeout(function () { new Image().src = dialog.querySelector('.rr-offer-books').src; }, 2000);
+  });
 
   var root = document.documentElement;
   var oldOverflow;

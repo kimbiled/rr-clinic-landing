@@ -36,7 +36,7 @@ export function Footer() {
             <a href="#hero" aria-label="RR Clinic — наверх" className="inline-block">
               <img src={asset('assets/icons/logo-gold.svg')} width={35} height={32} alt="" className="h-8 w-[35px]" />
             </a>
-            <p className="mt-[22px] max-w-[262px] font-text text-[15px] leading-[1.2] text-[#625f5e] max-md:mt-0 max-md:max-w-none max-md:text-[12px] max-md:leading-4">
+            <p className="mt-[22px] max-w-[262px] font-text text-[16px] leading-[1.2] text-[#625f5e] max-md:mt-0 max-md:max-w-none max-md:text-[12px] max-md:leading-4">
               {footer.tagline}
             </p>
             <div className="mt-7 flex gap-3 max-md:col-span-2 max-md:mt-3">
@@ -143,6 +143,7 @@ export function Footer() {
             <a
               key={link.label}
               href={link.href}
+              {...(link.href.startsWith('http') ? { target: '_blank', rel: 'noopener noreferrer' } : {})}
               className={`rr-foot__legal mt-[30px] justify-self-start ${LEGAL_MOBILE[i] ?? ''}`}
             >
               {link.label}
