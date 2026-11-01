@@ -113,6 +113,7 @@ export function MobileHero() {
           <CtaButton
             variant="primary"
             label={mobileHero.ctaLabel}
+            data-analytics-id="hero_consultation"
             href={clinic.whatsappHref || '#contacts'}
             target={clinic.whatsappHref ? '_blank' : undefined}
             rel="noopener noreferrer"

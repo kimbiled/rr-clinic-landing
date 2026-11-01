@@ -6,7 +6,7 @@ import { useIsMobile } from '../../hooks/useIsMobile';
 const [VIEW_LEFT, VIEW_TOP, VIEW_WIDTH, VIEW_HEIGHT] = worldMap.viewBox.split(' ').map(Number);
 
 /** Part of the map shown, in viewBox units. Desktop (design 2026-10-28): the full width, from the Arctic
- *  islands down to just below Thailand. Phones (design 2026-10-29): Europe to Thailand. */
+ *  islands down to just below Thailand. Phones (design 2026-11-01): Europe to Thailand, with Africa and India below. */
 interface Crop {
   x: number;
   y: number;
@@ -14,7 +14,7 @@ interface Crop {
   h: number;
 }
 const CROP_DESKTOP: Crop = { x: VIEW_LEFT, y: -250, w: VIEW_WIDTH, h: 270 };
-const CROP_MOBILE: Crop = { x: 318, y: -239, w: 283, h: 242 };
+const CROP_MOBILE: Crop = { x: 299, y: -251, w: 300, h: 276 };
 
 type Side = 'top' | 'top-left' | 'top-right' | 'left' | 'right' | 'bottom-left' | 'bottom-right';
 
@@ -37,6 +37,8 @@ const PINS: Record<string, { x: number; y: number; side: Side; label?: string; n
   uae: { x: 61.8, y: 72.3, side: 'right' },
   thailand: { x: 74.4, y: 81.5, side: 'right' },
 };
+/** No room next to Turkey and the UAE on phones; the design leaves it out. */
+const HIDDEN_ON_PHONES = ['israel'];
 /** Reveal (Trust section data-rv): the pills rise in one by one, lowest on the map first. */
 const PIN_REVEAL_START_MS = 450;
 const PIN_REVEAL_STEP_MS = 140;
@@ -58,7 +60,8 @@ const fromView = (x: number, y: number) => ({
  */
 export function WorldMap({ className }: { className?: string }) {
   const [active, setActive] = useState<string | null>(null);
-  const crop = useIsMobile() ? CROP_MOBILE : CROP_DESKTOP;
+  const isMobile = useIsMobile();
+  const crop = isMobile ? CROP_MOBILE : CROP_DESKTOP;
   const pins = worldMap.countries
     .map((c) => {
       const placed = PINS[c.key];
@@ -73,7 +76,7 @@ export function WorldMap({ className }: { className?: string }) {
         hoverOnly: !placed,
       };
     })
-    .filter((p) => p.x > 2 && p.x < 98 && p.y > 2 && p.y < 98);
+    .filter((p) => p.x > 2 && p.x < 98 && p.y > 2 && p.y < 98 && !(isMobile && HIDDEN_ON_PHONES.includes(p.key)));
   const revealOrder = pins
     .filter((p) => !p.hoverOnly)
     .sort((a, b) => b.y - a.y)

@@ -1,9 +1,8 @@
-import { useEffect, useRef, useState, type CSSProperties, type KeyboardEvent, type ReactNode } from 'react';
+import { useEffect, useRef, useState, type CSSProperties, type KeyboardEvent } from 'react';
 import { asset, heroData } from '../../data/hero';
 import { programs, type ProgramIcon as ProgramIconName } from '../../data/landing';
 import { useIsMobile } from '../../hooks/useIsMobile';
 import { useReducedMotion } from '../../hooks/useReducedMotion';
-import { CategoryIcon } from './Operations';
 import { revealItem, revealScope, useInView } from './useInView';
 import { whatsappLink } from './whatsapp';
 import './sections.css';
@@ -11,75 +10,9 @@ import './sections.css';
 /** Auto-advance period; the ring around the play button fills over the same time. */
 const SLIDE_MS = 7000;
 
-/** 20 px line icons for the program points that the operations list has no icon for (phone design). */
-const PROGRAM_ICONS: Partial<Record<ProgramIconName, ReactNode>> = {
-  clipboard: (
-    <>
-      <rect x="4.5" y="3.5" width="11" height="14" rx="1.6" />
-      <path d="M8 3.5V2.6c0-.3.3-.6.6-.6h2.8c.3 0 .6.3.6.6v.9M7.5 8h5M7.5 11h5M7.5 14h3" />
-    </>
-  ),
-  drip: (
-    <>
-      <path d="M7 2.5h6M8 2.5v3.5a2 2 0 0 0 4 0V2.5M10 8v3" />
-      <path d="M10 11c-1.4 1.6-2.2 2.8-2.2 3.8a2.2 2.2 0 0 0 4.4 0c0-1-.8-2.2-2.2-3.8ZM15 4v13.5" />
-    </>
-  ),
-  combo: <path d="M10 2.5v4M10 13.5v4M2.5 10h4M13.5 10h4M5 5l2.5 2.5M12.5 12.5 15 15M15 5l-2.5 2.5M7.5 12.5 5 15" />,
-  calendar: (
-    <>
-      <rect x="2.5" y="4" width="15" height="13.5" rx="2" />
-      <path d="M2.5 8.5h15M6.5 2.5v3M13.5 2.5v3M7 12.5l2 2 4-4" />
-    </>
-  ),
-  car: (
-    <>
-      <path d="M3 13.5V10l1.6-4c.3-.7.9-1 1.6-1h7.6c.7 0 1.3.3 1.6 1L17 10v3.5H3ZM3 10h14" />
-      <path d="M4.5 13.5v2M15.5 13.5v2M6 11.8h.01M14 11.8h.01" />
-    </>
-  ),
-  hotel: <path d="M2.5 16V5M2.5 12.5h15V16M17.5 12.5V10a2 2 0 0 0-2-2H9v4.5M5.8 10.3a1.3 1.3 0 1 0 0-.01" />,
-  nurse: (
-    <>
-      <circle cx="10" cy="7.5" r="3" />
-      <path d="M4 17.5c.5-3 3-4.8 6-4.8s5.5 1.8 6 4.8M7 3.5c1.8-1.3 4.2-1.3 6 0M10 2.2v2" />
-    </>
-  ),
-  headset: (
-    <>
-      <path d="M4 11V9.5a6 6 0 0 1 12 0V11" />
-      <rect x="3" y="11" width="3" height="4.5" rx="1.2" />
-      <rect x="14" y="11" width="3" height="4.5" rx="1.2" />
-      <path d="M15.5 15.5c0 1.2-1.4 2-3.5 2H10" />
-    </>
-  ),
-  video: (
-    <>
-      <rect x="2.5" y="5.5" width="11" height="9" rx="2" />
-      <path d="m13.5 9 4-2.2v6.4l-4-2.2" />
-    </>
-  ),
-};
-
+/** 20 px gold line icon before a program point. */
 function ProgramIcon({ name }: { name: ProgramIconName }) {
-  const own = PROGRAM_ICONS[name];
-  if (!own) return <CategoryIcon name={name as Parameters<typeof CategoryIcon>[0]['name']} />;
-  return (
-    <svg
-      width="20"
-      height="20"
-      viewBox="0 0 20 20"
-      fill="none"
-      stroke="currentColor"
-      strokeWidth="1.2"
-      strokeLinecap="round"
-      strokeLinejoin="round"
-      aria-hidden="true"
-      className="shrink-0"
-    >
-      {own}
-    </svg>
-  );
+  return <img src={asset(`assets/icons/program-${name}.svg`)} width={20} height={20} alt="" className="size-5 shrink-0" />;
 }
 
 const PlayIcon = ({ playing, color }: { playing: boolean; color: string }) =>
@@ -95,8 +28,8 @@ const PlayIcon = ({ playing, color }: { playing: boolean; color: string }) =>
   );
 
 /**
- * "Авторские программы" (design 2026-10-22): heading + "Есть другой запрос?" card inside the gold grid frame,
- * then one 1176×356 photo card per program that cross-fades (autoplay with a progress ring, arrows, dots).
+ * "Авторские программы" (design 2026-10-30): heading + "Есть другой запрос?" card, then one 1240×460 photo card per
+ * program with a white panel on it; the cards cross-fade (autoplay with a progress ring, arrows, dots).
  */
 export function Programs() {
   const { ref, inView } = useInView<HTMLElement>();
@@ -137,6 +70,7 @@ export function Programs() {
       <p className="mt-[9px] font-text text-[16px] leading-[17px] tracking-[-0.02em] text-[#8c7a66] max-md:mt-1.5 max-md:text-[13px]">
         <a
           href={heroData.clinic.whatsappHref || request.link.href}
+          data-analytics-id="custom_request"
           target={heroData.clinic.whatsappHref ? '_blank' : undefined}
           rel="noopener noreferrer"
           className="rr-request__link underline decoration-1 underline-offset-2"
@@ -164,7 +98,7 @@ export function Programs() {
       {...revealScope(inView)}
     >
       <div className="mx-auto max-w-[1440px] px-(--sec-pad) pb-[60px] max-md:pb-12">
-        <div className="relative px-8 max-md:px-0">
+        <div className="relative">
           <div className="flex h-[196px] items-start justify-between gap-10 max-md:h-auto max-md:flex-col max-md:gap-0">
             <div className="pt-[34px] max-md:pt-6">
               <p className="rr-eyebrow max-md:!text-[11px]" {...revealItem(0)}>
@@ -234,9 +168,7 @@ export function Programs() {
                               key={point}
                               className="flex items-center gap-3 font-text text-[13px] leading-4 text-[#625f5e]"
                             >
-                              <span className="text-[#c39b62]">
-                                <ProgramIcon name={item.icons[j] ?? 'body'} />
-                              </span>
+                              <ProgramIcon name={item.icons[j]} />
                               {point}
                             </li>
                           ))}
@@ -251,6 +183,7 @@ export function Programs() {
                         </a>
                         <a
                           {...whatsappLink(`Здравствуйте! Хочу узнать о программе «${item.title}»`)}
+                          data-analytics-id={`program_consultation_${i + 1}`}
                           className="rr-prog__consult grid h-[43px] w-[58px] place-items-center rounded-pill"
                           aria-label={`${programs.consultLabel}: ${item.title}`}
                         >
@@ -324,7 +257,7 @@ export function Programs() {
           ) : (
             <>
               <div
-                className="rr-prog relative mt-8 h-[356px] overflow-hidden rounded-[56px] bg-[#9c8270] outline-offset-4"
+                className="rr-prog relative mt-8 h-[460px] overflow-hidden rounded-[56px] bg-[#9c8270] outline-offset-4"
                 role="region"
                 aria-roledescription="карусель"
                 aria-label={programs.eyebrow}
@@ -353,50 +286,51 @@ export function Programs() {
                         alt={item.image.alt}
                         loading="lazy"
                         decoding="async"
-                        className="rr-prog__img absolute inset-0 -z-10 size-full object-cover"
+                        className="rr-prog__img absolute inset-0 -z-10 size-full object-cover object-right"
                       />
 
-                      <div className="rr-prog__text absolute top-9 left-10 text-white">
-                        <p className="font-text text-[18px] leading-6">{item.kicker}</p>
-                        <h3 className="mt-[9px] font-display text-[40px] leading-[48px] font-light tracking-[-0.01em]">
-                          {item.title}
-                        </h3>
-                        <ul className="mt-[13px] list-disc pl-[20px] font-text text-[16px] leading-[18px] marker:text-[13px]">
-                          {item.points.map((point) => (
-                            <li key={point}>{point}</li>
+                      <div className="rr-prog__panel absolute top-[42px] bottom-[42px] left-[42px] flex w-[590px] flex-col rounded-[28px] bg-white px-[34px] pt-[30px] pb-[24px] text-[#1b1919]">
+                        <p className="font-text text-[15px] leading-5 text-[#a4a09d]">{item.kicker}</p>
+                        <h3 className="mt-1.5 font-display text-[36px] leading-[44px] font-light tracking-[-0.01em]">{item.title}</h3>
+                        <ul className="mt-3 flex flex-col gap-3 font-text text-[16px] leading-5 text-[#625f5e]">
+                          {item.points.map((point, j) => (
+                            <li key={point} className="flex items-center gap-3">
+                              <ProgramIcon name={item.icons[j]} />
+                              {point}
+                            </li>
                           ))}
                         </ul>
-                      </div>
-
-                      <div className="rr-prog__ctas absolute bottom-[37px] left-10 flex items-center gap-[24px]">
-                        <a
-                          href={heroData.clinic.whatsappHref || '#contacts'}
-                          target={heroData.clinic.whatsappHref ? '_blank' : undefined}
-                          rel="noopener noreferrer"
-                          className="rr-prog__consult inline-flex h-12 items-center gap-2.5 rounded-pill pr-6 pl-5 font-display text-[15px] leading-6 text-[#2e2c2c]"
-                        >
-                          <img
-                            src={asset('assets/icons/whatsapp.svg')}
-                            width={20}
-                            height={20}
-                            alt=""
-                            className="size-5"
-                          />
-                          {programs.consultLabel}
-                        </a>
-                        <a
-                          href={surgeon.href}
-                          className="rr-prog__surgeon font-display text-[15px] leading-6 text-white"
-                        >
-                          {surgeon.label} <span aria-hidden="true">→</span>
-                        </a>
+                        <div className="mt-auto flex items-center gap-[11px]">
+                          <a
+                            href={heroData.clinic.whatsappHref || '#contacts'}
+                            data-analytics-id={`program_consultation_${i + 1}`}
+                            target={heroData.clinic.whatsappHref ? '_blank' : undefined}
+                            rel="noopener noreferrer"
+                            className="rr-prog__gold inline-flex h-[58px] flex-1 items-center justify-center gap-2.5 rounded-pill font-display text-[15px] leading-6 text-white"
+                          >
+                            <img
+                              src={asset('assets/icons/whatsapp.svg')}
+                              width={20}
+                              height={20}
+                              alt=""
+                              className="size-5 brightness-0 invert"
+                            />
+                            {programs.consultLabel}
+                          </a>
+                          <a
+                            href={surgeon.href}
+                            className="rr-prog__light inline-flex h-[58px] flex-1 items-center justify-center rounded-pill font-display text-[15px] leading-6 text-[#2e2c2c]"
+                          >
+                            {surgeon.label}
+                          </a>
+                        </div>
                       </div>
                     </div>
                   );
                 })}
 
                 {/* Controls: autoplay toggle with progress ring, prev, next (32 px, 5 px apart) */}
-                <div className="absolute right-[38px] bottom-[33px] flex gap-[5px]">
+                <div className="absolute right-[42px] bottom-[42px] flex gap-[5px]">
                   <button
                     type="button"
                     className="rr-prog__btn rr-prog__play relative grid size-8 place-items-center rounded-full"

@@ -112,6 +112,7 @@ export function Faq() {
           </div>
           <a
             {...whatsappLink(cta.message)}
+            data-analytics-id="faq_question"
             className="rr-ask__btn inline-flex h-[64px] shrink-0 items-center rounded-pill bg-white px-7 font-display text-[18px] leading-6 text-[#1b1919] max-md:h-12 max-md:justify-center max-md:text-[15px]"
           >
             {cta.label}

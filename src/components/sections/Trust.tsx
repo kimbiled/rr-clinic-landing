@@ -93,10 +93,10 @@ export function Trust() {
           </h2>
 
           <p
-            className="mt-6 font-text text-[20px] leading-[1.35] text-[#625f5e] max-md:mt-3 max-md:text-[14px] max-md:[&_br]:hidden"
+            className="mt-6 font-text text-[20px] leading-[1.35] text-[#625f5e] max-md:mt-3 max-md:text-[15px]"
             {...revealItem(1)}
           >
-            {withBreaks(trust.text)}
+            {withBreaks(isMobile ? trust.textMobile : trust.text)}
           </p>
         </div>
 
@@ -121,7 +121,7 @@ export function Trust() {
                 )}
               </dd>
               <dd
-                className="font-text text-[18px] leading-[1.2] tracking-[-0.01em] text-[#625f5e] max-md:text-[13px] max-md:[&_br]:hidden"
+                className="font-text text-[18px] leading-[1.2] tracking-[-0.01em] text-[#625f5e] max-md:max-w-[150px] max-md:text-[15px] max-md:leading-5 max-md:[&_br]:hidden"
                 aria-hidden="true"
               >
                 {withBreaks(stat.label)}

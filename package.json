@@ -8,6 +8,7 @@
     "build": "tsc -b && vite build",
     "preview": "vite preview",
     "typecheck": "tsc -b --noEmit",
+    "test:analytics": "node --test tests/analytics.test.mjs",
     "test:surgeon-pages": "node --test tests/surgeon-pages.test.mjs"
   },
   "dependencies": {

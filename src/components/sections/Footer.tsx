@@ -23,18 +23,23 @@ export function Footer() {
   const { contacts, services } = footer;
 
   return (
-    <footer id={footer.id} className="rr-section relative overflow-hidden bg-white pt-[60px] text-neutral-900 max-md:pt-6">
+    <footer id={footer.id} className="rr-section relative overflow-hidden bg-white pt-[84px] pb-[60px] text-neutral-900 max-md:pt-6 max-md:pb-0">
+      <div className="pointer-events-none absolute inset-x-0 top-5 bottom-[60px] max-md:hidden" aria-hidden="true">
+        <div className="mx-auto h-full max-w-[1440px] px-(--sec-pad)">
+          <span className="rr-foot__lines block h-full" />
+        </div>
+      </div>
       <span className="rr-rule rr-rule--warm pointer-events-none absolute inset-x-0" aria-hidden="true" />
       <div className="mx-auto max-w-[1440px] px-(--sec-pad)">
-        <div className="rr-frame rr-frame--warm relative grid grid-cols-[396px_218px_272px_1fr] px-6 pt-6 pb-8 max-md:grid-cols-2 max-md:gap-x-4 max-md:px-0 max-md:pb-6">
+        <div className="relative grid grid-cols-[396px_218px_272px_1fr] px-6 pt-6 pb-[22px] max-md:grid-cols-2 max-md:gap-x-4 max-md:px-0 max-md:pb-6">
           <div className="max-md:col-span-2 max-md:grid max-md:grid-cols-[auto_1fr] max-md:items-start max-md:gap-x-4">
             <a href="#hero" aria-label="RR Clinic — наверх" className="inline-block">
               <img src={asset('assets/icons/logo-gold.svg')} width={35} height={32} alt="" className="h-8 w-[35px]" />
             </a>
-            <p className="mt-5 max-w-[262px] font-text text-[15px] leading-[1.2] text-[#625f5e] max-md:mt-0 max-md:max-w-none max-md:text-[12px] max-md:leading-4">
+            <p className="mt-[22px] max-w-[262px] font-text text-[15px] leading-[1.2] text-[#625f5e] max-md:mt-0 max-md:max-w-none max-md:text-[12px] max-md:leading-4">
               {footer.tagline}
             </p>
-            <div className="mt-9 flex gap-3 max-md:col-span-2 max-md:mt-3">
+            <div className="mt-7 flex gap-3 max-md:col-span-2 max-md:mt-3">
               <a
                 href={footer.instagram}
                 target="_blank"
@@ -50,6 +55,7 @@ export function Footer() {
               </a>
               <a
                 {...whatsappLink('Здравствуйте!')}
+                data-analytics-id="footer_whatsapp"
                 aria-label="WhatsApp RR Clinic"
                 className="rr-foot__social grid size-10 place-items-center rounded-full"
               >
@@ -72,7 +78,7 @@ export function Footer() {
           {footer.columns.map((column) => (
             <nav key={column.title} aria-label={column.title} className="max-md:mt-8">
               <h2 className="rr-foot__title">{column.title}</h2>
-              <ul className="mt-7 flex flex-col gap-[15px] max-md:mt-4 max-md:gap-3">
+              <ul className="mt-7 flex flex-col gap-[15px] md:leading-5 max-md:mt-4 max-md:gap-3">
                 {column.links.map((link) => (
                   <li key={link.label}>
                     <a href={link.href} className="rr-foot__link">
@@ -86,10 +92,10 @@ export function Footer() {
 
           <nav aria-label={services.title} className="max-md:mt-8">
             <h2 className="rr-foot__title">{services.title}</h2>
-            <ul className="mt-7 flex flex-col gap-[15px] max-md:mt-4 max-md:gap-3">
+            <ul className="mt-7 flex flex-col gap-[15px] md:leading-5 max-md:mt-4 max-md:gap-3">
               {services.items.map((name) => (
                 <li key={name}>
-                  <a {...whatsappLink(operations.message.replace('{name}', name))} className="rr-foot__link">
+                  <a {...whatsappLink(operations.message.replace('{name}', name))} data-analytics-id="footer_service_enquiry" className="rr-foot__link">
                     {name}
                   </a>
                 </li>
@@ -99,15 +105,15 @@ export function Footer() {
 
           <div className="max-md:col-span-2 max-md:mt-8">
             <h2 className="rr-foot__title">{contacts.title}</h2>
-            <address className="mt-7 flex flex-col items-start gap-[15px] not-italic">
+            <address className="mt-7 flex flex-col items-start gap-[18px] not-italic max-md:gap-[15px]">
               <span className="rr-foot__text">{contacts.address}</span>
               {clinic.phone && (
-                <a href={clinic.phoneHref} className="rr-foot__link inline-flex items-center gap-2">
+                <a href={clinic.phoneHref} data-analytics-id="footer_phone" className="rr-foot__link inline-flex items-center gap-2">
                   {clinic.phone}
                   <Arrow />
                 </a>
               )}
-              <a href={`mailto:${contacts.email}`} className="rr-foot__link inline-flex items-center gap-2">
+              <a href={`mailto:${contacts.email}`} data-analytics-id="footer_email" className="rr-foot__link inline-flex items-center gap-2">
                 {contacts.email}
                 <Arrow />
               </a>
@@ -117,7 +123,7 @@ export function Footer() {
               href={contacts.map.href}
               target="_blank"
               rel="noopener noreferrer"
-              className="rr-foot__map relative mt-7 block h-[152px] w-[295px] overflow-hidden rounded-[24px] max-md:mt-5 max-md:h-[146px] max-md:w-[284px] max-md:rounded-[20px]"
+              className="rr-foot__map relative mt-[18px] block h-[152px] w-[295px] overflow-hidden rounded-[24px] max-md:mt-5 max-md:h-[146px] max-md:w-[284px] max-md:rounded-[20px]"
               aria-label={`${contacts.map.alt} — открыть в 2GIS`}
             >
               <img
@@ -129,20 +135,15 @@ export function Footer() {
                 decoding="async"
                 className="rr-foot__map-img size-full object-cover"
               />
-              <span className="absolute top-[54%] left-1/2 size-[11px] -translate-1/2 rounded-full border-2 border-white bg-[#c39b62]" />
-              <span className="absolute top-[54%] left-1/2 -translate-y-[calc(100%+10px)] rounded-pill bg-[#c39b62] px-3 py-1 font-text text-[13px] leading-4 text-white">
-                RR Clinic
-              </span>
-              <span className="absolute right-2 bottom-1 font-text text-[9px] leading-3 text-[#8c8784]">© OpenStreetMap</span>
             </a>
           </div>
 
-          <p className="rr-foot__muted col-start-1 mt-8 max-md:mt-6">{footer.copyright}</p>
+          <p className="rr-foot__muted col-start-1 mt-[30px] max-md:mt-6">{footer.copyright}</p>
           {footer.legal.map((link, i) => (
             <a
               key={link.label}
               href={link.href}
-              className={`rr-foot__legal mt-8 justify-self-start ${LEGAL_MOBILE[i] ?? ''}`}
+              className={`rr-foot__legal mt-[30px] justify-self-start ${LEGAL_MOBILE[i] ?? ''}`}
             >
               {link.label}
             </a>

@@ -12,18 +12,18 @@ export interface TeamTab {
   members: Doctor[];
 }
 
-/** Design order of the "Пластические хирурги" row (design 2026-10-28, ten cards). */
+/** Design order of the "Пластические хирурги" row (design 2026-10-30); it shows nine cards, Улагашева follows them. */
 const SURGEON_ORDER = [
   'kurmanbaev-rustam',
   'romanovskaya-tatyana',
   'musa-baurzhan',
   'temirkhanov-amir',
-  'chatinyan-garik',
-  'kodzoeva-leyla',
-  'ulagasheva-alina',
-  'savelyev-evgeniy',
   'tulepbergenova-tomiris',
   'temirkhan-anar',
+  'kodzoeva-leyla',
+  'savelyev-evgeniy',
+  'chatinyan-garik',
+  'ulagasheva-alina',
 ];
 
 /**
@@ -41,16 +41,15 @@ export interface CardText {
   tags: string[];
   /** Line above the name, e.g. "Пластический хирург • Стаж 10 лет". */
   role: string;
-  /** One line with ⌄ on the card; the full text (and `stats`) when expanded. */
+  /** Three lines on the card. */
   bio: string;
-  stats?: { value: string; label: string }[];
+  /** Two figures under the bio. */
+  stats: { value: string; label: string }[];
+  /** "Запись закрыта" instead of the booking button. */
+  bookingClosed?: boolean;
 }
 
-/**
- * Team-card copy (design 2026-10-29). The design shows each bio cut to one line; where the rest is not in
- * the design it is completed from the hero data / the doctor's page.
- * TODO(content): confirm the full bios with the clinic.
- */
+/** Team-card copy (design 2026-10-30). Улагашева is not in the design: her text and figures come from her page. */
 export const CARD_TEXT: Record<string, CardText> = {
   'kurmanbaev-rustam': {
     patronymic: 'Амангельдыевич',
@@ -66,55 +65,92 @@ export const CARD_TEXT: Record<string, CardText> = {
     patronymic: 'Владимировна',
     tags: ['Фейслифтинг', 'Блефаропластика', 'Маммопластика'],
     role: 'Основатель • Стаж 27 лет',
-    bio: 'Автор запатентованной методики «Голливудский фейслифтинг» — авторской подтяжки лица и шеи на основе Deep Plane Facelift.',
+    bio: 'Автор запатентованной методики «Голливудский фейслифтинг». Подтяжка лица и шеи с эффектом омоложения до 15 лет.',
+    stats: [
+      { value: '6 500', label: 'операций' },
+      { value: '250', label: 'операций на лице в год' },
+    ],
+    bookingClosed: true,
   },
   'musa-baurzhan': {
     patronymic: 'Жаннатович',
     tags: ['Блефаропластика', 'Маммопластика', 'Подтяжка груди'],
     role: 'Пластический хирург • Стаж 10 лет',
-    bio: 'Специалист по пластике век, увеличению и подтяжке груди.',
+    bio: 'Специалист по пластике век, увеличению и подтяжке груди. Возвращает лицу молодой вид за одну операцию.',
+    stats: [
+      { value: '2 000', label: 'операций' },
+      { value: '300', label: 'операций в год' },
+    ],
   },
   'temirkhanov-amir': {
     patronymic: 'Багдатович',
     tags: ['Абдоминопластика', 'Липомоделирование', 'Подтяжка груди'],
     role: 'Пластический хирург • Стаж 4 года',
-    bio: 'Специалист по абдоминопластике и липомоделированию, комплексной коррекции фигуры.',
+    bio: 'Специалист по абдоминопластике и липомоделированию. Возвращает форму груди, живота и талии после родов за одну операцию.',
+    stats: [
+      { value: '1 800+', label: 'часов в операционной' },
+      { value: '1', label: 'этап для коррекции фигуры' },
+    ],
   },
-  'chatinyan-garik': {
-    patronymic: 'Артурович',
-    tags: ['Ринопластика', 'Подтяжка лица', 'Маммопластика'],
-    role: 'Пластический хирург • Стаж 11 лет',
-    bio: 'Пластический и челюстно-лицевой хирург. Выполняет открытую и закрытую ринопластику.',
+  'tulepbergenova-tomiris': {
+    patronymic: 'Арыстанбековна',
+    tags: ['Блефаропластика'],
+    role: 'Хирург-резидент • RR Clinic',
+    bio: 'Хирург-резидент отделения пластической хирургии RR Clinic. Коррекция нависших век для более открытого взгляда.',
+    stats: [
+      { value: '3 000+', label: 'часов практики' },
+      { value: '1 000+', label: 'операций в команде' },
+    ],
+  },
+  'temirkhan-anar': {
+    patronymic: 'Нурланкызы',
+    tags: ['Блефаропластика'],
+    role: 'Хирург-резидент • Практика 8+ лет',
+    bio: 'Резидент отделения пластической хирургии RR Clinic, ученица Бауржана Мусы. Открытый взгляд с сохранением ваших черт.',
+    stats: [
+      { value: '2 000+', label: 'часов в операционной' },
+      { value: '8+', label: 'лет практики' },
+    ],
   },
   'kodzoeva-leyla': {
     patronymic: 'Магомедовна',
     tags: ['Интимная пластика', 'Маммопластика', 'Подтяжка груди'],
     role: 'Пластический хирург • Стаж 14 лет',
-    bio: 'Специалист по интимной пластике и пластике груди.',
-  },
-  'ulagasheva-alina': {
-    patronymic: 'Ибрагимовна',
-    tags: ['Пластика груди', 'Пластика лица', 'Пластика век'],
-    role: 'Пластический хирург • Стаж 8+ лет',
-    bio: 'Эстетическая хирургия груди и лица.',
+    bio: 'Специалист по интимной пластике и пластике груди. Лауреат премии «Хирург года» 2025, спикер конгресса ICTPS 2024.',
+    stats: [
+      { value: '1 000+', label: 'пациенток' },
+      { value: '100+', label: 'операций в год' },
+    ],
   },
   'savelyev-evgeniy': {
     patronymic: 'Игоревич',
     tags: ['Увеличение груди', 'Подтяжка груди', 'Повторные операции'],
     role: 'Кандидат мед. наук • Стаж 15+ лет',
     bio: 'Специализируется на пластике груди, восстановлении фигуры и сложных повторных операциях.',
+    stats: [
+      { value: '3 000+', label: 'операций' },
+      { value: '1 000+', label: 'пациенток' },
+    ],
   },
-  'tulepbergenova-tomiris': {
-    patronymic: 'Арыстанбековна',
-    tags: ['Блефаропластика'],
-    role: 'Хирург-резидент • RR Clinic',
-    bio: 'Хирург-резидент отделения пластической хирургии RR Clinic.',
+  'chatinyan-garik': {
+    patronymic: 'Артурович',
+    tags: ['Ринопластика', 'Подтяжка лица', 'Маммопластика'],
+    role: 'Пластический хирург • Стаж 11 лет',
+    bio: 'Пластический и челюстно-лицевой хирург. Выполняет открытую и закрытую ринопластику, создаёт чёткие контуры лица.',
+    stats: [
+      { value: '1 500+', label: 'операций' },
+      { value: '400+', label: 'операций в год' },
+    ],
   },
-  'temirkhan-anar': {
-    patronymic: 'Нурланкызы',
-    tags: ['Блефаропластика'],
-    role: 'Хирург-резидент • Практика 8+ лет',
-    bio: 'Резидент отделения пластической хирургии RR Clinic.',
+  'ulagasheva-alina': {
+    patronymic: 'Ибрагимовна',
+    tags: ['Пластика груди', 'Пластика лица', 'Пластика век'],
+    role: 'Пластический хирург • Стаж 8+ лет',
+    bio: 'Пластический хирург. Эстетическая хирургия груди и лица. Член Сибирской ассоциации пластических, реконструктивных и эстетических хирургов.',
+    stats: [
+      { value: '1 200+', label: 'операций' },
+      { value: '8+', label: 'лет практики' },
+    ],
   },
 };
 

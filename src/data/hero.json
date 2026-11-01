@@ -61,7 +61,7 @@
     {
       "id": "prices",
       "label": "Цены",
-      "href": "#prices"
+      "href": "#operations"
     }
   ],
   "hero": {
@@ -244,7 +244,11 @@
       "role": "Пластический хирург",
       "specialty": "Эстетическая хирургия груди и лица",
       "photo": null,
-      "avatar": null,
+      "avatar": {
+        "src": "assets/img/web/avatar-ulagasheva-alina.webp",
+        "width": 192,
+        "height": 192
+      },
       "city": "Астана",
       "href": "/ulagasheva-alina"
     },
@@ -256,7 +260,11 @@
       "role": "Хирург-резидент",
       "specialty": "Хирург-резидент, отделение пластической хирургии RR Clinic",
       "photo": null,
-      "avatar": null,
+      "avatar": {
+        "src": "assets/img/web/avatar-temirkhan-anar.webp",
+        "width": 192,
+        "height": 192
+      },
       "city": "Астана",
       "href": "/temirkhan-anar"
     }

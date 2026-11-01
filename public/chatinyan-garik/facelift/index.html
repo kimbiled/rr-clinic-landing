@@ -241,7 +241,9 @@ fbq('track', 'PageView');
   html { -webkit-text-size-adjust: 100%; text-size-adjust: 100%; }
   html.rr-wait #main { visibility: hidden; }
   #main > div:first-of-type { opacity: 1 !important; zoom: var(--rr-zoom, 1) !important; min-height: calc(100vh / var(--rr-zoom, 1)) !important; }
-  [data-rr-shown] { opacity: 1 !important; }
+  [data-rr-shown] { opacity: 1 !important; transform: var(--rr-end, none) !important; }
+  [data-rr-shown="fade"] { transition: opacity 450ms cubic-bezier(0.22, 1, 0.36, 1), transform 450ms cubic-bezier(0.22, 1, 0.36, 1); }
+  [data-framer-name="Before/After"] > [data-framer-name="Текст кнопки"] { opacity: 1 !important; transform: none !important; }
   [data-framer-name$="[Vectorized]"] { cursor: pointer; }
 </style>
 <script>
@@ -809,23 +811,31 @@ fbq('track', 'PageView');
 </style><!-- SnippetEnd: KqU3OZZqA --><!-- End of bodyEnd -->
 
 <script>
-  /* RR landing: entrance-animated elements already on screen are shown at once instead of after hydration; the ones
-     scrolled into view before Framer's JS has started are shown as they appear (patch 7), later ones animate as usual. */
+  /* RR landing: entrance-animated elements no longer wait for Framer, which keeps them blank until they are ~40 % up the
+     screen (up to 1.7 s of empty blocks while scrolling). The ones on screen are shown at once, the rest fade in as they
+     arrive, before and after hydration alike. */
   (function () {
     var vh = window.innerHeight;
     var els = document.querySelectorAll('#main [style*="will-change:transform"][style*="opacity:0"]');
+    function show(el, value) {
+      // The element's resting transform: its inline one without the entrance offset Framer appended.
+      var t = /(?:^|;)transform:([^;]*)/.exec(el.getAttribute('style'));
+      el.style.setProperty('--rr-end', (t ? t[1].replace(/ ?translateY\(\d+px\)$/, '') : '') || 'none');
+      el.setAttribute('data-rr-shown', value);
+    }
     var io = 'IntersectionObserver' in window ? new IntersectionObserver(function (entries) {
       for (var j = 0; j < entries.length; j++) {
         if (!entries[j].isIntersecting) continue;
-        entries[j].target.setAttribute('data-rr-shown', '');
+        show(entries[j].target, 'fade');
         io.unobserve(entries[j].target);
       }
-    }) : null;
+    }, { rootMargin: '0px 0px 100px 0px' }) : null;
     for (var i = 0; i < els.length; i++) {
       if (!/opacity:0(;|$)/.test(els[i].getAttribute('style'))) continue;
       var r = els[i].getBoundingClientRect();
-      if (r.bottom > 0 && r.top < vh && r.width > 0) els[i].setAttribute('data-rr-shown', '');
+      if (r.bottom > 0 && r.top < vh && r.width > 0) show(els[i], '');
       else if (io) io.observe(els[i]);
+      else show(els[i], '');
     }
     document.documentElement.classList.remove('rr-wait');
 
@@ -844,7 +854,6 @@ fbq('track', 'PageView');
       }
       var s = document.createElement('script');
       for (var name in bundle.attrs) s.setAttribute(name, bundle.attrs[name]);
-      s.onload = s.onerror = function () { if (io) io.disconnect(); };
       document.body.appendChild(s);
     }
     var triggers = ['pointerdown', 'keydown', 'touchstart', 'wheel', 'scroll'];

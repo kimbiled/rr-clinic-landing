@@ -298,6 +298,8 @@ export function SurgeonMenu() {
           </p>
           <a
             href={clinic.whatsappHref || '#contacts'}
+            data-analytics-id="menu_consultation"
+            data-analytics-placement="surgeon_menu"
             target={clinic.whatsappHref ? '_blank' : undefined}
             rel="noopener noreferrer"
             className="smenu-cta inline-flex h-[50px] w-[238px] max-md:w-full items-center justify-center gap-2.5 rounded-pill bg-[#eae8e8] font-display text-[14.5px] leading-6 text-[#2e2c2c] hover:bg-[#2e2c2c] hover:text-white"
