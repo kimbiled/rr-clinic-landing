@@ -22,15 +22,28 @@ function Question({ question, answer }: { question: string; answer: string }) {
           onClick={() => setOpen((v) => !v)}
         >
           {question}
-          <svg width="20" height="20" viewBox="0 0 20 20" aria-hidden="true" className="rr-faq__icon shrink-0 text-[#2e2c2c]">
-            <path d="M10 3v14M3 10h14" stroke="currentColor" strokeWidth="1.3" strokeLinecap="round" />
+          <svg
+            width="20"
+            height="20"
+            viewBox="0 0 20 20"
+            aria-hidden="true"
+            className="rr-faq__icon shrink-0 text-[#2e2c2c]"
+          >
+            <path
+              d="M10 3v14M3 10h14"
+              stroke="currentColor"
+              strokeWidth="1.3"
+              strokeLinecap="round"
+            />
           </svg>
         </button>
       </h3>
       {/* 0fr → 1fr rows animate the answer's height without measuring it */}
       <div id={id} role="region" className="rr-faq__a grid" aria-hidden={!open}>
         <div className="overflow-hidden">
-          <p className="max-w-[860px] pb-7 font-text text-[17px] leading-[1.4] text-[#625f5e] max-md:pb-4 max-md:text-[13px]">{answer}</p>
+          <p className="max-w-[860px] pb-7 font-text text-[17px] leading-[1.4] text-[#625f5e] max-md:pb-4 max-md:text-[13px]">
+            {answer}
+          </p>
         </div>
       </div>
     </li>
@@ -44,7 +57,8 @@ function Question({ question, answer }: { question: string; answer: string }) {
 export function Faq() {
   const { ref, inView } = useInView<HTMLElement>();
   const [tab, setTab] = useState<TabId>('all');
-  const items = tab === 'all' ? faq.items : faq.items.filter((item) => item.topic === tab);
+  const items =
+    tab === 'all' ? faq.items : faq.items.filter((item) => item.topic === tab);
   const { cta } = faq;
 
   return (
@@ -64,7 +78,10 @@ export function Faq() {
           <span className="max-md:hidden">{faq.title}</span>
           <span className="md:hidden">{faq.mobileTitle}</span>
         </h2>
-        <p className="mt-3 font-text text-[17px] leading-[20px] text-[#8c8784] max-md:mt-2 max-md:text-[13px] max-md:leading-[17px] max-md:[&_br]:hidden" {...revealItem(1)}>
+        <p
+          className="mt-3 font-text text-[17px] leading-[20px] text-[#8c8784] max-md:mt-2 max-md:text-[13px] max-md:leading-[17px] max-md:[&_br]:hidden"
+          {...revealItem(1)}
+        >
           {withBreaks(faq.text)}
         </p>
 
@@ -89,17 +106,35 @@ export function Faq() {
         </div>
       </div>
 
-      <span className="rr-rule pointer-events-none absolute inset-x-0 mt-9 max-md:mt-5" aria-hidden="true" />
+      <span
+        className="rr-rule pointer-events-none absolute inset-x-0 mt-9 max-md:mt-5"
+        aria-hidden="true"
+      />
       <div className="mx-auto mt-9 max-w-[1440px] px-(--sec-pad) max-md:mt-5">
-        <div className="rr-frame relative px-10 pt-2 pb-3 max-md:px-0 max-md:py-0" {...revealItem(3)}>
-          <ul key={tab} className="rr-faq__list" role="tabpanel" aria-label={faq.tabs.find((t) => t.id === tab)?.label}>
+        <div
+          className="rr-frame relative px-10 pt-2 pb-3 max-md:px-0 max-md:py-0"
+          {...revealItem(3)}
+        >
+          <ul
+            key={tab}
+            className="rr-faq__list"
+            role="tabpanel"
+            aria-label={faq.tabs.find((t) => t.id === tab)?.label}
+          >
             {items.map((item) => (
-              <Question key={item.question} question={item.question} answer={item.answer} />
+              <Question
+                key={item.question}
+                question={item.question}
+                answer={item.answer}
+              />
             ))}
           </ul>
         </div>
       </div>
-      <span className="rr-rule pointer-events-none absolute inset-x-0" aria-hidden="true" />
+      <span
+        className="rr-rule pointer-events-none absolute inset-x-0"
+        aria-hidden="true"
+      />
 
       <div className="mx-auto mt-6 max-w-[1440px] px-(--sec-pad)">
         <div
@@ -107,8 +142,12 @@ export function Faq() {
           {...revealItem(4)}
         >
           <div>
-            <h3 className="font-display text-[24px] leading-8 font-normal text-white max-md:text-[18px] max-md:leading-6">{cta.title}</h3>
-            <p className="mt-[2px] font-text text-[17px] leading-[22px] text-white/75 max-md:text-[12px] max-md:leading-4">{cta.text}</p>
+            <h3 className="font-display text-[24px] leading-8 font-normal text-white max-md:text-[18px] max-md:leading-6">
+              {cta.title}
+            </h3>
+            <p className="mt-[2px] font-text text-[17px] leading-[22px] text-white/75 max-md:text-[12px] max-md:leading-4">
+              {cta.text}
+            </p>
           </div>
           <a
             {...whatsappLink(cta.message)}

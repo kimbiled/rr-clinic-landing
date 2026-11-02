@@ -1,6 +1,7 @@
 import assert from 'node:assert/strict';
 import { readFile, access } from 'node:fs/promises';
 import { test } from 'node:test';
+import { POST } from '../api/lead.js';
 import { SURGEONS, SURGEON_ROUTES, consultationLink, decodeAttribute, isConsultationLink } from '../scripts/surgeon-pages.mjs';
 
 const publicRoot = new URL('../public/', import.meta.url);
@@ -31,7 +32,7 @@ test('inline scripts parse: a syntax error here keeps the page hidden until the 
   for (const route of [...SURGEON_ROUTES, 'privacy-policy']) {
     const html = await readFile(new URL(`${route}/index.html`, publicRoot), 'utf8');
     for (const [, attrs, code] of html.matchAll(/<script\b([^>]*)>([\s\S]*?)<\/script>/g)) {
-      if (/\bsrc=|type="(?:application|framer)/.test(attrs) || !code.trim()) continue;
+      if (/\bsrc=|type="(?:application|framer|importmap)/.test(attrs) || !code.trim()) continue;
       assert.doesNotThrow(() => new Function(code), `${route}: broken inline script`);
     }
   }
@@ -52,4 +53,85 @@ test('sync refuses another doctor or a non-WhatsApp lookalike as the consultatio
   assert.throws(() => consultationLink(wrong, 'mussa-baurzhan'), /consultation URL is missing/);
   assert.throws(() => consultationLink(wrong, 'not-a-surgeon'), /Unknown surgeon/);
   assert.equal(isConsultationLink('https://api.whatsapp.com.example.org/send/?text=консультацию'), false);
+});
+
+test('every page loads its patched Framer bundles and shows the approved FAQ', async () => {
+  const faq = JSON.parse(await readFile(new URL('../scripts/surgeon-faq.json', import.meta.url), 'utf8'));
+  assert.equal(Object.keys(faq).length, 24);
+  const escape = (text) => text.replaceAll('&', '&amp;').replaceAll('<', '&lt;').replaceAll('>', '&gt;');
+  for (const route of SURGEON_ROUTES) {
+    const html = await readFile(new URL(`${route}/index.html`, publicRoot), 'utf8');
+    const head = html.indexOf('<script type="importmap"');
+    assert.ok(head > -1 && head < html.search(/<script\b(?! type="importmap")/), `${route}: import map must come before other scripts`);
+    const { imports } = JSON.parse(/<script type="importmap" data-rr-bundles>(.*?)<\/script>/s.exec(html)[1]);
+    for (const local of Object.values(imports)) {
+      const code = await readFile(new URL(local.slice(1), publicRoot), 'utf8');
+      assert.ok(!/from\s*"\.\//.test(code), `${local}: relative import would miss Framer's CDN`);
+    }
+    assert.equal(faq[route].length, 10, route);
+    for (const { question, answer } of faq[route]) {
+      assert.ok(html.includes(escape(question)) && html.includes(escape(answer)), `${route}: ${question}`);
+    }
+    assert.ok(html.includes('href="/privacy-policy/"'), `${route}: consent link`);
+  }
+});
+
+test('only Rustam\'s three pages show the new consultation photo, and the interview poster stays', async () => {
+  await access(new URL('assets/img/web/rustam-consultation.webp', publicRoot));
+  for (const route of SURGEON_ROUTES) {
+    const html = await readFile(new URL(`${route}/index.html`, publicRoot), 'utf8');
+    const rustam = route.startsWith('kurmanbayev-rustam');
+    assert.equal(html.includes('rustam-consultation.webp'), rustam, route);
+    assert.ok(!/EZ8nQCefTwlnonYzZWp8lEl7eM|Zp8naUxdXneV8OgCywoaV1IpffI/.test(html), route);
+    if (rustam) assert.ok(html.includes('25NYFA5OiMlnrcSG1193S4gdxuM'), `${route}: interview poster`);
+  }
+});
+
+const lead = { name: ' Айгерим ', phone: '+77475696969', doctor: 'Рустам Курманбаев', page: '/kurmanbayev-rustam/' };
+
+function submit(body) {
+  return POST(new Request('https://rr.test/api/lead', { method: 'POST', body: typeof body === 'string' ? body : JSON.stringify(body) }));
+}
+
+async function withWebhook(respond, run) {
+  const realFetch = globalThis.fetch;
+  const realError = console.error;
+  const calls = [];
+  process.env.LEAD_WEBHOOK_URL = 'https://hooks.test/lead';
+  console.error = () => {};
+  globalThis.fetch = async (url, options) => { calls.push({ url, body: JSON.parse(options.body) }); return respond(); };
+  try { await run(calls); } finally {
+    globalThis.fetch = realFetch;
+    console.error = realError;
+    delete process.env.LEAD_WEBHOOK_URL;
+  }
+}
+
+test('a lead succeeds only after the webhook confirms it', async () => {
+  await withWebhook(() => new Response('ok'), async (calls) => {
+    const response = await submit(lead);
+    assert.equal(response.status, 200);
+    assert.deepEqual(await response.json(), { ok: true });
+    assert.equal(calls[0].url, 'https://hooks.test/lead');
+    assert.equal(calls[0].body.name, 'Айгерим');
+    assert.equal(calls[0].body.phone, '+77475696969');
+    assert.equal(calls[0].body.doctor, 'Рустам Курманбаев');
+    assert.equal(calls[0].body.page, '/kurmanbayev-rustam/');
+  });
+  await withWebhook(() => new Response('down', { status: 500 }), async () => {
+    assert.equal((await submit(lead)).status, 502);
+  });
+  await withWebhook(() => { throw new Error('offline'); }, async () => {
+    assert.equal((await submit(lead)).status, 502);
+  });
+});
+
+test('a lead fails without a configured webhook, and bad input never reaches it', async () => {
+  assert.equal((await submit(lead)).status, 503);
+  await withWebhook(() => new Response('ok'), async (calls) => {
+    for (const body of ['not json', { ...lead, name: '  ' }, { ...lead, phone: '+7747' }, { ...lead, phone: '87475696969' }, { ...lead, page: 'https://evil.test' }, 'x'.repeat(3000)]) {
+      assert.equal((await submit(body)).status, 400);
+    }
+    assert.equal(calls.length, 0);
+  });
 });
