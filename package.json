@@ -8,6 +8,7 @@
     "build": "tsc -b && vite build",
     "preview": "vite preview",
     "typecheck": "tsc -b --noEmit",
+    "sync:framer-bundles": "node scripts/framer-bundles.mjs",
     "test:analytics": "node --test tests/analytics.test.mjs",
     "test:surgeon-pages": "node --test tests/surgeon-pages.test.mjs"
   },
