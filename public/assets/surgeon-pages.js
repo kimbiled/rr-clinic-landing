@@ -32,10 +32,7 @@
           '<p id="rr-offer-name-error" class="rr-offer-error" hidden></p>' +
         '</div>' +
         '<div class="rr-offer-step" data-step="phone" hidden>' +
-          '<div class="rr-offer-label-row">' +
-            '<label class="rr-offer-label" for="rr-offer-phone">Ваш WhatsApp для связи</label>' +
-            '<button type="button" class="rr-offer-back">Назад</button>' +
-          '</div>' +
+          '<label class="rr-offer-label" for="rr-offer-phone">Ваш WhatsApp для связи</label>' +
           '<div class="rr-offer-field rr-offer-field-send">' +
             '<input id="rr-offer-phone" class="rr-offer-input" type="tel" name="phone" placeholder="+7 (___) ___-__-__" autocomplete="tel" inputmode="tel" enterkeyhint="send" aria-describedby="rr-offer-phone-error">' +
             '<button type="submit" class="rr-offer-button rr-offer-send">Записаться на консультацию</button>' +
@@ -80,7 +77,6 @@
   var phoneError = dialog.querySelector('#rr-offer-phone-error');
   var sendError = dialog.querySelector('.rr-offer-send-error');
   var sendButton = dialog.querySelector('.rr-offer-send');
-  var backButton = dialog.querySelector('.rr-offer-back');
   var doneButton = dialog.querySelector('.rr-offer-done');
   var step = 'name';
   var phoneNumber = '';
@@ -164,7 +160,6 @@
   function setSending(value) {
     sending = value;
     sendButton.disabled = value;
-    backButton.disabled = value;
     phoneInput.readOnly = value;
     if (value) sendButton.textContent = 'Отправляем…';
   }
@@ -224,10 +219,6 @@
       return;
     }
     send();
-  });
-  backButton.addEventListener('click', function () {
-    setStep('name');
-    nameInput.focus();
   });
   setStep('name');
 
