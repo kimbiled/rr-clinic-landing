@@ -9,6 +9,8 @@ interface DoctorCardProps {
   index: number;
   /** Called for "Подробнее" — return true when the click was handled (default link navigation is then cancelled). */
   onMore?: (doctor: Doctor) => boolean;
+  /** Fills its grid column at the carousel card's proportions (the surgeons page) instead of 340 × 544. */
+  fluid?: boolean;
 }
 
 /** Head-and-shoulders outline shown until the doctor's card photo arrives. */
@@ -26,7 +28,7 @@ function Silhouette() {
  * bottom — role line, name, the full bio, two figures, then "Записаться" (WhatsApp, or a closed state) /
  * "Подробнее" (the doctor's page).
  */
-export function DoctorCard({ doctor, index, onMore }: DoctorCardProps) {
+export function DoctorCard({ doctor, index, onMore, fluid = false }: DoctorCardProps) {
   const photo = TEAM_PHOTOS[doctor.id] ?? null;
   const nameId = `team-doctor-${doctor.id}`;
   const text = CARD_TEXT[doctor.id];
@@ -40,7 +42,9 @@ export function DoctorCard({ doctor, index, onMore }: DoctorCardProps) {
 
   return (
     <li
-      className="team-card relative h-[544px] w-[340px] shrink-0 snap-start overflow-hidden rounded-[24px] bg-[#f5f2f0] max-md:h-[514px] max-md:w-[calc(100vw-45px)]"
+      className={`team-card relative overflow-hidden rounded-[24px] bg-[#f5f2f0] ${
+        fluid ? 'aspect-[340/544] w-full' : 'h-[544px] w-[340px] shrink-0 snap-start max-md:h-[514px] max-md:w-[calc(100vw-45px)]'
+      }`}
       style={{ '--i': index } as CSSProperties}
       aria-labelledby={nameId}
     >

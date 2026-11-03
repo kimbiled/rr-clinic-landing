@@ -1,7 +1,7 @@
 import assert from 'node:assert/strict';
 import { readFile, access } from 'node:fs/promises';
 import { test } from 'node:test';
-import { POST } from '../api/lead.js';
+import { POST, serviceOf } from '../api/lead.js';
 import { SURGEONS, SURGEON_ROUTES, consultationLink, decodeAttribute, isConsultationLink } from '../scripts/surgeon-pages.mjs';
 
 const publicRoot = new URL('../public/', import.meta.url);
@@ -122,13 +122,23 @@ test('a lead succeeds only after Bitrix24 creates it, and names the doctor and p
     const { fields } = calls[0].body;
     assert.equal(fields.NAME, 'Айгерим');
     assert.deepEqual(fields.PHONE, [{ VALUE: '+77475696969', VALUE_TYPE: 'WORK' }]);
-    assert.equal(fields.TITLE, 'Заявка с сайта: Рустам Курманбаев');
+    assert.equal(fields.TITLE, 'Заявка с сайта: Рустам Курманбаев — консультация (страница врача)');
+    assert.equal(fields.SOURCE_ID, 'UC_SRZAY8', 'Rustam\'s own "Сайт доктор" source');
     assert.equal(fields.SOURCE_DESCRIPTION, 'https://rr.test/kurmanbayev-rustam/');
-    assert.match(fields.COMMENTS, /Врач: Рустам Курманбаев\nСтраница: https:\/\/rr\.test\/kurmanbayev-rustam\//);
+    assert.match(fields.COMMENTS, /^Врач: Рустам Курманбаев\nУслуга: консультация \(страница врача\)\n/);
     assert.equal(fields.UTM_SOURCE, 'instagram');
     assert.equal(fields.UTM_CAMPAIGN, 'breast');
     assert.ok(!('UTM_MEDIUM' in fields), 'an oversized UTM tag is dropped, not the lead');
   });
+  await withBitrix(created, async (calls) => {
+    await submit({ ...lead, page: '/kurmanbayev-rustam/abdominoplasty/' });
+    const { fields } = calls[0].body;
+    assert.equal(fields.TITLE, 'Заявка с сайта: Рустам Курманбаев — Абдоминопластика (abdominoplasty)');
+    assert.match(fields.COMMENTS, /\nУслуга: Абдоминопластика \(abdominoplasty\)\n/);
+  });
+  for (const route of SURGEON_ROUTES.filter((route) => route.includes('/'))) {
+    assert.doesNotMatch(serviceOf(`/${route}/`), /^[a-z-]+$/, `${route}: the service has no Russian name for managers`);
+  }
   for (const respond of [
     () => Response.json({ error: 'INVALID_CREDENTIALS' }, { status: 401 }),
     () => Response.json({ error: 'QUERY_LIMIT_EXCEEDED' }),

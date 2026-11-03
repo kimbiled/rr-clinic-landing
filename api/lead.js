@@ -30,16 +30,47 @@ function parseLead(body) {
   return lead;
 }
 
-// Managers see which doctor's page the visitor came from in the lead title, source and comment.
+// The clinic's Bitrix24 has a "Сайт доктор …" source per doctor; the rest go to the general "Сайт" source.
+const SITE_SOURCE = 'UC_EUES3Y';
+const DOCTOR_SOURCES = {
+  'kurmanbayev-rustam': 'UC_SRZAY8',
+  'temirkhanov-amir': 'UC_RDY76A',
+  'mussa-baurzhan': 'UC_B6PNAN',
+  'savelyev-evgeniy': 'UC_4HW3DS',
+  'tulepbergenova-tomiris': 'UC_AU1VXW',
+  'chatinyan-garik': 'UC_9Z060F',
+  'kodzoeva-leila': 'UC_L4WCH5',
+  'ulagasheva-alina': 'UC_I2WVSE',
+};
+
+// The service is the address's last part (/kurmanbayev-rustam/abdominoplasty/); a doctor's own page names none.
+const SERVICES = {
+  mammoplasty: 'Маммопластика',
+  abdominoplasty: 'Абдоминопластика',
+  blepharoplasty: 'Блефаропластика',
+  rhinoplasty: 'Ринопластика',
+  facelift: 'Фейслифтинг',
+  otoplasty: 'Отопластика',
+  'intimate-surgery': 'Интимная пластика',
+};
+
+export function serviceOf(page) {
+  const slug = page.split('/')[2] || '';
+  if (!/^[a-z0-9-]{1,60}$/.test(slug)) return 'консультация (страница врача)';
+  return SERVICES[slug] ? `${SERVICES[slug]} (${slug})` : slug;
+}
+
+// Managers see the doctor and the service in the lead title and comment; the page address stays in the source.
 export function crmLead(lead, host) {
   const url = `https://${/^[a-z0-9.-]+(:\d+)?$/i.test(host || '') ? host : 'rr-clinic.kz'}${lead.page}`;
+  const service = serviceOf(lead.page);
   const fields = {
-    TITLE: `Заявка с сайта: ${lead.doctor}`,
+    TITLE: `Заявка с сайта: ${lead.doctor} — ${service}`,
     NAME: lead.name,
     PHONE: [{ VALUE: lead.phone, VALUE_TYPE: 'WORK' }],
-    SOURCE_ID: 'WEB',
+    SOURCE_ID: DOCTOR_SOURCES[lead.page.split('/')[1]] || SITE_SOURCE,
     SOURCE_DESCRIPTION: url,
-    COMMENTS: `Врач: ${lead.doctor}\nСтраница: ${url}\nПопап «Консультация + 3 PDF в подарок»`,
+    COMMENTS: `Врач: ${lead.doctor}\nУслуга: ${service}\nПопап «Консультация + 3 PDF в подарок»`,
   };
   for (const [key, value] of Object.entries(lead.utm)) fields[`UTM_${key.toUpperCase()}`] = value;
   return { fields, params: { REGISTER_SONET_EVENT: 'Y' } };
