@@ -17,7 +17,10 @@
       '<svg viewBox="0 0 18 18" fill="none" aria-hidden="true"><path d="m3 3 12 12M15 3 3 15" stroke="currentColor" stroke-width="2" stroke-linecap="round"/></svg>' +
     '</button>' +
     '<div class="rr-offer-copy">' +
-      '<div class="rr-offer-progress" role="progressbar" aria-valuemin="0" aria-valuemax="100" aria-label="Заполнение заявки"><span></span></div>' +
+      '<div class="rr-offer-progress">' +
+        '<p id="rr-offer-progress-text" class="rr-offer-progress-text"></p>' +
+        '<div class="rr-offer-progress-track" role="progressbar" aria-valuemin="0" aria-valuemax="100" aria-labelledby="rr-offer-progress-text"><span><b aria-hidden="true"></b></span></div>' +
+      '</div>' +
       '<h2 id="rr-offer-title" class="rr-offer-title"></h2>' +
       '<p id="rr-offer-description" class="rr-offer-description"></p>' +
       '<form class="rr-offer-form" novalidate>' +
@@ -46,7 +49,9 @@
         '<div class="rr-offer-actions"><button type="button" class="rr-offer-button rr-offer-done">Хорошо</button></div>' +
       '</div>' +
     '</div>' +
-    '<img class="rr-offer-books" src="/assets/img/web/consultation-books.webp" width="1200" height="760" alt="Три PDF о подготовке к операции, наркозе и восстановлении" decoding="async" loading="lazy">' +
+    '<div class="rr-offer-art">' +
+      '<img class="rr-offer-books" src="/assets/img/web/consultation-books.webp" width="1200" height="761" alt="Три PDF о подготовке к операции, наркозе и восстановлении" decoding="async" loading="lazy">' +
+    '</div>' +
   '</div>';
   document.body.appendChild(dialog);
   // The illustration waits in the closed dialog: fetch it after the page, so it never competes with the first screen.
@@ -59,17 +64,18 @@
     title: 'Получите личную консультацию хирурга <span>+&nbsp;3&nbsp;PDF в&nbsp;подарок</span>',
     text: 'Узнайте, какая коррекция подойдёт вам. После консультации получите материалы RR Clinic о подготовке к операции, наркозе и восстановлении',
   };
+  // The bar cheers the visitor on: half done after opening, one step left once the name is in.
   var SCREENS = {
-    name: { title: OFFER.title, text: OFFER.text, progress: 50 },
-    phone: { title: OFFER.title, text: OFFER.text, progress: 95 },
-    success: { title: 'Заявка отправлена', text: 'Напишем вам в WhatsApp, чтобы согласовать время консультации', progress: 100 },
+    name: { title: OFFER.title, text: OFFER.text, progress: 50, cheer: 'Отличное начало! Всего 2 шага' },
+    phone: { title: OFFER.title, text: OFFER.text, progress: 95, cheer: 'Почти готово! Остался последний шаг' },
+    success: { title: 'Заявка отправлена', text: 'Напишем вам в WhatsApp, чтобы согласовать время консультации', progress: 100, cheer: 'Готово! Вы молодцы' },
   };
   var SEND_LABEL = 'Записаться на консультацию';
   var SEND_TIMEOUT = 12000;
   // A pause this long after a name of two or more letters moves the visitor on without a button press.
   var ADVANCE_DELAY = 1500;
   var form = dialog.querySelector('.rr-offer-form');
-  var progress = dialog.querySelector('.rr-offer-progress');
+  var progress = dialog.querySelector('.rr-offer-progress-track');
   var nameInput = dialog.querySelector('#rr-offer-name');
   var nameError = dialog.querySelector('#rr-offer-name-error');
   var nextButton = dialog.querySelector('.rr-offer-next');
@@ -98,14 +104,21 @@
   function setStep(next) {
     step = next;
     clearTimeout(advanceTimer);
+    // The success screen has no form: keep the form's height, so the popup does not shrink after sending.
+    var layout = dialog.querySelector('.rr-offer-layout');
+    layout.style.minHeight = next === 'success' && layout.offsetHeight ? layout.offsetHeight + 'px' : '';
     dialog.querySelector('.rr-offer-title').innerHTML = SCREENS[next].title;
     dialog.querySelector('.rr-offer-description').textContent = SCREENS[next].text;
     dialog.querySelectorAll('.rr-offer-step').forEach(function (element) {
       element.hidden = element.getAttribute('data-step') !== next;
     });
     form.hidden = next === 'success';
-    progress.setAttribute('aria-valuenow', SCREENS[next].progress);
-    progress.firstChild.style.width = SCREENS[next].progress + '%';
+    var done = SCREENS[next].progress;
+    dialog.querySelector('.rr-offer-progress-text').textContent = SCREENS[next].cheer;
+    progress.setAttribute('aria-valuenow', done);
+    progress.setAttribute('aria-valuetext', done + '%');
+    progress.firstChild.style.width = done + '%';
+    progress.firstChild.firstChild.textContent = done + '%';
   }
   function toPhone() {
     if (step !== 'name') return;

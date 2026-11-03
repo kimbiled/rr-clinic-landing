@@ -1,0 +1,119 @@
+/* "Хирурги" page (design 2026-11-03). Same layer order as styles/index.css. */
+@layer theme, base, antd, components, utilities;
+
+@layer components {
+  .docs-nav,
+  .docs-contact__pill,
+  .docs-contact__icon {
+    background: #f3f1ef;
+    transition: background-color 250ms var(--ease-out);
+  }
+
+  .docs-nav__link {
+    color: #2e2c2c;
+    transition: color 250ms var(--ease-out);
+  }
+
+  .docs-nav__link:hover,
+  .docs-nav__link[aria-current='page'] {
+    color: #497f75;
+  }
+
+  .docs-contact:hover .docs-contact__pill,
+  .docs-contact:hover .docs-contact__icon {
+    background: #e9e5e1;
+  }
+
+  .docs-chip {
+    background: #f5f2f0;
+  }
+
+  /* "Не знаете к кому записаться?": warm paper card with a gold outline button */
+  .docs-help {
+    min-height: 170px;
+    background:
+      radial-gradient(120% 90% at 100% 0%, rgb(255 255 255 / 0.55), transparent 60%),
+      linear-gradient(140deg, #f4e9d8, #ead9bd);
+    box-shadow: inset 0 0 0 1px #e6d4b6;
+  }
+
+  .docs-help__btn {
+    box-shadow: inset 0 0 0 1px #c9a46c;
+    transition:
+      background-color 250ms var(--ease-out),
+      color 250ms var(--ease-out);
+  }
+
+  .docs-help__btn:hover {
+    background: #bb9358;
+    color: #fff;
+  }
+
+  /* Filter capsule: the selected area is sage green, its icon on a white disc */
+  .docs-filters {
+    border: 1px solid #c5d7d2; /* RR Clinic/Green/200 */
+    background: #fff;
+  }
+
+  .docs-filters-scroll {
+    scrollbar-width: none;
+  }
+
+  .docs-filters-scroll::-webkit-scrollbar {
+    display: none;
+  }
+
+  .docs-filter {
+    color: #2f4a44;
+    cursor: pointer;
+    transition:
+      background-color 250ms var(--ease-out),
+      color 250ms var(--ease-out);
+  }
+
+  .docs-filter:hover {
+    background: rgb(86 126 117 / 0.08);
+  }
+
+  .docs-filter__icon {
+    background: #f1f5f4;
+  }
+
+  .docs-filter__count {
+    background: #eef3f1;
+    color: #5e8b7b;
+  }
+
+  .docs-filter[aria-pressed='true'] {
+    background: #497f75;
+    color: #fff;
+  }
+
+  .docs-filter[aria-pressed='true'] .docs-filter__icon {
+    background: #fff;
+  }
+
+  .docs-filter[aria-pressed='true'] .docs-filter__count {
+    background: rgb(255 255 255 / 0.2);
+    color: #fff;
+  }
+
+  /* Cards fade up one after another whenever the filter changes */
+  .docs-grid > * {
+    animation: docs-card-in 500ms var(--ease-out) both;
+    animation-delay: calc(min(var(--i, 0), 8) * 50ms);
+  }
+
+  @keyframes docs-card-in {
+    from {
+      opacity: 0;
+      transform: translateY(16px);
+    }
+  }
+
+  @media (prefers-reduced-motion: reduce) {
+    .docs-grid > * {
+      animation: none;
+    }
+  }
+}

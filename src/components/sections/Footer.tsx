@@ -18,9 +18,11 @@ function Arrow() {
  * Footer (design 2026-10-29): logo, tagline and socials; "Клиника" / "Популярные услуги" / "Контакты" columns
  * with the map card; legal row; the designer's outlined "RR Clinic" SVG below.
  */
-export function Footer() {
+export function Footer({ linkBase = '' }: { linkBase?: string }) {
   const { clinic } = heroData;
   const { contacts, services } = footer;
+  // Off the home page ("/" as linkBase) its section links lead back to it; "Контакты" stays on this footer.
+  const sectionHref = (href: string) => (href === `#${footer.id}` ? href : linkBase + href);
 
   return (
     <footer id={footer.id} className="rr-section relative overflow-hidden bg-white pt-[84px] pb-[60px] text-neutral-900 max-md:pt-6 max-md:pb-0">
@@ -33,7 +35,7 @@ export function Footer() {
       <div className="mx-auto max-w-[1440px] px-(--sec-pad)">
         <div className="relative grid grid-cols-[396px_218px_272px_1fr] px-6 pt-6 pb-[22px] max-md:grid-cols-2 max-md:gap-x-4 max-md:px-0 max-md:pb-6">
           <div className="max-md:col-span-2 max-md:grid max-md:grid-cols-[auto_1fr] max-md:items-start max-md:gap-x-4">
-            <a href="#hero" aria-label="RR Clinic — наверх" className="inline-block">
+            <a href={linkBase || '#hero'} aria-label={linkBase ? 'RR Clinic — на главную' : 'RR Clinic — наверх'} className="inline-block">
               <img src={asset('assets/icons/logo-gold.svg')} width={35} height={32} alt="" className="h-8 w-[35px]" />
             </a>
             <p className="mt-[22px] max-w-[262px] font-text text-[16px] leading-[1.2] text-[#625f5e] max-md:mt-0 max-md:max-w-none max-md:text-[12px] max-md:leading-4">
@@ -81,7 +83,7 @@ export function Footer() {
               <ul className="mt-7 flex flex-col gap-[15px] md:leading-5 max-md:mt-4 max-md:gap-3">
                 {column.links.map((link) => (
                   <li key={link.label}>
-                    <a href={link.href} className="rr-foot__link">
+                    <a href={sectionHref(link.href)} className="rr-foot__link">
                       {link.label}
                     </a>
                   </li>

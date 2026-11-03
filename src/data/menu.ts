@@ -17,14 +17,15 @@ export const menu = {
   links: [
     { label: 'О клинике', href: '#trust' },
     { label: 'Направления', href: '#services' },
-    { label: 'Врачи', href: '#doctors' },
+    // The surgeons page (design 2026-11-03), not the home page's team block.
+    { label: 'Врачи', href: '/doctors/' },
     { label: 'Цены', href: '#operations' },
   ],
   /** Phones (design 2026-10-29): more sections, no doctor list. */
   mobileLinks: [
     { label: 'О клинике', href: '#trust' },
     { label: 'Направления', href: '#operations' },
-    { label: 'Врачи', href: '#doctors' },
+    { label: 'Врачи', href: '/doctors/' },
     { label: 'До и после', href: '#works' },
     { label: 'Цены', href: '#operations' },
     { label: 'Контакты', href: '#contacts' },

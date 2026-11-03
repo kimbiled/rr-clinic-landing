@@ -28,4 +28,13 @@ export default defineConfig({
     alias: { '@': fileURLToPath(new URL('./src', import.meta.url)) },
   },
   server: { port: 5173 },
+  // Two React pages: the home page and /doctors/ ("Хирурги", opened from the menu's "Врачи").
+  build: {
+    rollupOptions: {
+      input: {
+        main: fileURLToPath(new URL('./index.html', import.meta.url)),
+        doctors: fileURLToPath(new URL('./doctors/index.html', import.meta.url)),
+      },
+    },
+  },
 });

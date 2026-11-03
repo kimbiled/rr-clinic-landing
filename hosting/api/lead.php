@@ -5,6 +5,34 @@
 const MAX_BODY = 2000;
 const CRM_TIMEOUT = 8;
 const UTM_KEYS = ['source', 'medium', 'campaign', 'content', 'term'];
+// The clinic's Bitrix24 has a "Сайт доктор …" source per doctor; the rest go to the general "Сайт" source.
+const SITE_SOURCE = 'UC_EUES3Y';
+const DOCTOR_SOURCES = [
+  'kurmanbayev-rustam' => 'UC_SRZAY8',
+  'temirkhanov-amir' => 'UC_RDY76A',
+  'mussa-baurzhan' => 'UC_B6PNAN',
+  'savelyev-evgeniy' => 'UC_4HW3DS',
+  'tulepbergenova-tomiris' => 'UC_AU1VXW',
+  'chatinyan-garik' => 'UC_9Z060F',
+  'kodzoeva-leila' => 'UC_L4WCH5',
+  'ulagasheva-alina' => 'UC_I2WVSE',
+];
+// The service is the address's last part (/kurmanbayev-rustam/abdominoplasty/); a doctor's own page names none.
+const SERVICES = [
+  'mammoplasty' => 'Маммопластика',
+  'abdominoplasty' => 'Абдоминопластика',
+  'blepharoplasty' => 'Блефаропластика',
+  'rhinoplasty' => 'Ринопластика',
+  'facelift' => 'Фейслифтинг',
+  'otoplasty' => 'Отопластика',
+  'intimate-surgery' => 'Интимная пластика',
+];
+
+function service_of($page) {
+  $slug = explode('/', $page)[2] ?? '';
+  if (!preg_match('/^[a-z0-9-]{1,60}$/', $slug)) return 'консультация (страница врача)';
+  return isset(SERVICES[$slug]) ? SERVICES[$slug] . " ($slug)" : $slug;
+}
 
 function respond($status, $ok) {
   http_response_code($status);
@@ -43,16 +71,17 @@ if (!is_string($webhook) || $webhook === '') {
   respond(503, false);
 }
 
-// Managers see which doctor's page the visitor came from in the lead title, source and comment.
+// Managers see the doctor and the service in the lead title and comment; the page address stays in the source.
 $host = $_SERVER['HTTP_HOST'] ?? '';
 $url = 'https://' . (preg_match('/^[a-z0-9.-]+(:\d+)?$/i', $host) ? $host : 'rr-clinic.kz') . $lead['page'];
+$service = service_of($lead['page']);
 $fields = [
-  'TITLE' => 'Заявка с сайта: ' . $lead['doctor'],
+  'TITLE' => 'Заявка с сайта: ' . $lead['doctor'] . ' — ' . $service,
   'NAME' => $lead['name'],
   'PHONE' => [['VALUE' => $lead['phone'], 'VALUE_TYPE' => 'WORK']],
-  'SOURCE_ID' => 'WEB',
+  'SOURCE_ID' => DOCTOR_SOURCES[explode('/', $lead['page'])[1]] ?? SITE_SOURCE,
   'SOURCE_DESCRIPTION' => $url,
-  'COMMENTS' => "Врач: {$lead['doctor']}\nСтраница: {$url}\nПопап «Консультация + 3 PDF в подарок»",
+  'COMMENTS' => "Врач: {$lead['doctor']}\nУслуга: {$service}\nПопап «Консультация + 3 PDF в подарок»",
 ];
 // UTM tags only help the managers: a malformed one is dropped, never a reason to lose the lead.
 $utm = is_array($input['utm'] ?? null) ? $input['utm'] : [];
