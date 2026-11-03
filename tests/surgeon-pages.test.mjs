@@ -90,45 +90,58 @@ test('only Rustam\'s three pages show the new consultation photo, and the interv
 const lead = { name: ' Айгерим ', phone: '+77475696969', doctor: 'Рустам Курманбаев', page: '/kurmanbayev-rustam/' };
 
 function submit(body) {
-  return POST(new Request('https://rr.test/api/lead', { method: 'POST', body: typeof body === 'string' ? body : JSON.stringify(body) }));
+  return POST(new Request('https://rr.test/api/lead', {
+    method: 'POST',
+    headers: { host: 'rr.test' },
+    body: typeof body === 'string' ? body : JSON.stringify(body),
+  }));
 }
 
-async function withWebhook(respond, run) {
+const created = () => Response.json({ result: 7 });
+
+async function withBitrix(respond, run) {
   const realFetch = globalThis.fetch;
   const realError = console.error;
   const calls = [];
-  process.env.LEAD_WEBHOOK_URL = 'https://hooks.test/lead';
+  process.env.BITRIX_WEBHOOK_URL = 'https://crm.test/rest/1/key/';
   console.error = () => {};
   globalThis.fetch = async (url, options) => { calls.push({ url, body: JSON.parse(options.body) }); return respond(); };
   try { await run(calls); } finally {
     globalThis.fetch = realFetch;
     console.error = realError;
-    delete process.env.LEAD_WEBHOOK_URL;
+    delete process.env.BITRIX_WEBHOOK_URL;
   }
 }
 
-test('a lead succeeds only after the webhook confirms it', async () => {
-  await withWebhook(() => new Response('ok'), async (calls) => {
-    const response = await submit(lead);
+test('a lead succeeds only after Bitrix24 creates it, and names the doctor and page', async () => {
+  await withBitrix(created, async (calls) => {
+    const response = await submit({ ...lead, utm: { source: 'instagram', campaign: 'breast', medium: 'x'.repeat(300) } });
     assert.equal(response.status, 200);
     assert.deepEqual(await response.json(), { ok: true });
-    assert.equal(calls[0].url, 'https://hooks.test/lead');
-    assert.equal(calls[0].body.name, 'Айгерим');
-    assert.equal(calls[0].body.phone, '+77475696969');
-    assert.equal(calls[0].body.doctor, 'Рустам Курманбаев');
-    assert.equal(calls[0].body.page, '/kurmanbayev-rustam/');
+    assert.equal(calls[0].url, 'https://crm.test/rest/1/key/crm.lead.add.json');
+    const { fields } = calls[0].body;
+    assert.equal(fields.NAME, 'Айгерим');
+    assert.deepEqual(fields.PHONE, [{ VALUE: '+77475696969', VALUE_TYPE: 'WORK' }]);
+    assert.equal(fields.TITLE, 'Заявка с сайта: Рустам Курманбаев');
+    assert.equal(fields.SOURCE_DESCRIPTION, 'https://rr.test/kurmanbayev-rustam/');
+    assert.match(fields.COMMENTS, /Врач: Рустам Курманбаев\nСтраница: https:\/\/rr\.test\/kurmanbayev-rustam\//);
+    assert.equal(fields.UTM_SOURCE, 'instagram');
+    assert.equal(fields.UTM_CAMPAIGN, 'breast');
+    assert.ok(!('UTM_MEDIUM' in fields), 'an oversized UTM tag is dropped, not the lead');
   });
-  await withWebhook(() => new Response('down', { status: 500 }), async () => {
-    assert.equal((await submit(lead)).status, 502);
-  });
-  await withWebhook(() => { throw new Error('offline'); }, async () => {
-    assert.equal((await submit(lead)).status, 502);
-  });
+  for (const respond of [
+    () => Response.json({ error: 'INVALID_CREDENTIALS' }, { status: 401 }),
+    () => Response.json({ error: 'QUERY_LIMIT_EXCEEDED' }),
+    () => new Response('<html>down</html>', { status: 500 }),
+    () => { throw new Error('offline'); },
+  ]) {
+    await withBitrix(respond, async () => assert.equal((await submit(lead)).status, 502));
+  }
 });
 
 test('a lead fails without a configured webhook, and bad input never reaches it', async () => {
   assert.equal((await submit(lead)).status, 503);
-  await withWebhook(() => new Response('ok'), async (calls) => {
+  await withBitrix(created, async (calls) => {
     for (const body of ['not json', { ...lead, name: '  ' }, { ...lead, phone: '+7747' }, { ...lead, phone: '87475696969' }, { ...lead, page: 'https://evil.test' }, 'x'.repeat(3000)]) {
       assert.equal((await submit(body)).status, 400);
     }

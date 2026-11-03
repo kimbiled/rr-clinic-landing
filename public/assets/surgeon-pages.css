@@ -115,6 +115,7 @@ html { -webkit-text-size-adjust: 100%; text-size-adjust: 100%; }
   box-shadow: 0 24px 80px #0002;
 }
 
+#rr-surgeon-offer:focus { outline: 0; }
 #rr-surgeon-offer::backdrop { background: rgb(0 0 0 / 30%); }
 #rr-surgeon-offer * { box-sizing: border-box; }
 #rr-surgeon-offer .rr-offer-layout {
@@ -124,69 +125,115 @@ html { -webkit-text-size-adjust: 100%; text-size-adjust: 100%; }
   align-items: end;
   min-height: 324px;
 }
-#rr-surgeon-offer .rr-offer-copy { align-self: center; padding: 48px 0 48px 48px; z-index: 1; }
+#rr-surgeon-offer .rr-offer-copy { align-self: center; padding: 40px 0 40px 48px; z-index: 1; }
+#rr-surgeon-offer .rr-offer-progress { height: 6px; margin: 0 0 24px; overflow: hidden; border-radius: 100px; background: #ffffff2e; }
+#rr-surgeon-offer .rr-offer-progress span { display: block; width: 50%; height: 100%; border-radius: inherit; background: #d6ad68; transition: width .4s ease; }
 #rr-surgeon-offer .rr-offer-title {
   margin: 0 0 4px;
   color: #fff;
   font: 400 clamp(28px, 3.4vw, 36px)/1.12 'RR Offer Futura', 'Futura PT', Arial, sans-serif;
   letter-spacing: -1px;
 }
-#rr-surgeon-offer .rr-offer-title span { display: block; color: #d6ad68; }
+#rr-surgeon-offer .rr-offer-title span { color: #d6ad68; }
 #rr-surgeon-offer .rr-offer-description { margin: 0; color: #d6e4e1; font: inherit; }
 #rr-surgeon-offer .rr-offer-step[hidden],
 #rr-surgeon-offer .rr-offer-form[hidden],
-#rr-surgeon-offer .rr-offer-error[hidden] { display: none; }
+#rr-surgeon-offer .rr-offer-error[hidden],
+#rr-surgeon-offer .rr-offer-next[hidden] { display: none; }
 #rr-surgeon-offer .rr-offer-form,
 #rr-surgeon-offer .rr-offer-step[data-step='success'] { margin-top: 24px; }
 #rr-surgeon-offer .rr-offer-label { display: block; margin-bottom: 8px; color: #fff; font: 500 17px/1.2 'RR Offer Futura', 'Futura PT', Arial, sans-serif; }
-#rr-surgeon-offer .rr-offer-input {
-  display: block;
-  width: 100%;
+#rr-surgeon-offer .rr-offer-label-row { display: flex; align-items: baseline; justify-content: space-between; gap: 12px; margin-bottom: 8px; }
+#rr-surgeon-offer .rr-offer-label-row .rr-offer-label { margin-bottom: 0; }
+/* The white pill holds the input and its button, so each step stays one row high. */
+#rr-surgeon-offer .rr-offer-field {
+  display: flex;
+  align-items: center;
+  gap: 8px;
   height: 56px;
-  padding: 0 24px;
+  padding: 4px;
   border: 2px solid transparent;
   border-radius: 100px;
-  color: #2e2c2c;
   background: #fff;
+}
+#rr-surgeon-offer .rr-offer-field:focus-within { box-shadow: 0 0 0 3px #d6ad68; }
+#rr-surgeon-offer .rr-offer-field:has([aria-invalid='true']) { border-color: #ffb4a8; }
+#rr-surgeon-offer .rr-offer-input {
+  display: block;
+  flex: 1 1 auto;
+  min-width: 0;
+  height: 100%;
+  padding: 0 0 0 20px;
+  border: 0;
+  border-radius: 100px;
+  color: #2e2c2c;
+  background: transparent;
   font: 400 18px/1.2 'RR Offer Futura', 'Futura PT', Arial, sans-serif;
   outline: 0;
 }
+#rr-surgeon-offer .rr-offer-input:focus-visible { outline: 0; }
 #rr-surgeon-offer .rr-offer-input::placeholder { color: #8c8784; opacity: 1; }
-#rr-surgeon-offer .rr-offer-input[aria-invalid='true'] { border-color: #ffb4a8; }
+#rr-surgeon-offer .rr-offer-next {
+  display: grid;
+  flex: none;
+  place-items: center;
+  width: 44px;
+  height: 44px;
+  padding: 0;
+  border: 0;
+  border-radius: 50%;
+  color: #2e2c2c;
+  background: #d6ad68;
+  cursor: pointer;
+  -webkit-tap-highlight-color: transparent;
+}
+#rr-surgeon-offer .rr-offer-next svg { width: 20px; height: 20px; }
 #rr-surgeon-offer .rr-offer-error { margin: 8px 0 0 24px; color: #ffcfc7; font: 400 16px/1.25 'RR Offer Futura', 'Futura PT', Arial, sans-serif; }
 #rr-surgeon-offer .rr-offer-actions { display: flex; gap: 12px; margin-top: 16px; }
-#rr-surgeon-offer .rr-offer-button,
-#rr-surgeon-offer .rr-offer-back {
+#rr-surgeon-offer .rr-offer-button {
   display: inline-flex;
+  flex: 1 1 auto;
   align-items: center;
   justify-content: center;
   min-height: 56px;
   padding: 12px 28px;
+  border: 0;
   border-radius: 100px;
+  color: #2e2c2c;
+  background: #d6ad68;
   font: 500 17px/1.2 'RR Offer Futura', 'Futura PT', Arial, sans-serif;
   text-align: center;
   cursor: pointer;
   -webkit-tap-highlight-color: transparent;
 }
-#rr-surgeon-offer .rr-offer-button { flex: 1 1 auto; border: 0; color: #2e2c2c; background: #fff; }
-#rr-surgeon-offer .rr-offer-button:hover:not(:disabled) { background: #f1efed; }
-#rr-surgeon-offer .rr-offer-back { flex: none; border: 1px solid #fff6; color: #fff; background: transparent; }
-#rr-surgeon-offer .rr-offer-back:hover:not(:disabled) { background: #fff1; }
+#rr-surgeon-offer .rr-offer-button:hover:not(:disabled),
+#rr-surgeon-offer .rr-offer-next:hover { background: #e2bf82; }
+#rr-surgeon-offer .rr-offer-field-send .rr-offer-send { flex: none; min-height: 44px; height: 44px; padding: 0 22px; font-size: 16px; }
+#rr-surgeon-offer .rr-offer-field button:focus-visible { outline: 2px solid #2e2c2c; outline-offset: -4px; }
+#rr-surgeon-offer .rr-offer-back {
+  flex: none;
+  margin: -8px 0;
+  padding: 8px 0;
+  border: 0;
+  color: #d6e4e1;
+  background: none;
+  font: 400 16px/1.2 'RR Offer Futura', 'Futura PT', Arial, sans-serif;
+  text-decoration: underline;
+  text-underline-offset: 3px;
+  cursor: pointer;
+}
+#rr-surgeon-offer .rr-offer-back:hover:not(:disabled) { color: #fff; }
 #rr-surgeon-offer button:disabled { cursor: default; opacity: .7; }
 #rr-surgeon-offer .rr-offer-consent { margin: 12px 0 0; color: #d6e4e1; font: 400 14px/1.25 'RR Offer Futura', 'Futura PT', Arial, sans-serif; }
 #rr-surgeon-offer .rr-offer-consent a { color: inherit; text-decoration: underline; text-underline-offset: 2px; }
-#rr-surgeon-offer .rr-offer-progress { margin-top: 16px; }
-#rr-surgeon-offer .rr-offer-progress-bar { height: 8px; overflow: hidden; border-radius: 100px; background: #ffffff2e; }
-#rr-surgeon-offer .rr-offer-progress-bar span { display: block; width: 95%; height: 100%; border-radius: inherit; background: #4fd18b; }
-#rr-surgeon-offer .rr-offer-progress-label { margin: 8px 0 0; color: #fff; font: 500 16px/1.25 'RR Offer Futura', 'Futura PT', Arial, sans-serif; }
-#rr-surgeon-offer .rr-offer-progress-gift { margin: 2px 0 0; color: #d6ad68; font: 400 16px/1.25 'RR Offer Futura', 'Futura PT', Arial, sans-serif; }
+/* Cropped below the shelf's top, so the shelf runs off the popup's bottom edge. */
 #rr-surgeon-offer .rr-offer-books {
   display: block;
   width: 100%;
   height: auto;
-  aspect-ratio: 570 / 350;
+  aspect-ratio: 1200 / 690;
   object-fit: cover;
-  object-position: center bottom;
+  object-position: center top;
   align-self: end;
   pointer-events: none;
 }
@@ -202,29 +249,36 @@ html { -webkit-text-size-adjust: 100%; text-size-adjust: 100%; }
   padding: 0;
   border: 0;
   border-radius: 50%;
-  color: #8f8f8f;
-  background: #f1efed;
+  color: #fff;
+  background: transparent;
   cursor: pointer;
 }
+#rr-surgeon-offer .rr-offer-close:hover { background: #ffffff1a; }
 #rr-surgeon-offer .rr-offer-close svg { width: 18px; height: 18px; }
 #rr-surgeon-offer :focus-visible { outline: 3px solid #d6ad68; outline-offset: -5px; }
+
+@media (prefers-reduced-motion: reduce) {
+  #rr-surgeon-offer .rr-offer-progress span { transition: none; }
+}
 
 @media (max-width: 699px) {
   #rr-surgeon-offer { width: calc(100% - 32px); border-radius: 28px; }
   #rr-surgeon-offer .rr-offer-layout { grid-template-columns: minmax(0, 1fr); min-height: 0; }
-  #rr-surgeon-offer .rr-offer-copy { padding: 56px 24px 0; }
+  /* The progress bar shares the top row with the close button. */
+  #rr-surgeon-offer .rr-offer-copy { padding: 27px 24px 0; }
+  #rr-surgeon-offer .rr-offer-progress { margin: 0 48px 22px 0; }
   #rr-surgeon-offer .rr-offer-title { font-size: clamp(27px, 7.4vw, 36px); letter-spacing: -.6px; }
   #rr-surgeon-offer .rr-offer-description { margin-top: 12px; font-size: 17px; }
-  #rr-surgeon-offer .rr-offer-actions { flex-wrap: wrap; gap: 4px; }
-  #rr-surgeon-offer .rr-offer-button { flex-basis: 100%; padding-inline: 12px; }
-  #rr-surgeon-offer .rr-offer-back { order: 1; flex: 1 1 100%; min-height: 44px; padding-block: 8px; border: 0; }
-  #rr-surgeon-offer .rr-offer-books { width: 100%; max-height: 250px; object-fit: contain; margin-top: 12px; }
+  /* A phone number and the full button text don't fit one row: stack them. */
+  #rr-surgeon-offer .rr-offer-field-send { flex-direction: column; align-items: stretch; gap: 12px; height: auto; padding: 0; border: 0; background: none; }
+  #rr-surgeon-offer .rr-offer-field-send:focus-within { box-shadow: none; }
+  #rr-surgeon-offer .rr-offer-field-send .rr-offer-input { flex: none; height: 56px; padding: 0 24px; border: 2px solid transparent; background: #fff; }
+  #rr-surgeon-offer .rr-offer-field-send .rr-offer-input:focus-visible { box-shadow: 0 0 0 3px #d6ad68; }
+  #rr-surgeon-offer .rr-offer-field-send .rr-offer-input[aria-invalid='true'] { border-color: #ffb4a8; }
+  #rr-surgeon-offer .rr-offer-field-send .rr-offer-send { height: 56px; min-height: 56px; font-size: 17px; }
+  #rr-surgeon-offer .rr-offer-field-send button:focus-visible { outline-offset: 3px; outline-color: #d6ad68; }
+  #rr-surgeon-offer .rr-offer-books { width: min(100%, 434px); margin: 12px auto 0; }
   #rr-surgeon-offer .rr-offer-close { width: 44px; height: 44px; top: 8px; right: 8px; }
-}
-
-/* All three screens share one height, so the popup does not jump between them. */
-@media (min-height: 560px) and (min-width: 700px) {
-  #rr-surgeon-offer .rr-offer-layout { min-height: 500px; }
 }
 
 @media (max-height: 500px) and (min-width: 700px) {

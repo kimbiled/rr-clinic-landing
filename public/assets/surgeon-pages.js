@@ -8,38 +8,42 @@
 
   var dialog = document.createElement('dialog');
   dialog.id = 'rr-surgeon-offer';
+  // Focus starts on the dialog itself: on the close button it drew a ring the moment the offer appeared.
+  dialog.tabIndex = -1;
   dialog.setAttribute('aria-labelledby', 'rr-offer-title');
   dialog.setAttribute('aria-describedby', 'rr-offer-description');
   dialog.innerHTML = '<div class="rr-offer-layout">' +
-    '<button type="button" class="rr-offer-close" aria-label="Закрыть предложение" autofocus>' +
+    '<button type="button" class="rr-offer-close" aria-label="Закрыть предложение">' +
       '<svg viewBox="0 0 18 18" fill="none" aria-hidden="true"><path d="m3 3 12 12M15 3 3 15" stroke="currentColor" stroke-width="2" stroke-linecap="round"/></svg>' +
     '</button>' +
     '<div class="rr-offer-copy">' +
+      '<div class="rr-offer-progress" role="progressbar" aria-valuemin="0" aria-valuemax="100" aria-label="Заполнение заявки"><span></span></div>' +
       '<h2 id="rr-offer-title" class="rr-offer-title"></h2>' +
       '<p id="rr-offer-description" class="rr-offer-description"></p>' +
       '<form class="rr-offer-form" novalidate>' +
         '<div class="rr-offer-step" data-step="name">' +
           '<label class="rr-offer-label" for="rr-offer-name">Как вас зовут?</label>' +
-          '<input id="rr-offer-name" class="rr-offer-input" type="text" name="name" placeholder="Ваше имя" autocomplete="name" maxlength="80" aria-describedby="rr-offer-name-error">' +
+          '<div class="rr-offer-field">' +
+            '<input id="rr-offer-name" class="rr-offer-input" type="text" name="name" placeholder="Ваше имя" autocomplete="name" enterkeyhint="next" maxlength="80" aria-describedby="rr-offer-name-error">' +
+            '<button type="submit" class="rr-offer-next" aria-label="Продолжить" hidden>' +
+              '<svg viewBox="0 0 20 20" fill="none" aria-hidden="true"><path d="M4 10h12m-5-5 5 5-5 5" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/></svg>' +
+            '</button>' +
+          '</div>' +
           '<p id="rr-offer-name-error" class="rr-offer-error" hidden></p>' +
-          '<div class="rr-offer-actions"><button type="submit" class="rr-offer-button">Продолжить</button></div>' +
         '</div>' +
         '<div class="rr-offer-step" data-step="phone" hidden>' +
-          '<label class="rr-offer-label" for="rr-offer-phone">Номер телефона</label>' +
-          '<input id="rr-offer-phone" class="rr-offer-input" type="tel" name="phone" placeholder="+7 (___) ___-__-__" autocomplete="tel" inputmode="tel" aria-describedby="rr-offer-phone-error">' +
-          '<p id="rr-offer-phone-error" class="rr-offer-error" hidden></p>' +
-          '<p class="rr-offer-error rr-offer-send-error" role="alert" hidden></p>' +
-          '<div class="rr-offer-actions">' +
+          '<div class="rr-offer-label-row">' +
+            '<label class="rr-offer-label" for="rr-offer-phone">Ваш WhatsApp для связи</label>' +
             '<button type="button" class="rr-offer-back">Назад</button>' +
+          '</div>' +
+          '<div class="rr-offer-field rr-offer-field-send">' +
+            '<input id="rr-offer-phone" class="rr-offer-input" type="tel" name="phone" placeholder="+7 (___) ___-__-__" autocomplete="tel" inputmode="tel" enterkeyhint="send" aria-describedby="rr-offer-phone-error">' +
             '<button type="submit" class="rr-offer-button rr-offer-send">Записаться на консультацию</button>' +
           '</div>' +
-          '<p class="rr-offer-consent">Нажимая кнопку, вы соглашаетесь с <a href="/privacy-policy/" target="_blank" rel="noopener">обработкой персональных данных</a></p>' +
-          '<div class="rr-offer-progress">' +
-            '<div class="rr-offer-progress-bar" role="progressbar" aria-valuemin="0" aria-valuemax="100" aria-valuenow="95" aria-label="Почти готово"><span></span></div>' +
-            '<p class="rr-offer-progress-label">Почти готово — 95%</p>' +
-            '<p class="rr-offer-progress-gift">3 PDF в подарок после консультации</p>' +
-          '</div>' +
+          '<p id="rr-offer-phone-error" class="rr-offer-error" hidden></p>' +
+          '<p class="rr-offer-error rr-offer-send-error" role="alert" hidden></p>' +
         '</div>' +
+        '<p class="rr-offer-consent">Оставляя заявку, вы соглашаетесь с <a href="/privacy-policy/" target="_blank" rel="noopener">обработкой персональных данных</a></p>' +
       '</form>' +
       '<div class="rr-offer-step" data-step="success" hidden>' +
         '<div class="rr-offer-actions"><button type="button" class="rr-offer-button rr-offer-done">Хорошо</button></div>' +
@@ -53,19 +57,25 @@
     setTimeout(function () { new Image().src = dialog.querySelector('.rr-offer-books').src; }, 2000);
   });
 
+  // The offer stays the headline on both form steps, so phones and desktops read the same promise.
+  var OFFER = {
+    title: 'Получите личную консультацию хирурга <span>+&nbsp;3&nbsp;PDF в&nbsp;подарок</span>',
+    text: 'Узнайте, какая коррекция подойдёт вам. После консультации получите материалы RR Clinic о подготовке к операции, наркозе и восстановлении',
+  };
   var SCREENS = {
-    name: {
-      title: 'Получите личную консультацию хирурга <span>+ 3 PDF в подарок</span>',
-      text: 'Узнайте, какая коррекция подойдёт вам. После консультации получите материалы RR Clinic о подготовке к операции, наркозе и восстановлении',
-    },
-    phone: { title: 'Ваш WhatsApp для связи', text: 'Ответим на вопросы и подберём удобное время консультации' },
-    success: { title: 'Заявка отправлена', text: 'Напишем вам в WhatsApp, чтобы согласовать время консультации' },
+    name: { title: OFFER.title, text: OFFER.text, progress: 50 },
+    phone: { title: OFFER.title, text: OFFER.text, progress: 95 },
+    success: { title: 'Заявка отправлена', text: 'Напишем вам в WhatsApp, чтобы согласовать время консультации', progress: 100 },
   };
   var SEND_LABEL = 'Записаться на консультацию';
   var SEND_TIMEOUT = 12000;
+  // A pause this long after a name of two or more letters moves the visitor on without a button press.
+  var ADVANCE_DELAY = 1500;
   var form = dialog.querySelector('.rr-offer-form');
+  var progress = dialog.querySelector('.rr-offer-progress');
   var nameInput = dialog.querySelector('#rr-offer-name');
   var nameError = dialog.querySelector('#rr-offer-name-error');
+  var nextButton = dialog.querySelector('.rr-offer-next');
   var phoneInput = dialog.querySelector('#rr-offer-phone');
   var phoneError = dialog.querySelector('#rr-offer-phone-error');
   var sendError = dialog.querySelector('.rr-offer-send-error');
@@ -76,6 +86,7 @@
   var phoneNumber = '';
   var sending = false;
   var sent = false;
+  var advanceTimer;
 
   function setError(input, element, message) {
     element.textContent = message;
@@ -90,12 +101,20 @@
   }
   function setStep(next) {
     step = next;
+    clearTimeout(advanceTimer);
     dialog.querySelector('.rr-offer-title').innerHTML = SCREENS[next].title;
     dialog.querySelector('.rr-offer-description').textContent = SCREENS[next].text;
     dialog.querySelectorAll('.rr-offer-step').forEach(function (element) {
       element.hidden = element.getAttribute('data-step') !== next;
     });
     form.hidden = next === 'success';
+    progress.setAttribute('aria-valuenow', SCREENS[next].progress);
+    progress.firstChild.style.width = SCREENS[next].progress + '%';
+  }
+  function toPhone() {
+    if (step !== 'name') return;
+    setStep('phone');
+    phoneInput.focus();
   }
 
   // The field shows the mask; phoneNumber keeps the ten digits after +7.
@@ -134,7 +153,13 @@
     setError(phoneInput, phoneError, '');
     clearSendError();
   });
-  nameInput.addEventListener('input', function () { setError(nameInput, nameError, ''); });
+  nameInput.addEventListener('input', function () {
+    var ready = nameInput.value.trim().length >= 2;
+    setError(nameInput, nameError, '');
+    nextButton.hidden = !ready;
+    clearTimeout(advanceTimer);
+    if (ready) advanceTimer = setTimeout(toPhone, ADVANCE_DELAY);
+  });
 
   function setSending(value) {
     sending = value;
@@ -142,6 +167,16 @@
     backButton.disabled = value;
     phoneInput.readOnly = value;
     if (value) sendButton.textContent = 'Отправляем…';
+  }
+  // Ad tags from the landing URL go to the CRM lead, so managers see which campaign brought it.
+  function utm() {
+    var params = new URLSearchParams(location.search);
+    var tags = {};
+    ['source', 'medium', 'campaign', 'content', 'term'].forEach(function (key) {
+      var value = params.get('utm_' + key);
+      if (value) tags[key] = value.slice(0, 200);
+    });
+    return tags;
   }
   function send() {
     if (sending) return;
@@ -152,7 +187,7 @@
     fetch('/api/lead', {
       method: 'POST',
       headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify({ name: nameInput.value.trim(), phone: '+7' + phoneNumber, doctor: doctor, page: location.pathname }),
+      body: JSON.stringify({ name: nameInput.value.trim(), phone: '+7' + phoneNumber, doctor: doctor, page: location.pathname, utm: utm() }),
       signal: controller.signal,
     }).then(function (response) {
       return response.ok ? response.json() : null;
@@ -180,8 +215,7 @@
         nameInput.focus();
         return;
       }
-      setStep('phone');
-      phoneInput.focus();
+      toPhone();
       return;
     }
     if (phoneNumber.length !== 10) {
@@ -210,6 +244,7 @@
     oldOverflow = undefined;
   }
   function hide() {
+    clearTimeout(advanceTimer);
     if (dialog.open) dialog.close();
     restoreScroll();
   }
@@ -225,6 +260,7 @@
     oldOverflow = root.style.overflow;
     root.style.overflow = 'hidden';
     dialog.showModal();
+    dialog.focus();
   }
   function resume() {
     if (shown || document.hidden || timer !== undefined) return;
