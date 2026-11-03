@@ -143,8 +143,6 @@ html { -webkit-text-size-adjust: 100%; text-size-adjust: 100%; }
 #rr-surgeon-offer .rr-offer-form,
 #rr-surgeon-offer .rr-offer-step[data-step='success'] { margin-top: 24px; }
 #rr-surgeon-offer .rr-offer-label { display: block; margin-bottom: 8px; color: #fff; font: 500 17px/1.2 'RR Offer Futura', 'Futura PT', Arial, sans-serif; }
-#rr-surgeon-offer .rr-offer-label-row { display: flex; align-items: baseline; justify-content: space-between; gap: 12px; margin-bottom: 8px; }
-#rr-surgeon-offer .rr-offer-label-row .rr-offer-label { margin-bottom: 0; }
 /* The white pill holds the input and its button, so each step stays one row high. */
 #rr-surgeon-offer .rr-offer-field {
   display: flex;
@@ -156,7 +154,7 @@ html { -webkit-text-size-adjust: 100%; text-size-adjust: 100%; }
   border-radius: 100px;
   background: #fff;
 }
-#rr-surgeon-offer .rr-offer-field:focus-within { box-shadow: 0 0 0 3px #d6ad68; }
+#rr-surgeon-offer .rr-offer-field:focus-within { box-shadow: 0 0 0 2px #d6ad68; }
 #rr-surgeon-offer .rr-offer-field:has([aria-invalid='true']) { border-color: #ffb4a8; }
 #rr-surgeon-offer .rr-offer-input {
   display: block;
@@ -210,19 +208,6 @@ html { -webkit-text-size-adjust: 100%; text-size-adjust: 100%; }
 #rr-surgeon-offer .rr-offer-next:hover { background: #e2bf82; }
 #rr-surgeon-offer .rr-offer-field-send .rr-offer-send { flex: none; min-height: 44px; height: 44px; padding: 0 22px; font-size: 16px; }
 #rr-surgeon-offer .rr-offer-field button:focus-visible { outline: 2px solid #2e2c2c; outline-offset: -4px; }
-#rr-surgeon-offer .rr-offer-back {
-  flex: none;
-  margin: -8px 0;
-  padding: 8px 0;
-  border: 0;
-  color: #d6e4e1;
-  background: none;
-  font: 400 16px/1.2 'RR Offer Futura', 'Futura PT', Arial, sans-serif;
-  text-decoration: underline;
-  text-underline-offset: 3px;
-  cursor: pointer;
-}
-#rr-surgeon-offer .rr-offer-back:hover:not(:disabled) { color: #fff; }
 #rr-surgeon-offer button:disabled { cursor: default; opacity: .7; }
 #rr-surgeon-offer .rr-offer-consent { margin: 12px 0 0; color: #d6e4e1; font: 400 14px/1.25 'RR Offer Futura', 'Futura PT', Arial, sans-serif; }
 #rr-surgeon-offer .rr-offer-consent a { color: inherit; text-decoration: underline; text-underline-offset: 2px; }
@@ -273,7 +258,7 @@ html { -webkit-text-size-adjust: 100%; text-size-adjust: 100%; }
   #rr-surgeon-offer .rr-offer-field-send { flex-direction: column; align-items: stretch; gap: 12px; height: auto; padding: 0; border: 0; background: none; }
   #rr-surgeon-offer .rr-offer-field-send:focus-within { box-shadow: none; }
   #rr-surgeon-offer .rr-offer-field-send .rr-offer-input { flex: none; height: 56px; padding: 0 24px; border: 2px solid transparent; background: #fff; }
-  #rr-surgeon-offer .rr-offer-field-send .rr-offer-input:focus-visible { box-shadow: 0 0 0 3px #d6ad68; }
+  #rr-surgeon-offer .rr-offer-field-send .rr-offer-input:focus-visible { box-shadow: 0 0 0 2px #d6ad68; }
   #rr-surgeon-offer .rr-offer-field-send .rr-offer-input[aria-invalid='true'] { border-color: #ffb4a8; }
   #rr-surgeon-offer .rr-offer-field-send .rr-offer-send { height: 56px; min-height: 56px; font-size: 17px; }
   #rr-surgeon-offer .rr-offer-field-send button:focus-visible { outline-offset: 3px; outline-color: #d6ad68; }

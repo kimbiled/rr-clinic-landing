@@ -19,6 +19,10 @@ const OLD_PHOTO = /https:\/\/framerusercontent\.com\/images\/(?:EZ8nQCefTwlnonYz
 // The case galleries start their 8 s timers on mount. surgeon-pages.js resolves this promise when the block is on screen.
 const GALLERY_TIMER = /await ([\w$]+\(\(\)=>[\w$]+\(`[\w-]{9}`,!0\),8e3\))/g;
 const WAIT_FOR_GALLERY = 'await window.rrCasesVisible;await $1';
+// Framer's entry script loads its on-page editor, which shows a pencil button to anyone signed in to Framer.
+// `void 0&&(...)` keeps the expression valid and never calls the loader.
+const EDITOR_BAR = /EditorBar:[\w$]+===void 0\?void 0:/;
+const OTHER_PAGES = ['privacy-policy'];
 const TEXT_FIXES = {
   'chatinyan-garik/facelift': [['Гармоничная форма носа', 'Свежий, естественный вид']],
 };
@@ -136,7 +140,9 @@ const firstHtml = await readFile(new URL(`${SURGEON_ROUTES[0]}/index.html`, PUBL
 const entry = /script_main\.[\w-]+\.mjs/.exec(firstHtml)?.[0];
 if (!entry) throw new Error('Framer entry bundle not found');
 const main = await bundle(entry);
-const routes = new Map([...main.matchAll(/page:[\w$]+\(\(\)=>import\(`\.\/([^`]+)`\)\),path:`([^`]+)`/g)].map(([, name, path]) => [path, name]));
+if (!EDITOR_BAR.test(main)) throw new Error(`${entry}: editor bar loader not found`);
+await writeFile(new URL(entry, OUT), absoluteImports(main.replace(EDITOR_BAR, 'EditorBar:void 0&&')));
+const routes =new Map([...main.matchAll(/page:[\w$]+\(\(\)=>import\(`\.\/([^`]+)`\)\),path:`([^`]+)`/g)].map(([, name, path]) => [path, name]));
 const originals = new Map();
 async function original(name) {
   if (!originals.has(name)) originals.set(name, bundle(name));
@@ -156,7 +162,7 @@ for (const route of SURGEON_ROUTES) {
   }
   if (!code.includes(CONSENT_LABEL)) throw new Error(`${route}: consent item not found`);
   code = code.replaceAll(CONSENT_LABEL, `${CONSENT_LABEL},tnmgeyy1t:\`${CONSENT_HREF}\``);
-  const chunks = [name];
+  const chunks = [entry, name];
   await writeFile(new URL(name, OUT), absoluteImports(code));
   for (const dependency of imports(source).filter((file) => !CORE.test(file))) {
     const text = await original(dependency);
@@ -171,4 +177,13 @@ for (const route of SURGEON_ROUTES) {
   const url = new URL(`${route}/index.html`, PUBLIC);
   await writeFile(url, patchHtml(await readFile(url, 'utf8'), route, pairs, chunks));
   console.log(`${route}: ${chunks.length} bundles`);
+}
+
+// Pages without content fixes still load the entry script without the editor.
+for (const page of OTHER_PAGES) {
+  const url = new URL(`${page}/index.html`, PUBLIC);
+  const html = await readFile(url, 'utf8');
+  if (!html.includes(`"${SITE}${entry}"`)) throw new Error(`${page}: ${entry} not found`);
+  await writeFile(url, html.replaceAll(`"${SITE}${entry}"`, `"${LOCAL}${entry}"`));
+  console.log(`${page}: entry script`);
 }
