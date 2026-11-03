@@ -6,6 +6,7 @@
   "scripts": {
     "dev": "vite",
     "build": "tsc -b && vite build",
+    "build:hosting": "npm run build && cp -R hosting/. dist/ && rm -f dist/README.md && rm -rf dist/.ruff_cache && rm -f rr-clinic-hosting.zip && (cd dist && zip -qr ../rr-clinic-hosting.zip .)",
     "preview": "vite preview",
     "typecheck": "tsc -b --noEmit",
     "sync:framer-bundles": "node scripts/framer-bundles.mjs",

@@ -1,7 +1,8 @@
-// Receives the surgeon page popup lead and forwards it to the clinic's webhook.
-// The popup shows success only after { ok: true }, so answer it only once the webhook confirmed.
+// Receives the surgeon page popup lead and creates a lead in the clinic's Bitrix24 CRM.
+// The popup shows success only after { ok: true }, so answer it only once Bitrix24 returned the new lead id.
 const MAX_BODY = 2000;
-const WEBHOOK_TIMEOUT = 8000;
+const CRM_TIMEOUT = 8000;
+const UTM_KEYS = ['source', 'medium', 'campaign', 'content', 'term'];
 
 function text(value, limit) {
   if (typeof value !== 'string') return '';
@@ -18,30 +19,52 @@ function parseLead(body) {
     phone: text(input?.phone, 12),
     doctor: text(input?.doctor, 80),
     page: text(input?.page, 200),
+    utm: {},
   };
   if (!lead.name || !lead.doctor || !/^\+7\d{10}$/.test(lead.phone) || !/^\/(?!\/)/.test(lead.page)) return null;
+  // UTM tags only help the managers: a malformed one is dropped, never a reason to lose the lead.
+  for (const key of UTM_KEYS) {
+    const value = text(input?.utm?.[key], 200);
+    if (value) lead.utm[key] = value;
+  }
   return lead;
+}
+
+// Managers see which doctor's page the visitor came from in the lead title, source and comment.
+export function crmLead(lead, host) {
+  const url = `https://${/^[a-z0-9.-]+(:\d+)?$/i.test(host || '') ? host : 'rr-clinic.kz'}${lead.page}`;
+  const fields = {
+    TITLE: `Заявка с сайта: ${lead.doctor}`,
+    NAME: lead.name,
+    PHONE: [{ VALUE: lead.phone, VALUE_TYPE: 'WORK' }],
+    SOURCE_ID: 'WEB',
+    SOURCE_DESCRIPTION: url,
+    COMMENTS: `Врач: ${lead.doctor}\nСтраница: ${url}\nПопап «Консультация + 3 PDF в подарок»`,
+  };
+  for (const [key, value] of Object.entries(lead.utm)) fields[`UTM_${key.toUpperCase()}`] = value;
+  return { fields, params: { REGISTER_SONET_EVENT: 'Y' } };
 }
 
 export async function POST(request) {
   const lead = parseLead(await request.text());
   if (!lead) return Response.json({ ok: false }, { status: 400 });
-  const webhook = process.env.LEAD_WEBHOOK_URL;
+  const webhook = process.env.BITRIX_WEBHOOK_URL;
   if (!webhook) {
-    console.error('LEAD_WEBHOOK_URL is not set');
+    console.error('BITRIX_WEBHOOK_URL is not set');
     return Response.json({ ok: false }, { status: 503 });
   }
   try {
-    const response = await fetch(webhook, {
+    const response = await fetch(`${webhook.replace(/\/+$/, '')}/crm.lead.add.json`, {
       method: 'POST',
       headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify({ ...lead, createdAt: new Date().toISOString() }),
-      signal: AbortSignal.timeout(WEBHOOK_TIMEOUT),
+      body: JSON.stringify(crmLead(lead, request.headers.get('host'))),
+      signal: AbortSignal.timeout(CRM_TIMEOUT),
     });
-    if (!response.ok) throw new Error(`webhook answered ${response.status}`);
+    const answer = await response.json().catch(() => ({}));
+    if (!response.ok || !(Number(answer.result) > 0)) throw new Error(`Bitrix24 answered ${response.status} ${answer.error || ''}`);
   } catch (error) {
     // The lead itself is personal data: keep it out of the logs.
-    console.error('Lead webhook failed:', error.message);
+    console.error('Bitrix24 lead failed:', error.message);
     return Response.json({ ok: false }, { status: 502 });
   }
   return Response.json({ ok: true });
