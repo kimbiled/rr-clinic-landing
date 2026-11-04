@@ -78,13 +78,28 @@ export function DoctorCard({ doctor, index, onMore, fluid = false }: DoctorCardP
 
       <div className="team-card__panel absolute inset-x-[16px] bottom-[16px] rounded-[20px] p-4">
         {text?.role && <p className="font-text text-[14px] leading-[18px] text-[#5e8b7b]">{text.role}</p>}
-        <h3 id={nameId} className="mt-2 font-display text-[19px] leading-[23px] font-normal tracking-[-0.01em] text-[#1b1919] max-md:text-[18px] max-md:leading-[22px]">
+        <h3
+          id={nameId}
+          className={
+            fluid
+              ? 'mt-2 font-display text-[18px] leading-[1.2] font-medium text-[#2e2c2c]'
+              : 'mt-2 font-display text-[19px] leading-[23px] font-normal tracking-[-0.01em] text-[#1b1919] max-md:text-[18px] max-md:leading-[22px]'
+          }
+        >
           {doctor.lastName}
           <br />
           {given}
         </h3>
 
-        <p className="mt-2.5 min-h-[54px] overflow-hidden font-text text-[14px] leading-[18px] text-[#625f5e] max-md:line-clamp-3 max-md:h-[54px]">{bio}</p>
+        <p
+          className={
+            fluid
+              ? 'mt-2.5 min-h-[46px] font-text text-[14px] leading-[1.1] text-[#625f5e]'
+              : 'mt-2.5 min-h-[54px] overflow-hidden font-text text-[14px] leading-[18px] text-[#625f5e] max-md:line-clamp-3 max-md:h-[54px]'
+          }
+        >
+          {bio}
+        </p>
 
         {text?.stats && (
           <dl className="mt-2.5 flex gap-3 max-md:gap-5">
