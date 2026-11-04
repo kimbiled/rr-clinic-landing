@@ -618,6 +618,39 @@ export const reviews: ReviewsContent = {
   disclaimer: 'Ролики публикуются с согласия пациентов. Имеются противопоказания, необходима консультация специалиста.',
 };
 
+export interface ClinicTourContent {
+  id: string;
+  title: string;
+  text: string;
+  /**
+   * Grid order (design 2026-11-04): the first photo stands two rows tall on the left, the last one lies two columns
+   * wide at the bottom; the rest fill the cells between them in order.
+   */
+  items: { label: string; image: LandingImage }[];
+}
+
+const tourPhoto = (name: string, width: number, height: number, alt: string): LandingImage => ({
+  src: `assets/img/web/tour-${name}.webp`,
+  width,
+  height,
+  alt,
+});
+
+export const clinicTour: ClinicTourContent = {
+  id: 'clinic',
+  title: 'Знакомство с RR Clinic',
+  text: 'Посмотрите, как клиника выглядит изнутри, — от ресепшена до кабинетов. Чтобы перед первым визитом здесь уже было немного знакомо.',
+  items: [
+    { label: 'Фасад здания', image: tourPhoto('facade', 800, 994, 'Здание RR Clinic с вывеской на фасаде') },
+    { label: 'Кабинеты врачей', image: tourPhoto('cabinets', 900, 503, 'Кабинет врача с рабочим столом и кушеткой') },
+    { label: 'Реабилитационная', image: tourPhoto('rehab', 900, 503, 'Реабилитационная палата с двумя кроватями') },
+    { label: 'Reception', image: tourPhoto('reception', 900, 503, 'Стойка ресепшена в холле клиники') },
+    { label: 'Операционная', image: tourPhoto('surgery', 900, 503, 'Хирурги во время операции') },
+    { label: 'Палаты', image: tourPhoto('wards', 900, 503, 'Палата с функциональными кроватями') },
+    { label: 'Холл RR Clinic', image: tourPhoto('hall', 1376, 768, 'Холл клиники с логотипом RR Clinic на стене') },
+  ],
+};
+
 export type FaqTopic = 'safety' | 'prep' | 'prices' | 'after' | 'visitors';
 
 export interface FaqContent {

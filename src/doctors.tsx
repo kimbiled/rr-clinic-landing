@@ -7,6 +7,7 @@ import './styles/index.css';
 // Entry of /doctors/ ("Хирурги"), a separate Vite page next to the home page (see vite.config.ts).
 initializeAnalytics({
   measurementId: import.meta.env.VITE_GA_MEASUREMENT_ID,
+  clarityId: import.meta.env.VITE_CLARITY_PROJECT_ID,
   enabled: import.meta.env.PROD || import.meta.env.VITE_GA_DEBUG === 'true',
   debug: import.meta.env.VITE_GA_DEBUG === 'true',
 });

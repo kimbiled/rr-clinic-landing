@@ -16,7 +16,7 @@ export const OPEN_WORKS_EVENT = 'rr:open-works';
 const NUDGE_MS = 1400;
 const NUDGE_DELAY_MS = 600;
 
-interface Work {
+export interface Work {
   /** Files: assets/img/web/works/<id>-before.webp and -after.webp. */
   id: string;
   doctorId: string;
@@ -54,7 +54,7 @@ export function DoctorAvatar({ doctor, size }: { doctor: Doctor; size: number })
  * A split work gives each photo its own side of the divider, inner edge at the divider, so at 50 % it matches the pair
  * in the design and at either end one photo fills the card.
  */
-function Compare({ work, nudgeDelay }: { work: Work; nudgeDelay?: number }) {
+export function Compare({ work, nudgeDelay }: { work: Work; nudgeDelay?: number }) {
   const reducedMotion = useReducedMotion();
   const [pos, setPos] = useState(50);
   const [touched, setTouched] = useState(false);

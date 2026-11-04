@@ -49,12 +49,4 @@ export const page = {
   accent: 'RR Clinic',
   subtitle: ['узких специалистов — каждый эксперт в своей зоне', 'Не делаем всё подряд, делаем своё на отлично'],
   help: { title: 'Не знаете к кому записаться?', button: 'Менеджер подберёт врача' },
-  links: [
-    { label: 'О клинике', href: '/#trust' },
-    { label: 'Услуги', href: '/#services' },
-    { label: 'Врачи', href: '/doctors/' },
-    { label: 'До/после', href: '/#works' },
-    { label: 'Цены', href: '/#operations' },
-    { label: 'Контакты', href: '#contacts' },
-  ],
 };

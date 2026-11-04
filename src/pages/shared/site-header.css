@@ -1,0 +1,68 @@
+/* Inner pages' header. Same layer order as styles/index.css. */
+@layer theme, base, antd, components, utilities;
+
+@layer components {
+  .site-header__nav,
+  .site-header__pill,
+  .site-header__icon {
+    background: #f3f1ef;
+    transition: background-color 250ms var(--ease-out);
+  }
+
+  .site-header__link {
+    color: #2e2c2c;
+    transition: color 250ms var(--ease-out);
+  }
+
+  .site-header__link:hover,
+  .site-header__link[aria-current='page'] {
+    color: #497f75;
+  }
+
+  .site-header__phone {
+    color: #2e2c2c;
+  }
+
+  .site-header__contact {
+    transition: scale 200ms var(--ease-out);
+  }
+
+  .site-header__contact:hover .site-header__pill,
+  .site-header__contact:hover .site-header__icon {
+    background: #e9e5e1;
+  }
+
+  .site-header__contact img {
+    transition: transform 200ms var(--ease-out);
+  }
+
+  .site-header__contact:hover img {
+    transform: rotate(-8deg);
+  }
+
+  .site-header__contact:active {
+    scale: 0.97;
+  }
+
+  /* Over a photo: frosted links, white phone; the contact button is the home page's light grey, white on hover */
+  .site-header[data-tone='overlay'] .site-header__nav {
+    background: rgb(255 255 255 / 0.72);
+    -webkit-backdrop-filter: blur(12px);
+    backdrop-filter: blur(12px);
+  }
+
+  .site-header[data-tone='overlay'] .site-header__phone {
+    color: #fff;
+    text-shadow: 0 1px 8px rgb(0 0 0 / 0.25);
+  }
+
+  .site-header[data-tone='overlay'] .site-header__pill,
+  .site-header[data-tone='overlay'] .site-header__icon {
+    background: #f0efee;
+  }
+
+  .site-header[data-tone='overlay'] .site-header__contact:hover .site-header__pill,
+  .site-header[data-tone='overlay'] .site-header__contact:hover .site-header__icon {
+    background: #fff;
+  }
+}

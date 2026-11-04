@@ -816,6 +816,32 @@
     display: none;
   }
 
+  /* "Знакомство с RR Clinic": each photo melts into blur and a warm shade under its caption, as in the design */
+  .rr-tour__blur {
+    -webkit-backdrop-filter: blur(8px);
+    backdrop-filter: blur(8px);
+    -webkit-mask-image: linear-gradient(180deg, transparent 62%, #000 92%);
+    mask-image: linear-gradient(180deg, transparent 62%, #000 92%);
+  }
+
+  .rr-tour__shade {
+    background: linear-gradient(180deg, transparent 55%, rgb(36 24 16 / 0.55));
+  }
+
+  .rr-tour__img {
+    transition: transform 700ms var(--ease-out);
+  }
+
+  .rr-tour:hover .rr-tour__img {
+    transform: scale(1.03);
+  }
+
+  @media (prefers-reduced-motion: reduce) {
+    .rr-tour__img {
+      transition: none;
+    }
+  }
+
   .rr-ba__shade {
     background: linear-gradient(180deg, rgb(0 0 0 / 0.16), transparent 20%, transparent 60%, rgb(36 24 16 / 0.72));
   }

@@ -1,3 +1,13 @@
+// Analytics (GA4 click and section events, Clarity heatmap): the same code as the React pages, built from
+// src/lib/analytics.ts by scripts/analytics-bundle.mjs.
+(function () {
+  if (document.querySelector('script[src="/assets/rr-analytics.js"]')) return;
+  var tag = document.createElement('script');
+  tag.async = true;
+  tag.src = '/assets/rr-analytics.js';
+  document.head.appendChild(tag);
+})();
+
 (function () {
   'use strict';
   var script = document.currentScript;
