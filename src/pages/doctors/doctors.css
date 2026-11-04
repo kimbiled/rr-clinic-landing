@@ -28,17 +28,13 @@
     background: #f5f2f0;
   }
 
-  /* "Не знаете к кому записаться?": warm paper card with a gold outline button */
+  /* "Не знаете к кому записаться?": the home page's beige arches card ("Есть другой запрос?") with a gold outline button */
   .docs-help {
-    min-height: 170px;
-    background:
-      radial-gradient(120% 90% at 100% 0%, rgb(255 255 255 / 0.55), transparent 60%),
-      linear-gradient(140deg, #f4e9d8, #ead9bd);
-    box-shadow: inset 0 0 0 1px #e6d4b6;
+    background: url('/assets/img/web/programs-request-bg.svg') center / cover no-repeat, #f1e7d8;
   }
 
   .docs-help__btn {
-    box-shadow: inset 0 0 0 1px #c9a46c;
+    box-shadow: inset 0 0 0 1px #a07d47;
     transition:
       background-color 250ms var(--ease-out),
       color 250ms var(--ease-out);
@@ -51,7 +47,7 @@
 
   /* Filter capsule: the selected area is sage green, its icon on a white disc */
   .docs-filters {
-    border: 1px solid #c5d7d2; /* RR Clinic/Green/200 */
+    border: 1px solid #d2e5e2; /* border/accent-soft */
     background: #fff;
   }
 
