@@ -2,28 +2,6 @@
 @layer theme, base, antd, components, utilities;
 
 @layer components {
-  .docs-nav,
-  .docs-contact__pill,
-  .docs-contact__icon {
-    background: #f3f1ef;
-    transition: background-color 250ms var(--ease-out);
-  }
-
-  .docs-nav__link {
-    color: #2e2c2c;
-    transition: color 250ms var(--ease-out);
-  }
-
-  .docs-nav__link:hover,
-  .docs-nav__link[aria-current='page'] {
-    color: #497f75;
-  }
-
-  .docs-contact:hover .docs-contact__pill,
-  .docs-contact:hover .docs-contact__icon {
-    background: #e9e5e1;
-  }
-
   .docs-chip {
     background: #f5f2f0;
   }

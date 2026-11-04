@@ -1,5 +1,6 @@
 [
   { "id": "pair-1", "doctorId": "romanovskaya-tatyana", "title": "Голливудский фейслифтинг", "category": "face", "split": true },
+  { "id": "kurmanbaev-buttocks", "doctorId": "kurmanbaev-rustam", "title": "Липофилинг ягодиц", "category": "body" },
   { "id": "pair-2", "doctorId": "kurmanbaev-rustam", "title": "Абдоминопластика", "category": "body", "split": true },
   { "id": "pair-3", "doctorId": "savelyev-evgeniy", "title": "Увеличение груди", "category": "breast", "split": true },
   { "id": "pair-4", "doctorId": "temirkhanov-amir", "title": "Абдоминопластика", "category": "body", "split": true },

@@ -1,0 +1,294 @@
+/* A surgeon's own page (design 2026-11-04). Same layer order as styles/index.css. */
+@layer theme, base, antd, components, utilities;
+
+@layer components {
+  /* ---- Hero: hall photo, portrait on the right, white card on the left ---- */
+  /* 1440 × 690 in the design; the hall export already carries its blur and the darker radial edge. */
+  .dp-hero {
+    min-height: 690px;
+    background: #b9a58c;
+  }
+
+  /* Only a light veil under the header so the white logo and phone read on the bright hall */
+  .dp-hero__shade {
+    background: linear-gradient(180deg, rgb(30 24 18 / 0.22), transparent 22%);
+  }
+
+  /* The 450 × 642 portrait, 168 px from the frame's right edge, standing on the hero's bottom */
+  .dp-hero__photo {
+    position: absolute;
+    right: max(60px, calc((100vw - 1440px) / 2 + 168px));
+    bottom: 0;
+    height: min(642px, 93%);
+    width: auto;
+  }
+
+  /* The story preview: 128 × 228, top 305, 84 px from the right; white rim and the export's gold glow */
+  .dp-hero__video {
+    position: absolute;
+    right: max(24px, calc((100vw - 1440px) / 2 + 84px));
+    top: 305px;
+    width: 128px;
+    height: 228px;
+    overflow: hidden;
+    border: 2px solid rgb(255 255 255 / 0.5);
+    border-radius: 12px;
+    background: #fff;
+    box-shadow:
+      0 4px 20px rgb(0 0 0 / 0.25),
+      0 16px 96px rgb(156 114 57);
+    transition: transform 300ms var(--ease-out);
+  }
+
+  .dp-hero__video:hover {
+    transform: translateY(-3px);
+  }
+
+  .dp-chip {
+    display: inline-flex;
+    height: 30px;
+    align-items: center;
+    border-radius: var(--radius-pill);
+    padding: 0 12px;
+    font-family: var(--font-text);
+    font-size: 13px;
+    white-space: nowrap;
+  }
+
+  .dp-chip--light {
+    background: rgb(255 255 255 / 0.78);
+    color: #625f5e;
+    -webkit-backdrop-filter: blur(8px);
+    backdrop-filter: blur(8px);
+  }
+
+  .dp-chip--green {
+    background: rgb(73 127 117 / 0.92);
+    color: #fff;
+  }
+
+  .dp-cta {
+    background: #3f6d63;
+    transition: background-color 250ms var(--ease-out);
+  }
+
+  .dp-cta:hover {
+    background: #335a51;
+  }
+
+  @media (max-width: 767px) {
+    .dp-hero {
+      min-height: 0;
+    }
+
+    /* Phones: the portrait stands in the flow above the card */
+    .dp-hero__photo {
+      position: relative;
+      right: auto;
+      display: block;
+      height: 340px;
+      margin: 8px auto 0;
+    }
+  }
+
+  /* ---- Prices ---- */
+  .dp-offer {
+    background: url('/assets/img/web/arches-light.svg') center / 300px auto repeat, #5a8478;
+    box-shadow: 0 24px 48px -20px rgb(47 74 68 / 0.55);
+  }
+
+  .dp-offer__btn {
+    transition: background-color 250ms var(--ease-out);
+  }
+
+  .dp-offer__btn:hover {
+    background: #f1f5f4;
+  }
+
+  .dp-tabs {
+    border: 1px solid #d2e5e2;
+    background: #fff;
+  }
+
+  .dp-tab {
+    color: #2f4a44;
+    cursor: pointer;
+    transition:
+      background-color 250ms var(--ease-out),
+      color 250ms var(--ease-out);
+  }
+
+  .dp-tab:hover {
+    background: rgb(86 126 117 / 0.08);
+  }
+
+  .dp-tab__icon {
+    background: #f1f5f4;
+  }
+
+  .dp-tab__count {
+    background: #eef3f1;
+    color: #5e8b7b;
+  }
+
+  .dp-tab[aria-pressed='true'] {
+    background: #497f75;
+    color: #fff;
+  }
+
+  .dp-tab[aria-pressed='true'] .dp-tab__icon {
+    background: #fff;
+  }
+
+  .dp-tab[aria-pressed='true'] .dp-tab__count {
+    background: rgb(255 255 255 / 0.2);
+    color: #fff;
+  }
+
+  .dp-price {
+    background: #f5f3f1;
+    cursor: pointer;
+    transition: background-color 250ms var(--ease-out);
+  }
+
+  .dp-price:hover {
+    background: #eeebe8;
+  }
+
+  .dp-price[aria-pressed='true'] {
+    background: #e3eeeb;
+  }
+
+  .dp-price-list > * {
+    animation: dp-rise 400ms var(--ease-out) both;
+  }
+
+  @keyframes dp-rise {
+    from {
+      opacity: 0;
+      transform: translateY(8px);
+    }
+  }
+
+  /* ---- Works: a thin frame with vertical rules ---- */
+  .dp-works-frame {
+    border-inline: 1px solid #efe9e2;
+  }
+
+  .dp-works {
+    scrollbar-width: none;
+  }
+
+  .dp-works::-webkit-scrollbar {
+    display: none;
+  }
+
+  .dp-progress {
+    background: #e6dccd;
+  }
+
+  .dp-progress > span {
+    transition:
+      left 300ms var(--ease-out),
+      width 300ms var(--ease-out);
+  }
+
+  .dp-arrow {
+    display: grid;
+    width: 40px;
+    height: 40px;
+    place-items: center;
+    border-radius: 50%;
+    box-shadow: inset 0 0 0 1px #bb9358;
+    color: #bb9358;
+    font-size: 16px;
+    cursor: pointer;
+    transition:
+      background-color 250ms var(--ease-out),
+      color 250ms var(--ease-out),
+      opacity 250ms var(--ease-out);
+  }
+
+  .dp-arrow--fill,
+  .dp-arrow:hover:not(:disabled) {
+    background: #bb9358;
+    color: #fff;
+  }
+
+  .dp-arrow:disabled {
+    cursor: default;
+    opacity: 0.45;
+  }
+
+  @media (max-width: 767px) {
+    .dp-works-frame {
+      border: 0;
+    }
+  }
+
+  /* ---- Certificates ---- */
+  /* The designer's line pattern (716 × 375, the card's own size) over the mint fill */
+  .dp-cert {
+    background: url('/assets/img/web/doctor/rustam/cert-pattern.webp') center / cover no-repeat, #d9e8e4;
+  }
+
+  .dp-cert__btn {
+    background: #3f6d63;
+    transition: background-color 250ms var(--ease-out);
+  }
+
+  .dp-cert__btn:hover {
+    background: #335a51;
+  }
+
+  .dp-glass {
+    background: rgb(255 255 255 / 0.78);
+    -webkit-backdrop-filter: blur(12px);
+    backdrop-filter: blur(12px);
+  }
+
+  .dp-interview img,
+  .dp-video img {
+    transition: transform 700ms var(--ease-out);
+  }
+
+  .dp-interview:hover img,
+  .dp-video:hover img {
+    transform: scale(1.03);
+  }
+
+  /* ---- Reviews ---- */
+  .dp-video {
+    background: #d8cfc6;
+  }
+
+  /* As in the exports: brown veils at the top and bottom… */
+  .dp-video__shade {
+    background:
+      linear-gradient(180deg, rgb(67 59 51 / 0.3), transparent 74px),
+      linear-gradient(0deg, rgb(67 59 51 / 0.45), transparent 45%);
+  }
+
+  /* …and on the wide card a dark fade from the left, under the text (336 of 505 px) */
+  .dp-video--wide .dp-video__shade {
+    background: linear-gradient(90deg, rgb(0 0 0 / 0.5), transparent 66.5%);
+  }
+
+  .dp-book > span {
+    box-shadow: inset 0 0 0 1px #2e2c2c;
+    transition:
+      background-color 250ms var(--ease-out),
+      color 250ms var(--ease-out);
+  }
+
+  .dp-book:hover > span {
+    background: #2e2c2c;
+    color: #fff;
+  }
+
+  @media (prefers-reduced-motion: reduce) {
+    .dp-price-list > * {
+      animation: none;
+    }
+  }
+}
