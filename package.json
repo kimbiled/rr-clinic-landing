@@ -5,13 +5,14 @@
   "type": "module",
   "scripts": {
     "dev": "vite",
-    "build": "tsc -b && vite build",
+    "build": "node scripts/analytics-bundle.mjs && tsc -b && vite build",
     "build:hosting": "npm run build && cp -R hosting/. dist/ && rm -f dist/README.md && rm -rf dist/.ruff_cache && rm -f rr-clinic-hosting.zip && (cd dist && zip -qr ../rr-clinic-hosting.zip .)",
     "preview": "vite preview",
     "typecheck": "tsc -b --noEmit",
     "sync:framer-bundles": "node scripts/framer-bundles.mjs",
     "test:analytics": "node --test tests/analytics.test.mjs",
-    "test:surgeon-pages": "node --test tests/surgeon-pages.test.mjs"
+    "test:surgeon-pages": "node --test tests/surgeon-pages.test.mjs",
+    "build:analytics": "node scripts/analytics-bundle.mjs"
   },
   "dependencies": {
     "@ant-design/cssinjs": "^2.1.2",
