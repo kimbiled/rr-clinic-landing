@@ -12,6 +12,7 @@ import { Journey } from './components/sections/Journey';
 import { Operations } from './components/sections/Operations';
 import { Works } from './components/sections/Works';
 import { Reviews } from './components/sections/Reviews';
+import { ClinicTour } from './components/sections/ClinicTour';
 import { Faq } from './components/sections/Faq';
 import { Footer } from './components/sections/Footer';
 
@@ -90,6 +91,7 @@ export default function App() {
         <Operations />
         <Works />
         <Reviews />
+        <ClinicTour />
         <Faq />
       </main>
       <Footer />
