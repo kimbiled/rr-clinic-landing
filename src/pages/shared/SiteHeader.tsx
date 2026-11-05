@@ -1,5 +1,9 @@
 import { asset, heroData } from '../../data/hero';
 import { whatsappLink } from '../../components/sections/whatsapp';
+import { HeroProvider } from '../../components/hero/HeroContext';
+import { MobileNav } from '../../components/mobile/MobileNav';
+import { DeferredSurgeonMenu } from '../../components/surgeon-menu/DeferredSurgeonMenu';
+import { useIsMobile } from '../../hooks/useIsMobile';
 import './site-header.css';
 
 /** Inner pages' section links: back to the home page's blocks, "Врачи" to the surgeons page. */
@@ -30,6 +34,20 @@ export function WhatsAppIcon({ size = 18 }: { size?: number }) {
  */
 export function SiteHeader({ tone = 'light', current }: { tone?: 'light' | 'overlay'; current?: string }) {
   const { clinic } = heroData;
+  const isMobile = useIsMobile();
+
+  // Phones: the home page's header (logo · phone · menu), fixed so it stays with the page, and its menu.
+  // The spacer keeps the page's first block where the in-flow header used to push it.
+  if (isMobile) {
+    return (
+      <HeroProvider>
+        <MobileNav homeHref="/" solid={tone === 'light'} />
+        <div className="h-20" aria-hidden="true" />
+        <DeferredSurgeonMenu />
+      </HeroProvider>
+    );
+  }
+
   return (
     <header className="site-header mx-auto flex h-[80px] max-w-[1440px] items-center gap-6 px-(--sec-pad) max-md:h-16" data-tone={tone}>
       <a href="/" aria-label="RR Clinic — на главную" className="shrink-0">

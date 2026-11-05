@@ -207,8 +207,8 @@ PY
   encode "$program_tmp" program-mommy-makeover-mobile 740 1190 "1350 0 1054 1696"
   rm -f "$program_tmp"
 fi
-# Phone card: the founders only (x 990..2380 of the 2480 render), 357 CSS px wide @2x.
-encode "$SRC/trust-card.png" trust-card-mobile 714 0 "990 0 1390 1120"
+# Phone card: the founders only (x 990..2380 of the 2480 render), 357 CSS px wide @3x.
+encode "$SRC/trust-card.png" trust-card-mobile 1072 0 "990 0 1390 1120"
 # statue-v2 = Figma "rr-statue-cool-marble-v2" (embedded 1678×937 PNG). The hero centrepiece is
 # shown upscaled on retina, so lossy artefacts read as blur: spend bytes here (q95 ≈ 95 KB).
 QUALITY=95 fit_wide "$SRC/statue-v2.png" statue 1290

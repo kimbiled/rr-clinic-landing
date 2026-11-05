@@ -27,6 +27,42 @@ const TEXT_FIXES = {
   'chatinyan-garik/facelift': [['Гармоничная форма носа', 'Свежий, естественный вид']],
 };
 
+// Leila's pages (client 2026-11-05): name with the patronymic, surname first. Plain text, matched in the bundles
+// and in the saved HTML; "доктора Лейлы" also covers "у доктора Лейлы" in the hero title.
+const LEILA_TEXT = [
+  ['Лейла Магомедовна Кодзоева', 'Кодзоева Лейла Магомедовна'],
+  ['с доктором Лейлой Магомедовной Кодзоевой', 'с доктором Кодзоевой Лейлой Магомедовной'],
+  ['доктора Лейлы', 'доктора Лейлы Магомедовны'],
+];
+// The sticky gift button names her without the patronymic. Exact literals, so the <title> and meta stay as they are:
+// [in the bundle, replacement, in the saved HTML, replacement].
+const LEILA_LITERALS = [
+  ['`Лейла Кодзоева`', '`Кодзоева Лейла Магомедовна`', '>Лейла Кодзоева<', '>Кодзоева Лейла Магомедовна<'],
+  [
+    '`Лейла Кодзоева. Пластический хирург`',
+    '`Кодзоева Лейла Магомедовна. Пластический хирург`',
+    '>Лейла Кодзоева. Пластический хирург<',
+    '>Кодзоева Лейла Магомедовна. Пластический хирург<',
+  ],
+];
+const isLeila = (route) => route === 'kodzoeva-leila' || route.startsWith('kodzoeva-leila/');
+
+/** Leila's name fixes on one bundle; `hits` collects the fixes found, checked once the page's bundles are done. */
+function patchLeila(code, hits) {
+  let out = code;
+  for (const [before, after] of LEILA_TEXT) {
+    if (!out.includes(before)) continue;
+    hits.add(before);
+    out = out.replaceAll(before, after);
+  }
+  for (const [before, after] of LEILA_LITERALS) {
+    if (!out.includes(before)) continue;
+    hits.add(before);
+    out = out.replaceAll(before, after);
+  }
+  return out;
+}
+
 // Rustam's phone tabs all show the abdomen heading. The bundle has one heading per tab on desktop only, so
 // choose it by the active variant. Variant 6 is the abdomen tab on /mammoplasty, where the tabs come in another order.
 const RUSTAM_BUNDLE = /^rT5OpQw55\./;
@@ -121,6 +157,15 @@ function patchHtml(html, route, pairs, chunks) {
     if (!out.includes(htmlText(item.answer))) throw new Error(`${route}: approved answer missing from HTML: ${item.question}`);
   }
   for (const [before, after] of TEXT_FIXES[route] || []) out = out.replace(htmlPattern(before), htmlText(after));
+  if (isLeila(route)) {
+    // The saved HTML is patched in place, so skip text already extended ("доктора Лейлы Магомедовны").
+    for (const [before, after] of LEILA_TEXT) {
+      const tail = after.startsWith(before) ? after.slice(before.length) : '';
+      const pattern = tail ? new RegExp(`${htmlPattern(before).source}(?!(?: |\\u00a0|&nbsp;|&#160;)?${htmlPattern(tail).source})`, 'g') : htmlPattern(before);
+      out = out.replace(pattern, () => htmlText(after));
+    }
+    for (const [, , before, after] of LEILA_LITERALS) out = out.replaceAll(before, after);
+  }
   out = out.replace(OLD_PHOTO, NEW_PHOTO);
   if (route === 'kurmanbayev-rustam/mammoplasty') {
     for (const [before, after] of RUSTAM_LIFT_HTML) out = out.replaceAll(before, after);
@@ -160,19 +205,27 @@ for (const route of SURGEON_ROUTES) {
     if (!code.includes(before)) throw new Error(`${route}: text not in the bundle: ${before}`);
     code = code.replaceAll(before, after);
   }
+  const leilaHits = new Set();
+  if (isLeila(route)) code = patchLeila(code, leilaHits);
   if (!code.includes(CONSENT_LABEL)) throw new Error(`${route}: consent item not found`);
   code = code.replaceAll(CONSENT_LABEL, `${CONSENT_LABEL},tnmgeyy1t:\`${CONSENT_HREF}\``);
   const chunks = [entry, name];
   await writeFile(new URL(name, OUT), absoluteImports(code));
   for (const dependency of imports(source).filter((file) => !CORE.test(file))) {
     const text = await original(dependency);
-    const gated = text.replace(GALLERY_TIMER, WAIT_FOR_GALLERY);
+    let gated = text.replace(GALLERY_TIMER, WAIT_FOR_GALLERY);
+    if (isLeila(route)) gated = patchLeila(gated, leilaHits);
     if (gated === text) continue;
     if (!shared.has(dependency)) {
       shared.add(dependency);
       await writeFile(new URL(dependency, OUT), absoluteImports(patchShared(dependency, gated)));
     }
     chunks.push(dependency);
+  }
+  if (route === 'kodzoeva-leila') {
+    // Her main page shows every name form; the procedure pages may lack some (e.g. no hero "у доктора Лейлы").
+    const missing = [...LEILA_TEXT, ...LEILA_LITERALS].map(([before]) => before).filter((before) => !leilaHits.has(before));
+    if (missing.length) throw new Error(`${route}: Leila name text not found in the bundles: ${missing.join(' | ')}`);
   }
   const url = new URL(`${route}/index.html`, PUBLIC);
   await writeFile(url, patchHtml(await readFile(url, 'utf8'), route, pairs, chunks));
@@ -183,6 +236,10 @@ for (const route of SURGEON_ROUTES) {
 for (const page of OTHER_PAGES) {
   const url = new URL(`${page}/index.html`, PUBLIC);
   const html = await readFile(url, 'utf8');
+  if (html.includes(`"${LOCAL}${entry}"`) && !html.includes(`"${SITE}${entry}"`)) {
+    console.log(`${page}: entry script (already local)`);
+    continue;
+  }
   if (!html.includes(`"${SITE}${entry}"`)) throw new Error(`${page}: ${entry} not found`);
   await writeFile(url, html.replaceAll(`"${SITE}${entry}"`, `"${LOCAL}${entry}"`));
   console.log(`${page}: entry script`);

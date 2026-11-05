@@ -213,6 +213,10 @@
       if (!result || result.ok !== true) throw new Error('Lead was not accepted');
       clearTimeout(timeout);
       sent = true;
+      // GA4 "generate_lead" (only after Bitrix24 accepted it): counts requests per doctor's page in reports.
+      if (typeof window.gtag === 'function') {
+        window.gtag('event', 'generate_lead', { doctor: doctor, lead_source: 'doctor_popup', page_path: location.pathname });
+      }
       setSending(false);
       setStep('success');
       doneButton.focus();
@@ -248,7 +252,8 @@
   var root = document.documentElement;
   var oldOverflow;
   var returnFocus;
-  var remaining = 10000;
+  var POPUP_DELAY = 5000; // the offer opens after 5 s on the page (was 10 s, client 2026-11-05)
+  var remaining = POPUP_DELAY;
   var started = 0;
   var timer;
   var shown = false;
@@ -317,7 +322,7 @@
   window.addEventListener('pageshow', function (event) {
     if (!event.persisted || sent) return;
     shown = false;
-    remaining = 10000;
+    remaining = POPUP_DELAY;
     resume();
   });
   resume();

@@ -125,8 +125,8 @@ export const trust: TrustContent = {
     photoMobile: {
       // trust-card cropped to the founders (scripts/optimize-images.sh → trust-card-mobile)
       src: 'assets/img/web/trust-card-mobile.webp',
-      width: 714,
-      height: 576,
+      width: 1072,
+      height: 864,
       alt: 'Основатели RR Clinic Рустам Курманбаев и Татьяна Романовская',
     },
     people: [
@@ -499,7 +499,7 @@ export const operations: OperationsContent = {
     },
   ],
   cta: {
-    title: 'Не знаете, какая операция вам нужна?',
+    title: 'Не знаете, какая операция вам\u00a0нужна?',
     text: 'Опишите, что хочется изменить, — хирург на консультации предложит подходящий вариант и назовёт точную стоимость.',
     label: 'Записаться на консультацию',
     message: 'Здравствуйте! Хочу записаться на консультацию',
@@ -532,7 +532,6 @@ export const works: WorksContent = {
     'chatinyan-garik',
     'romanovskaya-tatyana',
     'tulepbergenova-tomiris',
-    'ulagasheva-alina',
     'temirkhan-anar',
   ],
   moreLabel: 'Показать ещё работы',

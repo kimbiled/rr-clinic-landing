@@ -3,7 +3,6 @@ import { mobileHero } from '../../data/mobileHero';
 import { ParticlesCanvas } from '../fx/ParticlesCanvas';
 import { CtaButton } from '../hero/CtaButton';
 import { useHero } from '../hero/HeroContext';
-import { openSurgeonMenu, useSurgeonMenuTrigger } from '../surgeon-menu/menuTrigger';
 import { MobileCases } from './MobileCases';
 import './mobile.css';
 
@@ -40,10 +39,9 @@ function Stars({ value, max }: { value: number; max: number }) {
  * (before/after cases) and the clinic line. Replaces the desktop stage + navbar below 768 px.
  */
 export function MobileHero() {
-  const { data, surgeonMenuOpen, setSurgeonMenuOpen } = useHero();
+  const { data } = useHero();
   const { hero, clinic } = data;
   const { rating } = clinic;
-  const menuTrigger = useSurgeonMenuTrigger('nav', surgeonMenuOpen);
   const ratingValue = rating.value.toFixed(1);
   const ratingSource = rating.source === '2GIS' ? '2ГИС' : rating.source;
   const { address } = mobileHero;
@@ -69,26 +67,7 @@ export function MobileHero() {
         {/* Same gold dust as the desktop stage; z-auto keeps it under the header, text and CTA that follow */}
         <ParticlesCanvas className="z-auto" />
 
-        {/* Header: logo · phone · menu */}
-        <div className="absolute inset-x-4 top-[31px] flex h-[42px] items-center justify-between">
-          <a href="#hero" aria-label={`${clinic.name} — на главную`} className="block">
-            <img src={asset('assets/icons/logo.svg')} width={44} height={40} alt="" className="h-10 w-11" />
-          </a>
-          <a href={clinic.phoneHref} className="absolute left-1/2 -translate-x-1/2 font-text text-[14px] leading-4 tracking-[-0.01em] whitespace-nowrap">
-            {clinic.phone}
-          </a>
-          <button
-            type="button"
-            className="m-hero__menu grid size-[42px] place-items-center rounded-full bg-white"
-            aria-label="Меню"
-            {...menuTrigger}
-            onClick={(e) => openSurgeonMenu(e.currentTarget, setSurgeonMenuOpen, 'nav')}
-          >
-            <svg viewBox="0 0 16 12" width={16} height={12} fill="none" aria-hidden="true">
-              <path d="M1 1.5h14M4 6h11M8 10.5h7" stroke="#2e2c2c" strokeWidth="1.4" strokeLinecap="round" />
-            </svg>
-          </button>
-        </div>
+        {/* Header (logo · phone · menu) is <MobileNav/>, fixed so it stays with the page */}
 
         <p className="m-hero__chip absolute top-[283px] left-1/2 flex h-[38px] w-[min(330px,calc(100%-32px))] -translate-x-1/2 items-center justify-center gap-2.5 rounded-[10px] font-text text-[14px] leading-none font-medium tracking-[-0.015em] whitespace-nowrap">
           <svg viewBox="0 0 12 15" width={12} height={15} aria-hidden="true">

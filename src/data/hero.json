@@ -110,7 +110,7 @@
         "height": 192
       },
       "city": "Астана",
-      "href": "/kurmanbayev-rustam",
+      "href": "/doctors/kurmanbayev-rustam/",
       "figmaNodeId": "1763:7302"
     },
     {
@@ -235,22 +235,6 @@
       "city": "Астана",
       "href": "/savelyev-evgeniy",
       "figmaNodeId": "1610:402"
-    },
-    {
-      "id": "ulagasheva-alina",
-      "name": "Улагашева Алина",
-      "firstName": "Алина",
-      "lastName": "Улагашева",
-      "role": "Пластический хирург",
-      "specialty": "Эстетическая хирургия груди и лица",
-      "photo": null,
-      "avatar": {
-        "src": "assets/img/web/avatar-ulagasheva-alina.webp",
-        "width": 192,
-        "height": 192
-      },
-      "city": "Астана",
-      "href": "/ulagasheva-alina"
     },
     {
       "id": "temirkhan-anar",

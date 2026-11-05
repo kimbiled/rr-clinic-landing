@@ -29,6 +29,17 @@ export interface VideoReview {
   href: string;
 }
 
+export interface EducationGroup {
+  title: string;
+  items: { year: string; title: string; text: string }[];
+}
+
+/** A tab of "Результаты операций": the works whose title is one of `titles`. */
+export interface WorkFilter {
+  label: string;
+  titles: string[];
+}
+
 export interface DoctorProfile {
   /** hero.json / works.json id. */
   doctorId: string;
@@ -52,7 +63,14 @@ export interface DoctorProfile {
   /** `story`: the Instagram-story preview beside the portrait; it opens `interview.href`. */
   hero: { background: ImageAsset; photo: ImageAsset; story: ImageAsset };
   prices: PriceGroup[];
-  certificate: { name: string; lines: string[]; href: string };
+  /** Filters over the doctor's works (works.json titles); "Все работы" comes first by itself. */
+  workFilters: WorkFilter[];
+  /** Index into `workFilters` selected on load; -1 = "Все работы". */
+  workFilterDefault: number;
+  /** "Образование и квалификация": the specialist certificate card and the accordion groups. */
+  education: { certificate: { number: string; href: string }; groups: EducationGroup[] };
+  /** "Достижения и опыт": the list, the cut-out portrait, the badge with the patients' faces. */
+  achievements: { items: { title: string; text: string }[]; photo: ImageAsset; badge: string; instagram: string };
   interview: { poster: ImageAsset; label: string; href: string };
   reviews: {
     text: { author: string; date: string; text: string };
@@ -169,15 +187,69 @@ const rustam: DoctorProfile = {
       ],
     },
   ],
-  certificate: {
-    name: 'Курманбаев Рустам Амангельдыевич',
-    lines: [
-      'Специальность: пластическая хирургия',
-      'Обновлен: 11.09.2023',
-      'Действителен до: 11.09.2028',
-      'Регистрационный номер: KZ61VBM02152825',
+  workFilters: [
+    { label: 'Абдоминопластика', titles: ['Абдоминопластика'] },
+    { label: 'Маммопластика', titles: ['Маммопластика', 'Операции на груди'] },
+    { label: 'Липомоделирование', titles: ['Липомоделирование', 'Липофилинг ягодиц'] },
+  ],
+  workFilterDefault: 0,
+  education: {
+    certificate: {
+      number: 'KZ61VBM02152825',
+      href: 'https://drive.google.com/file/d/1GvNGB2HXchxamX90drG3e1ZTCfAoRBBq/view?usp=drive_link',
+    },
+    groups: [
+      {
+        title: 'Базовое образование',
+        items: [
+          { year: '2013', title: 'Лечебное дело', text: 'Государственный медицинский университет города Семей, Казахстан. Базовое образование.' },
+          { year: '2015', title: 'Интернатура по хирургии', text: 'Государственный медицинский университет города Семей, Казахстан.' },
+          { year: '2017', title: 'Ординатура по пластической хирургии', text: 'Новосибирский государственный университет, Россия.' },
+        ],
+      },
+      {
+        title: 'Повышение квалификации',
+        items: [
+          {
+            year: '2015',
+            title: 'Пластическая хирургия',
+            text: 'Курс у президента Ассоциации пластических хирургов Казахстана Болата Каленовича Баирова. Алматы, Казахстан.',
+          },
+          { year: '2016', title: 'Реконструктивная и эстетическая хирургия', text: 'Университетская клиника Charité. Берлин, Германия.' },
+          { year: '2016', title: 'Пластическая хирургия', text: 'Курс в клинике Clinica da Lagoa. Рио-де-Жанейро, Бразилия.' },
+        ],
+      },
+      {
+        title: 'Стажировки и совместная практика',
+        items: [
+          { year: '2016', title: 'Стажировка по BBL', text: 'Стажировка у Dr. Alexander Aslani. Европа.' },
+          { year: '2017', title: 'Совместная практика', text: 'Совместная практика с Dr. Marcus Petros. Колумбия.' },
+        ],
+      },
+      {
+        title: 'Конгрессы',
+        items: [
+          {
+            year: '2024',
+            title: 'Национальный конгресс',
+            text: 'XIII Национальный конгресс имени Миланова «Пластическая хирургия, эстетическая медицина и косметология».',
+          },
+        ],
+      },
     ],
-    href: 'https://drive.google.com/file/d/1GvNGB2HXchxamX90drG3e1ZTCfAoRBBq/view?usp=drive_link',
+  },
+  achievements: {
+    items: [
+      { title: 'Более 10 000 операций', text: 'Практический опыт в пластической хирургии груди и тела.' },
+      { title: 'Обучение у Constantino Mendieta', text: 'Обучался у пластического хирурга Constantino Mendieta в США.' },
+      { title: 'Две операции под одним наркозом', text: 'Выполняет несколько вмешательств в рамках одной операции под одним наркозом.' },
+      { title: 'Повторная коррекция и пластика\nпосле похудения', text: 'Работает с последствиями предыдущих операций и избытками кожи после снижения веса.' },
+      { title: 'Основатель RR Clinic', text: 'Основал клинику пластической хирургии в Астане.' },
+    ],
+    // assets-src/img/doctor-kurmanbaev-rustam-figma.svg (the cut-out), 1000 px wide.
+    photo: img('assets/img/web/doctor/rustam/achievements.webp', 1000, 1393, 'Рустам Курманбаев'),
+    badge: '10 000+',
+    instagram: 'https://www.instagram.com/dr.rustam.kz/',
   },
   interview: {
     poster: img('assets/img/web/doctor/rustam/interview.webp', 1008, 750, 'Рустам Курманбаев в операционной'),

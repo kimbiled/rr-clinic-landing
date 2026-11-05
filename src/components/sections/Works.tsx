@@ -91,7 +91,6 @@ export function Compare({ work, nudgeDelay }: { work: Work; nudgeDelay?: number 
         className={`absolute top-0 left-0 h-full object-cover ${work.split ? 'object-right' : ''}`}
         style={work.split ? { width: `${pos}%` } : { width: '100%', clipPath: `inset(0 ${100 - pos}% 0 0)` }}
       />
-      <span className="rr-ba__blur rr-edge-blur pointer-events-none absolute inset-0" aria-hidden="true" />
       <span className="rr-ba__shade pointer-events-none absolute inset-0" aria-hidden="true" />
 
       <span className="rr-ba__label absolute top-5 left-5" aria-hidden="true">

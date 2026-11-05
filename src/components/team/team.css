@@ -17,51 +17,49 @@
     outline-color: #8f6526;
   }
 
-  /* ---------- Capsule tabs: antd Segmented restyled to Figma "Вкладки / капсула" ---------- */
-  .team-tabs.ant-segmented {
-    position: relative;
+  /* ---------- Capsule tabs (Figma "Вкладки / капсула"), see TeamTabs.tsx ---------- */
+  .team-tabs {
+    display: inline-flex;
+    gap: 4px;
+    padding: 5px;
     border: 1px solid #c5d7d2; /* RR Clinic/Green/200 */
+    border-radius: var(--radius-pill);
     background: #fff;
   }
 
-  .team-tabs .ant-segmented-group {
-    gap: 4px;
-  }
-
-  .team-tabs .ant-segmented-item,
-  .team-tabs .ant-segmented-thumb {
+  .team-tabs__item {
+    display: flex;
+    height: 46px;
+    align-items: center;
+    gap: 10px;
+    padding: 0 20px 0 7px;
     border-radius: var(--radius-pill);
-  }
-
-  .team-tabs .ant-segmented-item-label {
-    padding: 0 20px; /* Figma tab: 40 px tall, 10/20 padding, Futura Medium 16 */
+    color: #2f4a44;
     font-family: var(--font-text);
     font-size: 16px;
     font-weight: 500;
-    letter-spacing: 0;
+    white-space: nowrap;
+    cursor: pointer;
+    transition:
+      background-color 320ms var(--ease-out),
+      color 320ms var(--ease-out),
+      border-color 320ms var(--ease-out),
+      width 420ms var(--ease-out);
+    -webkit-tap-highlight-color: transparent;
   }
 
-  .team-tabs .ant-segmented-item-selected,
-  .team-tabs .ant-segmented-thumb {
-    box-shadow: none;
+  .team-tabs__item:hover {
+    background: rgb(86 126 117 / 0.08);
+    color: #1f3631;
   }
 
-  /* The selected pill is 46 px tall; the capsule stays 58 px, so its inner padding gives way. */
-  @media (min-width: 768px) {
-    .team-tabs.ant-segmented {
-      padding: 5px;
-    }
-
-    .team-tabs .ant-segmented-item-label {
-      min-height: 46px;
-      line-height: 46px;
-    }
+  .team-tabs__item[aria-checked='true'] {
+    background: #497f75;
+    color: #fff;
   }
 
-  .team-tabs__label {
-    display: flex;
-    align-items: center;
-    gap: 10px;
+  .team-tabs__item:active {
+    scale: 0.98;
   }
 
   .team-tabs__icon {
@@ -74,43 +72,41 @@
     background: white;
   }
 
+  .team-tabs__item:focus-visible {
+    outline: 2px solid #2f4a44;
+    outline-offset: 2px;
+  }
+
+  /* Phones: icon discs; the selected one widens to show its label (width and colour move together). */
   @media (max-width: 767px) {
-    .team-tabs.ant-segmented {
-      display: block;
+    .team-tabs {
+      display: flex;
       width: 100%;
+      gap: 12px;
       padding: 0;
       border: 0;
       background: transparent;
     }
 
-    .team-tabs .ant-segmented-group {
-      gap: 12px;
-    }
-
-    .team-tabs .ant-segmented-item {
-      flex: 0 0 46px;
-      min-width: 0;
-      border: 1px solid #d5e5e3;
-    }
-
-    .team-tabs .ant-segmented-item-selected-text {
-      flex: 0 0 205px;
-      border-color: #497f75;
-    }
-
-    .team-tabs .ant-segmented-item-label {
-      display: flex;
-      height: 44px;
-      min-height: 44px;
-      align-items: center;
-      padding: 0;
-      font-size: 14px;
-    }
-
-    .team-tabs__label {
-      width: 100%;
-      min-width: 0;
+    .team-tabs__item {
+      position: relative;
+      width: 46px;
+      flex: none;
       gap: 8px;
+      overflow: hidden;
+      padding: 0 0 0 1px;
+      border: 1px solid #d5e5e3;
+      font-size: 15px;
+    }
+
+    .team-tabs__item:hover {
+      background: transparent;
+    }
+
+    .team-tabs__item[aria-checked='true'] {
+      width: 205px;
+      border-color: #497f75;
+      background: #497f75;
     }
 
     .team-tabs__icon {
@@ -119,33 +115,34 @@
     }
 
     .team-tabs__text {
-      position: absolute;
-      width: 1px;
-      height: 1px;
-      overflow: hidden;
-      clip-path: inset(50%);
-      white-space: nowrap;
+      min-width: 0;
+      padding-right: 12px;
+      line-height: 1.05;
+      text-align: left;
+      opacity: 0;
+      transform: translateX(-6px);
+      transition:
+        opacity 220ms var(--ease-out),
+        transform 320ms var(--ease-out);
     }
 
-    .ant-segmented-item-selected-text .team-tabs__text {
-      position: static;
-      width: auto;
-      height: auto;
-      padding-right: 12px;
-      clip-path: none;
-      font-family: var(--font-text);
-      font-size: 15px;
-      font-weight: 500;
-      white-space: nowrap;
-      text-align: left;
-      line-height: 1.05;
+    .team-tabs__item[aria-checked='true'] .team-tabs__text {
+      opacity: 1;
+      transform: none;
+      transition-delay: 120ms;
     }
   }
 
-  /* R3-4a: the focus lands on the hidden radio input, so ring the visible item around it (WCAG 2.4.7). */
-  .team-tabs .ant-segmented-item:has(.ant-segmented-item-input:focus-visible) {
-    outline: 2px solid #2f4a44;
-    outline-offset: 2px;
+  /* Switching tab: the new panel (cards or the empty note) fades up instead of popping in. */
+  @keyframes team-panel-in {
+    from {
+      opacity: 0;
+      transform: translateY(10px);
+    }
+  }
+
+  .team-panel-in {
+    animation: team-panel-in 380ms var(--ease-out) both;
   }
 
   /* ---------- Doctor row (full-bleed scroller, content inset matches the 1440 grid) ---------- */
@@ -350,6 +347,15 @@
   }
 
   @media (prefers-reduced-motion: reduce) {
+    .team-panel-in {
+      animation: none;
+    }
+
+    .team-tabs__item,
+    .team-tabs__text {
+      transition: none;
+    }
+
     .team-reveal > *,
     .team-carousel .team-card,
     .team-card__img,

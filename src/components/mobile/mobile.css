@@ -38,11 +38,6 @@
     display: none;
   }
 
-  .m-hero__menu {
-    transition: transform 200ms var(--ease-out);
-  }
-
-  .m-hero__menu:active,
   .m-hero__rating:active .m-hero__rating-arrow {
     transform: scale(0.94);
   }
@@ -111,7 +106,6 @@
   @media (prefers-reduced-motion: reduce) {
     .m-cases__slide,
     .m-cases__nav,
-    .m-hero__menu,
     .m-hero__rating-arrow {
       transition: none;
     }

@@ -34,11 +34,9 @@ export const menu = {
   subtitle: 'Выберите специалиста и познакомьтесь с его работами',
   /** Row by row, two per row (left, right). */
   doctors: [
-    { name: 'Рустам Курманбаев', tags: ['Липомоделирование', 'Абдоминопластика'], doctorId: 'kurmanbaev-rustam', href: '/kurmanbayev-rustam' },
+    { name: 'Рустам Курманбаев', tags: ['Липомоделирование', 'Абдоминопластика'], doctorId: 'kurmanbaev-rustam', href: '/doctors/kurmanbayev-rustam/' },
     { name: 'Гарик Чатинян', tags: ['Ринопластика', 'Подтяжка лица'], doctorId: 'chatinyan-garik', href: '/chatinyan-garik' },
     { name: 'Амир Темирханов', tags: ['Коррекция фигуры', 'Подтяжка груди'], doctorId: 'temirkhanov-amir', href: '/temirkhanov-amir' },
-    // TODO(content): not in hero.json yet (no photo / cases).
-    { name: 'Алина Улагашева', tags: ['Пластика груди', 'Пластика лица'], href: '/ulagasheva-alina' },
     { name: 'Татьяна Романовская', tags: ['Подтяжка лица', 'Блефаропластика'], doctorId: 'romanovskaya-tatyana', href: '/romanovskaya-tatyana' },
     { name: 'Евгений Савельев', tags: ['Пластика груди', 'Повторные операции'], doctorId: 'savelyev-evgeniy', href: '/savelyev-evgeniy' },
     { name: 'Лейла Кодзоева', tags: ['Интимная пластика', 'Пластика груди'], doctorId: 'kodzoeva-leyla', href: '/kodzoeva-leila' },

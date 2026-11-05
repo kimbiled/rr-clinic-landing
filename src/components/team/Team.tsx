@@ -1,5 +1,3 @@
-import { theme } from 'antd';
-import type { ThemeConfig } from 'antd';
 import { useCallback, useMemo, useState } from 'react';
 import { heroData } from '../../data/hero';
 import type { Doctor } from '../../data/types';
@@ -12,41 +10,7 @@ import { TeamEmpty } from './TeamEmpty';
 import { useRevealOnce } from './useRevealOnce';
 import { useIsMobile } from '../../hooks/useIsMobile';
 import { MobileStepper } from '../mobile/MobileStepper';
-import { AntdProvider } from '../../theme/AntdProvider';
-import { antdTheme } from '../../theme/antdTheme';
 import './team.css';
-
-/** Sage green of the design's team block (selected tab, accent word). */
-const SAGE = '#497f75'; // RR Clinic/Green/500
-
-/** Light-surface antd theme for this white section (the global theme is dark for the hero). */
-const lightTheme: ThemeConfig = {
-  ...antdTheme,
-  algorithm: theme.defaultAlgorithm,
-  token: {
-    ...antdTheme.token,
-    colorPrimary: SAGE,
-    colorBgBase: '#ffffff',
-    colorTextBase: '#2e2c2c',
-    colorBgElevated: '#ffffff',
-  },
-  components: {
-    Segmented: {
-      // antd: tab height = controlHeight − 2×trackPadding → 40 px tabs; + 2×8 + 2×1 border = Figma's 58 px capsule
-      controlHeight: 56,
-      trackPadding: 8,
-      trackBg: '#ffffff',
-      itemColor: '#2f4a44',
-      itemHoverColor: '#1f3631',
-      itemHoverBg: 'rgba(86, 126, 117, 0.08)',
-      itemActiveBg: 'rgba(86, 126, 117, 0.14)',
-      itemSelectedBg: SAGE,
-      itemSelectedColor: '#ffffff',
-      fontSize: 16,
-      motionDurationSlow: '0.35s',
-    },
-  },
-};
 
 const PANEL_ID = 'team-panel';
 
@@ -83,7 +47,7 @@ export function Team() {
   );
 
   return (
-    <AntdProvider theme={lightTheme}>
+    <>
       <section id="doctors" aria-labelledby="team-title" className="team-section relative overflow-hidden bg-white text-neutral-900">
         <div className="relative mx-auto max-w-[1440px] px-(--team-pad) pt-16 max-md:pt-12">
           <div ref={headRef} className={`team-reveal ${headIn ? 'is-in' : ''}`}>
@@ -116,14 +80,16 @@ export function Team() {
         </div>
 
         <div id={PANEL_ID} className="relative mt-8 pb-[42px] max-md:mt-5 max-md:pb-12">
-          <TeamCarousel
-            scroller={scroller}
-            doctors={tab.members}
-            label={tab.label}
-            inView={bodyIn}
-            onMore={onMore}
-            empty={<TeamEmpty label={tab.label} />}
-          />
+          <div key={tab.id} className="team-panel-in">
+            <TeamCarousel
+              scroller={scroller}
+              doctors={tab.members}
+              label={tab.label}
+              inView={bodyIn}
+              onMore={onMore}
+              empty={<TeamEmpty label={tab.label} />}
+            />
+          </div>
           {isMobile && !scroller.isEmpty && (
             <MobileStepper
               className="mx-(--team-pad) mt-5"
@@ -136,6 +102,6 @@ export function Team() {
           )}
         </div>
       </section>
-    </AntdProvider>
+    </>
   );
 }

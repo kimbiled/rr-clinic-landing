@@ -12,6 +12,14 @@ const HALF = { before: { x: 0, w: 0.5 }, after: { x: 0.5, w: 0.5 } } as const;
 const isBeforeAfter = (c: Case): c is BeforeAfterCase => c.type === 'beforeAfter';
 
 /**
+ * Source pixels across a half of the card. The card half is ≈ 150 CSS px, so below ~280 px a photo is
+ * upscaled on a 2–3x phone screen and reads as blurry (case-1, case-3, case-6 have only 160–210 px).
+ */
+const MIN_HALF_PX = 280;
+const halfPx = (img: ImageAsset) => (img.framing ? img.framing.w : 0.5) * img.width;
+const isSharp = (c: BeforeAfterCase) => Math.min(halfPx(c.before), halfPx(c.after)) >= MIN_HALF_PX;
+
+/**
  * The Figma crops are cut for the desktop card half (100 × 220); the phone half is narrower, so "cover" would
  * trim the sides and zoom in. Instead keep the crop's full width and grow it vertically around its centre
  * (≈ 16 % more head and chin), staying inside the source; only when that would run off the image fall back to cover.
@@ -36,7 +44,11 @@ function sideStyle(img: ImageAsset, side: 'before' | 'after'): CSSProperties | u
  */
 export function MobileCases() {
   const { data, selectedDoctorId } = useHero();
-  const all = useMemo(() => data.cases.filter(isBeforeAfter), [data.cases]);
+  const all = useMemo(() => {
+    const pairs = data.cases.filter(isBeforeAfter);
+    const sharp = pairs.filter(isSharp);
+    return sharp.length ? sharp : pairs;
+  }, [data.cases]);
   const cases = useMemo(() => {
     const own = selectedDoctorId ? all.filter((c) => c.doctorId === selectedDoctorId) : [];
     return own.length ? own : all;
@@ -87,7 +99,7 @@ export function MobileCases() {
   const current = cases[Math.min(index, n - 1)];
 
   return (
-    <div>
+    <div className="mx-auto w-[min(100%,310px)]">
       <div
         ref={cardRef}
         className="m-cases__card relative aspect-[362/461] w-full touch-pan-y overflow-hidden rounded-[17px] bg-[#4a3624] select-none"

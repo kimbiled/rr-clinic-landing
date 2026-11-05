@@ -1,11 +1,11 @@
-import { useEffect, useId, useRef, useState } from 'react';
+import { useId, useState, type CSSProperties } from 'react';
 import { asset } from '../../data/hero';
 import rawWorks from '../../data/works.json';
 import { Compare, type Work } from '../../components/sections/Works';
 import { Footer } from '../../components/sections/Footer';
 import { whatsappLink } from '../../components/sections/whatsapp';
 import { SiteHeader, WhatsAppIcon } from '../shared/SiteHeader';
-import type { DoctorProfile, PriceGroup, VideoReview } from './profiles';
+import type { DoctorProfile, EducationGroup, PriceGroup, VideoReview } from './profiles';
 import '../../components/sections/sections.css';
 import './doctor.css';
 
@@ -221,100 +221,222 @@ function Prices({ groups }: { groups: PriceGroup[] }) {
   );
 }
 
-/** "Результаты работ": the doctor's before/after works two at a time, ← progress → under them. */
-function Works({ profile }: { profile: DoctorProfile }) {
-  const works = (rawWorks as Work[]).filter((work) => work.doctorId === profile.doctorId);
-  const row = useRef<HTMLUListElement>(null);
-  const [view, setView] = useState({ start: 0, size: 1 });
-
-  useEffect(() => {
-    const el = row.current;
-    if (!el) return undefined;
-    const update = () => setView({ start: el.scrollLeft / el.scrollWidth, size: el.clientWidth / el.scrollWidth });
-    update();
-    el.addEventListener('scroll', update, { passive: true });
-    window.addEventListener('resize', update);
-    return () => {
-      el.removeEventListener('scroll', update);
-      window.removeEventListener('resize', update);
-    };
-  }, []);
-
-  const step = (dir: number) => {
-    const el = row.current;
-    const card = el?.firstElementChild as HTMLElement | null;
-    if (el && card) el.scrollBy({ left: dir * (card.offsetWidth + 24), behavior: 'smooth' });
-  };
-
-  if (!works.length) return null;
+/** Section title in the design's two tones: dark first line, muted second ("Результаты / операций"). */
+function TwoToneTitle({ id, first, second }: { id: string; first: string; second: string }) {
   return (
-    <section className="mx-auto mt-[88px] grid max-w-[1440px] grid-cols-[300px_1fr] gap-x-14 px-(--sec-pad) max-md:mt-14 max-md:grid-cols-1" aria-labelledby="dp-works">
-      <h2 id="dp-works" className="self-center font-display text-[34px] leading-[1.1] font-normal tracking-[-0.02em] text-[#1b1919] max-md:text-[28px]">
-        Результаты работ
-        <br />
-        <span className="text-[#b3a89f]">{profile.worksOf}</span>
-      </h2>
-      <div className="dp-works-frame relative px-4 py-8 max-md:mt-5 max-md:p-0">
-        <ul ref={row} className="dp-works flex snap-x snap-mandatory gap-6 overflow-x-auto max-md:gap-3">
-          {works.map((work) => (
-            <li key={work.id} className="rr-ba relative h-[460px] w-[calc(50%-12px)] shrink-0 snap-start overflow-hidden rounded-[24px] bg-[#b4a294] max-md:h-[420px] max-md:w-[85%]">
-              <Compare work={work} />
-              <p className="pointer-events-none absolute inset-x-0 bottom-0 z-[1] px-5 pb-5 font-text text-[20px] leading-6 font-medium text-white">{work.title}</p>
-            </li>
-          ))}
-        </ul>
-        <div className="mt-6 flex items-center justify-center gap-4">
-          <button type="button" onClick={() => step(-1)} disabled={view.start <= 0.001} className="dp-arrow" aria-label="Предыдущие работы">
-            ←
-          </button>
-          <span className="dp-progress relative h-px w-[200px]" aria-hidden="true">
-            <span className="absolute inset-y-[-1px] rounded-pill bg-[#bb9358]" style={{ left: `${view.start * 100}%`, width: `${view.size * 100}%` }} />
-          </span>
-          <button type="button" onClick={() => step(1)} disabled={view.start + view.size >= 0.999} className="dp-arrow dp-arrow--fill" aria-label="Следующие работы">
-            →
-          </button>
+    <h2 id={id} className="font-display text-[34px] leading-[1.1] font-normal tracking-[-0.02em] text-[#1b1919] max-md:text-[28px]">
+      {first}
+      <br />
+      <span className="text-[#b3a89f]">{second}</span>
+    </h2>
+  );
+}
+
+const WORKS_STEP = 3;
+
+/** "Результаты операций" (design 2026-11-05): filter pills on the right, three before/after cards, "Показать ещё работы". */
+function Works({ profile }: { profile: DoctorProfile }) {
+  const all = (rawWorks as Work[]).filter((work) => work.doctorId === profile.doctorId);
+  const filters = profile.workFilters
+    .map((filter) => ({ ...filter, works: all.filter((work) => filter.titles.includes(work.title)) }))
+    .filter((filter) => filter.works.length > 0);
+  const [active, setActive] = useState(() => (filters[profile.workFilterDefault] ? profile.workFilterDefault : -1));
+  const [shown, setShown] = useState(WORKS_STEP);
+  const works = active < 0 ? all : filters[active].works;
+
+  if (!all.length) return null;
+
+  const tabs = [{ label: 'Все работы', count: all.length, index: -1 }, ...filters.map((f, i) => ({ label: f.label, count: f.works.length, index: i }))];
+
+  return (
+    <section className="mx-auto mt-[88px] max-w-[1440px] px-(--sec-pad) max-md:mt-14" aria-labelledby="dp-works">
+      <div className="flex items-center justify-between gap-8 max-lg:flex-col max-lg:items-start max-md:gap-5">
+        <TwoToneTitle id="dp-works" first="Результаты" second="операций" />
+        <div className="dp-works-tabs-scroll max-md:-mx-4 max-md:w-[calc(100%+32px)] max-md:overflow-x-auto max-md:px-4">
+          <div role="group" aria-label="Операции" className="dp-tabs inline-flex gap-1.5 rounded-pill p-1.5">
+            {tabs.map((tab) => (
+              <button
+                key={tab.label}
+                type="button"
+                aria-pressed={tab.index === active}
+                onClick={() => {
+                  setActive(tab.index);
+                  setShown(WORKS_STEP);
+                }}
+                className="dp-tab flex h-11 shrink-0 items-center gap-2 rounded-pill px-4 font-text text-[14px] font-medium whitespace-nowrap"
+              >
+                {tab.label}
+                <span className="dp-tab__count grid h-[22px] min-w-[22px] place-items-center rounded-pill px-1.5 text-[12px] leading-none">{tab.count}</span>
+              </button>
+            ))}
+          </div>
         </div>
       </div>
+
+      <ul key={active} className="dp-works-grid mt-8 grid grid-cols-3 gap-6 max-lg:grid-cols-2 max-md:mt-6 max-md:grid-cols-1 max-md:gap-3">
+        {works.slice(0, shown).map((work, i) => (
+          <li
+            key={work.id}
+            className="dp-work rr-ba relative aspect-[400/440] overflow-hidden rounded-[24px] bg-[#b4a294]"
+            style={{ '--i': i % WORKS_STEP } as CSSProperties}
+          >
+            <Compare work={work} />
+            <p className="pointer-events-none absolute inset-x-0 bottom-0 z-[1] px-5 pb-5 font-text text-[20px] leading-6 font-medium text-white">{work.title}</p>
+          </li>
+        ))}
+      </ul>
+
+      {shown < works.length && (
+        <div className="mt-8 flex justify-center max-md:mt-6">
+          <button
+            type="button"
+            onClick={() => setShown((n) => n + WORKS_STEP)}
+            className="dp-more flex h-12 items-center gap-2 rounded-pill px-8 font-text text-[14px] font-medium text-[#2f4a44]"
+          >
+            Показать ещё работы
+            <svg width="10" height="6" viewBox="0 0 10 6" fill="none" aria-hidden="true">
+              <path d="m1 1 4 4 4-4" stroke="currentColor" strokeWidth="1.3" strokeLinecap="round" strokeLinejoin="round" />
+            </svg>
+          </button>
+        </div>
+      )}
     </section>
   );
 }
 
-function Certificates({ profile }: { profile: DoctorProfile }) {
-  const { certificate, interview } = profile;
+function EducationGroupItem({ group, defaultOpen }: { group: EducationGroup; defaultOpen: boolean }) {
+  const [open, setOpen] = useState(defaultOpen);
+  const id = useId();
   return (
-    <section className="mx-auto mt-[88px] max-w-[1440px] px-(--sec-pad) max-md:mt-14" aria-labelledby="dp-certs">
-      <h2 id="dp-certs" className="font-display text-[34px] leading-[1.1] font-normal tracking-[-0.02em] text-[#1b1919] max-md:text-[28px]">
-        Сертификаты и лицензии
-      </h2>
-      <div className="mt-6 grid grid-cols-[1fr_0.73fr] gap-6 max-md:grid-cols-1 max-md:gap-3">
-        <div className="dp-cert flex min-h-[380px] flex-col rounded-[24px] p-8 max-md:min-h-0 max-md:p-5">
-          <p className="self-start rounded-[10px] bg-white px-3 py-2 font-text text-[13px] leading-none text-[#2e2c2c]">Сертификат специалиста</p>
-          <h3 className="mt-5 font-display text-[26px] leading-[1.2] font-normal tracking-[-0.01em] text-[#1b1919] max-md:text-[20px]">{certificate.name}</h3>
-          <ul className="mt-3 font-text text-[16px] leading-[1.45] text-[#4b4846] max-md:text-[14px]">
-            {certificate.lines.map((line) => (
-              <li key={line}>{line}</li>
+    <li className="dp-acc border-b border-[#ece8e4]" data-open={open || undefined}>
+      <h3>
+        <button
+          type="button"
+          aria-expanded={open}
+          aria-controls={id}
+          onClick={() => setOpen((v) => !v)}
+          className="flex w-full items-center justify-between gap-6 py-6 text-left font-display text-[22px] leading-[1.2] font-normal tracking-[-0.01em] text-[#2e2c2c] max-md:py-5 max-md:text-[18px]"
+        >
+          {group.title}
+          <span className="dp-acc__icon grid size-8 shrink-0 place-items-center rounded-full" aria-hidden="true">
+            <svg width="10" height="6" viewBox="0 0 10 6" fill="none">
+              <path d="m1 1 4 4 4-4" stroke="currentColor" strokeWidth="1.2" strokeLinecap="round" strokeLinejoin="round" />
+            </svg>
+          </span>
+        </button>
+      </h3>
+      <div id={id} role="region" className="dp-acc__panel grid" aria-hidden={!open}>
+        <div className="overflow-hidden">
+          <ul className="flex flex-col gap-5 pb-7 pl-6 max-md:pl-0">
+            {group.items.map((item) => (
+              <li key={`${item.year}-${item.title}`}>
+                <p className="font-text text-[16px] leading-[1.3] font-medium text-[#1b1919] max-md:text-[15px]">
+                  {item.year} · {item.title}
+                </p>
+                <p className="mt-1 font-text text-[14px] leading-[1.35] text-[#7c7876]">{item.text}</p>
+              </li>
             ))}
           </ul>
-          <a
-            href={certificate.href}
-            target="_blank"
-            rel="noopener noreferrer"
-            className="dp-cert__btn mt-auto flex h-[52px] items-center justify-center gap-2 rounded-pill font-text text-[16px] font-medium text-white max-md:mt-6"
-          >
-            <svg width="16" height="16" viewBox="0 0 16 16" fill="none" aria-hidden="true">
-              <circle cx="7" cy="7" r="5" stroke="currentColor" strokeWidth="1.4" />
-              <path d="m11 11 3.5 3.5" stroke="currentColor" strokeWidth="1.4" strokeLinecap="round" />
-            </svg>
-            Посмотреть дипломы
-          </a>
         </div>
-        <a href={interview.href} target="_blank" rel="noopener noreferrer" className="dp-interview relative block min-h-[380px] overflow-hidden rounded-[24px] max-md:min-h-[260px]">
-          <img src={asset(interview.poster.src)} width={interview.poster.width} height={interview.poster.height} alt={interview.poster.alt} loading="lazy" className="absolute inset-0 size-full object-cover" />
-          <span className="dp-glass absolute bottom-6 left-6 flex items-center gap-2 rounded-[14px] px-4 py-3 font-text text-[15px] font-medium text-[#2e2c2c] max-md:right-4 max-md:bottom-4 max-md:left-4">
-            <Play size={16} />
-            {interview.label}
-          </span>
-        </a>
+      </div>
+    </li>
+  );
+}
+
+/** "Образование и квалификация": the specialist certificate card beside the title, the accordion of studies below. */
+function Education({ profile }: { profile: DoctorProfile }) {
+  const { certificate, groups } = profile.education;
+  return (
+    <section className="mx-auto mt-[88px] max-w-[1440px] px-(--sec-pad) max-md:mt-14" aria-labelledby="dp-edu">
+      <div className="flex items-start justify-between gap-8 max-md:flex-col max-md:gap-5">
+        <TwoToneTitle id="dp-edu" first="Образование" second="и квалификация" />
+        <div className="dp-cert relative flex w-[520px] items-center overflow-hidden rounded-[24px] p-6 max-md:w-full max-md:p-5">
+          <div className="relative z-[1] flex flex-col items-start">
+            <p className="font-text text-[13px] leading-none text-[#625f5e]">№ {certificate.number}</p>
+            <p className="mt-3 font-display text-[20px] leading-[1.2] text-[#1b1919]">Сертификат специалиста</p>
+            <a
+              href={certificate.href}
+              target="_blank"
+              rel="noopener noreferrer"
+              data-analytics-id={`doctor_page_certificate_${profile.doctorId}`}
+              className="dp-cert__btn mt-5 flex h-11 items-center gap-2 rounded-pill px-5 font-text text-[14px] font-medium text-white"
+            >
+              Посмотреть сертификат
+              <svg width="10" height="10" viewBox="0 0 10 10" fill="none" aria-hidden="true">
+                <path d="M2 8 8 2M3 2h5v5" stroke="currentColor" strokeWidth="1.3" strokeLinecap="round" strokeLinejoin="round" />
+              </svg>
+            </a>
+          </div>
+          {/* A blurred sheet standing in for the certificate itself, as in the design (the real one opens on click). */}
+          <span className="dp-cert__sheet absolute top-4 right-4 bottom-4 w-[46%] rounded-[12px] max-md:w-[42%]" aria-hidden="true" />
+        </div>
+      </div>
+      <ul className="mt-6 border-t border-[#ece8e4]">
+        {groups.map((group) => (
+          <EducationGroupItem key={group.title} group={group} defaultOpen={false} />
+        ))}
+      </ul>
+    </section>
+  );
+}
+
+/** "Достижения и опыт": a warm band, the achievements on the left, the cut-out portrait and a "10 000+" badge on the right. */
+function Achievements({ profile }: { profile: DoctorProfile }) {
+  const { items, photo, badge, instagram } = profile.achievements;
+  return (
+    <section className="dp-achieve relative mt-[88px] overflow-hidden max-md:mt-14" aria-labelledby="dp-achieve">
+      <div className="relative mx-auto grid max-w-[1440px] grid-cols-[1fr_1fr] px-(--sec-pad) max-md:grid-cols-1">
+        <div className="py-[72px] max-md:pt-12 max-md:pb-6">
+          <h2 id="dp-achieve" className="font-display text-[34px] leading-[1.1] font-normal tracking-[-0.02em] text-white max-md:text-[28px]">
+            Достижения
+            <br />
+            <span className="text-white/60">и опыт</span>
+          </h2>
+          <ul className="mt-10 flex max-w-[520px] flex-col gap-7 max-md:mt-7 max-md:gap-5">
+            {items.map((item) => (
+              <li key={item.title}>
+                <p className="font-display text-[20px] leading-[1.25] whitespace-pre-line text-white max-md:text-[18px]">{item.title}</p>
+                <p className="mt-1.5 font-text text-[14px] leading-[1.4] text-white/75">{item.text}</p>
+              </li>
+            ))}
+          </ul>
+        </div>
+        <div className="relative min-h-[560px] max-md:min-h-[400px]">
+          <img
+            src={asset(photo.src)}
+            width={photo.width}
+            height={photo.height}
+            alt={photo.alt}
+            loading="lazy"
+            decoding="async"
+            className="absolute bottom-0 left-1/2 h-[94%] w-auto max-w-none -translate-x-1/2 object-contain object-bottom max-md:h-full"
+          />
+          <div className="dp-glass absolute right-0 bottom-8 flex items-center gap-3 rounded-pill py-2 pr-2 pl-3 max-md:right-auto max-md:bottom-5 max-md:left-0">
+            <span className="flex -space-x-2.5">
+              {profile.reviews.patients.map((src) => (
+                <img key={src} src={asset(src)} width={32} height={32} alt="" loading="lazy" className="size-8 rounded-full object-cover ring-2 ring-white/70" />
+              ))}
+            </span>
+            <span className="flex flex-col font-text leading-none text-[#2e2c2c]">
+              <span className="text-[16px] font-medium">{badge}</span>
+              <span className="mt-1 text-[12px] text-[#625f5e]">операций</span>
+            </span>
+            <a
+              href={instagram}
+              target="_blank"
+              rel="noopener noreferrer"
+              data-analytics-id={`doctor_page_instagram_${profile.doctorId}`}
+              aria-label={`Instagram: ${profile.shortName}`}
+              className="dp-insta grid size-10 place-items-center rounded-full text-white"
+            >
+              <svg width="18" height="18" viewBox="0 0 18 18" fill="none" aria-hidden="true">
+                <rect x="2" y="2" width="14" height="14" rx="4" stroke="currentColor" strokeWidth="1.4" />
+                <circle cx="9" cy="9" r="3.2" stroke="currentColor" strokeWidth="1.4" />
+                <circle cx="13.2" cy="4.8" r="0.9" fill="currentColor" />
+              </svg>
+            </a>
+          </div>
+        </div>
       </div>
     </section>
   );
@@ -442,8 +564,9 @@ function Faq({ profile }: { profile: DoctorProfile }) {
 }
 
 /**
- * A surgeon's own page (design 2026-11-04, Рустам Курманбаев): hero card, prices with a WhatsApp message for the
- * chosen operation, before/after works, certificate and interview, reviews, the doctor's FAQ and the footer.
+ * A surgeon's own page (design 2026-11-05, Рустам Курманбаев): hero card, prices with a WhatsApp message for the
+ * chosen operation, filtered before/after works, education with the certificate, achievements, reviews, the doctor's
+ * FAQ and the footer.
  */
 export function DoctorPage({ profile }: { profile: DoctorProfile }) {
   return (
@@ -453,7 +576,8 @@ export function DoctorPage({ profile }: { profile: DoctorProfile }) {
         <main>
           <Prices groups={profile.prices} />
           <Works profile={profile} />
-          <Certificates profile={profile} />
+          <Education profile={profile} />
+          <Achievements profile={profile} />
           <Reviews profile={profile} />
           <Faq profile={profile} />
         </main>

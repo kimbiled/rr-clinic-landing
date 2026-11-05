@@ -70,6 +70,10 @@ export function SurgeonMenu() {
     if (target) smoothScrollTo(target, { reducedMotion });
   };
 
+  // On an inner page (/doctors/…) the home page's sections aren't here: "#trust" → "/#trust".
+  const sectionHref = (href: string) =>
+    href.startsWith('#') && href.length > 1 && !document.getElementById(href.slice(1)) ? `/${href}` : href;
+
   // A doctor with their own page opens it; otherwise one from the data filters the hero cases
   // ("познакомьтесь с его работами") and the rest go to the team section.
   const choose = (doctor: MenuDoctor) => {
@@ -213,7 +217,7 @@ export function SurgeonMenu() {
               {(isMobile ? menu.mobileLinks : menu.links).map((link, i) => (
                 <li key={link.label} className="smenu-in" style={{ '--i': i } as CSSProperties}>
                   <a
-                    href={link.href}
+                    href={sectionHref(link.href)}
                     onClick={(e) => {
                       onAnchorClick(e, reducedMotion);
                       close();

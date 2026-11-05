@@ -12,7 +12,7 @@ export interface TeamTab {
   members: Doctor[];
 }
 
-/** Design order of the "Пластические хирурги" row (design 2026-10-30); it shows nine cards, Улагашева follows them. */
+/** Design order of the "Пластические хирурги" row (design 2026-10-30): nine cards. */
 const SURGEON_ORDER = [
   'kurmanbaev-rustam',
   'romanovskaya-tatyana',
@@ -23,7 +23,6 @@ const SURGEON_ORDER = [
   'kodzoeva-leyla',
   'savelyev-evgeniy',
   'chatinyan-garik',
-  'ulagasheva-alina',
 ];
 
 /**
@@ -49,7 +48,7 @@ export interface CardText {
   bookingClosed?: boolean;
 }
 
-/** Team-card copy (design 2026-10-30). Улагашева is not in the design: her text and figures come from her page. */
+/** Team-card copy (design 2026-10-30). */
 export const CARD_TEXT: Record<string, CardText> = {
   'kurmanbaev-rustam': {
     patronymic: 'Амангельдыевич',
@@ -142,22 +141,12 @@ export const CARD_TEXT: Record<string, CardText> = {
       { value: '400+', label: 'операций в год' },
     ],
   },
-  'ulagasheva-alina': {
-    patronymic: 'Ибрагимовна',
-    tags: ['Пластика груди', 'Пластика лица', 'Пластика век'],
-    role: 'Пластический хирург • Стаж 8+ лет',
-    bio: 'Пластический хирург. Эстетическая хирургия груди и лица. Член Сибирской ассоциации пластических, реконструктивных и эстетических хирургов.',
-    stats: [
-      { value: '1 200+', label: 'операций' },
-      { value: '8+', label: 'лет практики' },
-    ],
-  },
 };
 
 function orderedSurgeons(doctors: Doctor[]): Doctor[] {
   const byId = new Map(doctors.map((d) => [d.id, d]));
   const head = SURGEON_ORDER.map((id) => byId.get(id)).filter((d): d is Doctor => Boolean(d));
-  // Anyone else in the data follows the design's ten.
+  // Anyone else in the data follows the design's nine.
   const tail = doctors.filter((d) => !SURGEON_ORDER.includes(d.id));
   return [...head, ...tail];
 }
