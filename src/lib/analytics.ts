@@ -211,11 +211,14 @@ export function initializeAnalytics({ measurementId, clarityId, enabled = true, 
     if (event.defaultPrevented || event.button !== 0 || !(event.target instanceof Element)) return;
     const el = event.target.closest(CLICKABLE);
     if (!el) return;
+    // A doctor's landing names its doctor on <html data-rr-doctor>, so reports can count clicks per doctor.
+    const doctor = document.documentElement?.getAttribute?.('data-rr-doctor') || undefined;
+    const withDoctor = <T extends object>(params: T) => (doctor ? { ...params, doctor } : params);
     const params = uiClick(el, location.href);
-    window.gtag?.('event', 'ui_click', params);
+    window.gtag?.('event', 'ui_click', withDoctor(params));
     if (el instanceof HTMLAnchorElement) {
       const contact = contactClick(el.href, params.placement, (el as HTMLElement).dataset.analyticsId || 'contact_link', location.origin);
-      if (contact) window.gtag?.('event', 'contact_click', contact);
+      if (contact) window.gtag?.('event', 'contact_click', withDoctor(contact));
     }
   }, true);
 

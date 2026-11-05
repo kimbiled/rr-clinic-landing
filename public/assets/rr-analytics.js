@@ -163,18 +163,20 @@
           loadScript(`https://www.clarity.ms/tag/${encodeURIComponent(clarity)}`);
       }
       document.addEventListener('click', (event) => {
-          var _a, _b;
+          var _a, _b, _c, _d;
           if (event.defaultPrevented || event.button !== 0 || !(event.target instanceof Element))
               return;
           const el = event.target.closest(CLICKABLE);
           if (!el)
               return;
+          const doctor = ((_b = (_a = document.documentElement) === null || _a === void 0 ? void 0 : _a.getAttribute) === null || _b === void 0 ? void 0 : _b.call(_a, 'data-rr-doctor')) || undefined;
+          const withDoctor = (params) => (doctor ? { ...params, doctor } : params);
           const params = uiClick(el, location.href);
-          (_a = window.gtag) === null || _a === void 0 ? void 0 : _a.call(window, 'event', 'ui_click', params);
+          (_c = window.gtag) === null || _c === void 0 ? void 0 : _c.call(window, 'event', 'ui_click', withDoctor(params));
           if (el instanceof HTMLAnchorElement) {
               const contact = contactClick(el.href, params.placement, el.dataset.analyticsId || 'contact_link', location.origin);
               if (contact)
-                  (_b = window.gtag) === null || _b === void 0 ? void 0 : _b.call(window, 'event', 'contact_click', contact);
+                  (_d = window.gtag) === null || _d === void 0 ? void 0 : _d.call(window, 'event', 'contact_click', withDoctor(contact));
           }
       }, true);
       watchSections();

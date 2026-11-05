@@ -15,6 +15,8 @@
   var consultation = script.getAttribute('data-consultation');
   var doctor = script.getAttribute('data-doctor');
   if (!consultation || !doctor) return;
+  // rr-analytics.js adds this name to every click, so GA can count clicks per doctor's landing.
+  document.documentElement.setAttribute('data-rr-doctor', doctor);
 
   var dialog = document.createElement('dialog');
   dialog.id = 'rr-surgeon-offer';

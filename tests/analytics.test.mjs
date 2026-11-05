@@ -145,6 +145,17 @@ test('links are described without queries, foreign paths or contact destinations
   assert.deepEqual(d('javascript:void(0)'), { link_type: 'button' });
 });
 
+test("on a doctor's landing every click carries the doctor's name", () => {
+  const app = setup();
+  app.context.document.documentElement = el('html', { 'data-rr-doctor': 'Лейла Кодзоева' });
+  app.initializeAnalytics({ measurementId: 'G-TEST123' });
+  const link = el('a', { href: 'https://wa.me/123' }, [], 'Записаться на консультацию');
+  el('section', { id: 'hero' }, [link]);
+  app.click(link);
+  assert.equal(app.events('ui_click')[0].doctor, 'Лейла Кодзоева');
+  assert.equal(app.events('contact_click')[0].doctor, 'Лейла Кодзоева');
+});
+
 test('a WhatsApp click sends ui_click and contact_click, never the destination or message', () => {
   const app = setup();
   app.initializeAnalytics({ measurementId: 'G-TEST123' });
