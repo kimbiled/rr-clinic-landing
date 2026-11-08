@@ -938,6 +938,8 @@ fbq('track', 'PageView');
     function logo(e) { return e.target.closest && e.target.closest(LOGO); }
     window.addEventListener('click', function (e) {
       if (!logo(e) || e.button !== 0 || e.metaKey || e.ctrlKey || e.shiftKey || e.altKey) return;
+      /* This listener stops the click before the analytics one: report it first. */
+      if (window.__rrTrackClick) window.__rrTrackClick(e);
       e.preventDefault();
       e.stopImmediatePropagation();
       location.href = '/';
