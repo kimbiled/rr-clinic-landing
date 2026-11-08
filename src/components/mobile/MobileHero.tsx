@@ -4,6 +4,7 @@ import { ParticlesCanvas } from '../fx/ParticlesCanvas';
 import { CtaButton } from '../hero/CtaButton';
 import { useHero } from '../hero/HeroContext';
 import { MobileCases } from './MobileCases';
+import { useTwoGisRating } from '../../lib/twoGisRating';
 import './mobile.css';
 
 /**
@@ -42,7 +43,9 @@ export function MobileHero() {
   const { data } = useHero();
   const { hero, clinic } = data;
   const { rating } = clinic;
-  const ratingValue = rating.value.toFixed(1);
+  // Value and review count come live from 2GIS (src/lib/twoGisRating.ts); hero.json is the fallback.
+  const live = useTwoGisRating({ value: rating.value, count: rating.count });
+  const ratingValue = live.value.toFixed(1);
   const ratingSource = rating.source === '2GIS' ? '2ГИС' : rating.source;
   const { address } = mobileHero;
 
@@ -115,7 +118,7 @@ export function MobileHero() {
             <span className="font-text text-[13px] leading-[13px] text-white/65">
               {ratingSource} <span className="mx-0.5">•</span> <span className="text-white">{ratingValue}</span>
             </span>
-            <Stars value={rating.value} max={rating.max ?? 5} />
+            <Stars value={live.value} max={rating.max ?? 5} />
           </span>
           <span className="m-hero__rating-arrow ml-auto grid size-[46px] place-items-center rounded-full" aria-hidden="true">
             <svg viewBox="0 0 8 12" width={7} height={11} fill="none">

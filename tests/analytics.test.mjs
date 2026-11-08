@@ -212,3 +212,15 @@ test('rr-analytics.js is generated from analytics.ts, stays off on localhost and
   ]);
   assert.equal(live.listeners.length, 1);
 });
+
+test('a click reported through __rrTrackClick (surgeon-pages.js stops it at the window) counts once', () => {
+  const app = setup();
+  app.initializeAnalytics({ measurementId: 'G-TEST123' });
+  const link = el('a', { href: 'https://api.whatsapp.com/send?phone=1&text=консультация' }, [], 'Записаться на консультацию');
+  const event = { target: link, button: 0, defaultPrevented: false };
+  app.context.window.__rrTrackClick(event);
+  app.listeners.forEach(({ handler }) => handler(event));
+  assert.equal(app.events('ui_click').length, 1);
+  assert.equal(app.events('ui_click')[0].button_text, 'Записаться на консультацию');
+  assert.equal(app.events('contact_click')[0].contact_method, 'whatsapp');
+});

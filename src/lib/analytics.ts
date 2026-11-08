@@ -34,6 +34,7 @@ declare global {
     gtag?: (...args: unknown[]) => void;
     clarity?: ((...args: unknown[]) => void) & { q?: unknown[] };
     __rrAnalytics?: boolean;
+    __rrTrackClick?: (event: MouseEvent) => void;
   }
 }
 
@@ -207,10 +208,12 @@ export function initializeAnalytics({ measurementId, clarityId, enabled = true, 
 
   // Delegation also covers lazy doctor cards, mobile variants, Ant Design portals and Framer's hydrated markup.
   // Capture phase: Framer components may stop the click before it bubbles to the document.
-  document.addEventListener('click', (event) => {
-    if (event.defaultPrevented || event.button !== 0 || !(event.target instanceof Element)) return;
+  const tracked = new WeakSet<Event>();
+  const trackClick = (event: MouseEvent) => {
+    if (tracked.has(event) || event.defaultPrevented || event.button !== 0 || !(event.target instanceof Element)) return;
     const el = event.target.closest(CLICKABLE);
     if (!el) return;
+    tracked.add(event);
     // A doctor's landing names its doctor on <html data-rr-doctor>, so reports can count clicks per doctor.
     const doctor = document.documentElement?.getAttribute?.('data-rr-doctor') || undefined;
     const withDoctor = <T extends object>(params: T) => (doctor ? { ...params, doctor } : params);
@@ -220,7 +223,11 @@ export function initializeAnalytics({ measurementId, clarityId, enabled = true, 
       const contact = contactClick(el.href, params.placement, (el as HTMLElement).dataset.analyticsId || 'contact_link', location.origin);
       if (contact) window.gtag?.('event', 'contact_click', withDoctor(contact));
     }
-  }, true);
+  };
+  // surgeon-pages.js stops some clicks at the window (consultation links, page-to-page links) before they reach the
+  // document, so it reports them through this hook first.
+  window.__rrTrackClick = trackClick;
+  document.addEventListener('click', trackClick, true);
 
   watchSections();
 }

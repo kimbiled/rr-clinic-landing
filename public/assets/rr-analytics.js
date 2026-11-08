@@ -162,13 +162,15 @@
           (_c = window.clarity) !== null && _c !== void 0 ? _c : (window.clarity = Object.assign(function (...args) { var _a; var _b; ((_a = (_b = window.clarity).q) !== null && _a !== void 0 ? _a : (_b.q = [])).push(args); }, {}));
           loadScript(`https://www.clarity.ms/tag/${encodeURIComponent(clarity)}`);
       }
-      document.addEventListener('click', (event) => {
+      const tracked = new WeakSet();
+      const trackClick = (event) => {
           var _a, _b, _c, _d;
-          if (event.defaultPrevented || event.button !== 0 || !(event.target instanceof Element))
+          if (tracked.has(event) || event.defaultPrevented || event.button !== 0 || !(event.target instanceof Element))
               return;
           const el = event.target.closest(CLICKABLE);
           if (!el)
               return;
+          tracked.add(event);
           const doctor = ((_b = (_a = document.documentElement) === null || _a === void 0 ? void 0 : _a.getAttribute) === null || _b === void 0 ? void 0 : _b.call(_a, 'data-rr-doctor')) || undefined;
           const withDoctor = (params) => (doctor ? { ...params, doctor } : params);
           const params = uiClick(el, location.href);
@@ -178,7 +180,9 @@
               if (contact)
                   (_d = window.gtag) === null || _d === void 0 ? void 0 : _d.call(window, 'event', 'contact_click', withDoctor(contact));
           }
-      }, true);
+      };
+      window.__rrTrackClick = trackClick;
+      document.addEventListener('click', trackClick, true);
       watchSections();
   }
   var host = location.hostname;

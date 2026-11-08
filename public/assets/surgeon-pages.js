@@ -397,6 +397,8 @@
     try { url = new URL(anchor.href, location.href); } catch (_) { return; }
     if ((url.hostname === 'api.whatsapp.com' || url.hostname === 'wa.me') && /консультац/i.test(url.searchParams.get('text') || '')) {
       anchor.href = consultation;
+      // This listener runs before the analytics one on the document: report the click before stopping it.
+      if (window.__rrTrackClick) window.__rrTrackClick(event);
       // Keep the native anchor action (new tabs/modifier keys included).
       event.stopImmediatePropagation();
       return;
@@ -405,7 +407,45 @@
     // surgeon, timer and patches instead of Framer's unpatched client-side page.
     if ((url.origin === location.origin || url.hostname === 'rr-clinic.kz') && url.pathname !== location.pathname) {
       if (url.hostname === 'rr-clinic.kz') anchor.href = url.pathname + url.search + url.hash;
+      if (window.__rrTrackClick) window.__rrTrackClick(event);
       event.stopImmediatePropagation();
     }
   }, true);
+})();
+
+// 2GIS rating on the Framer pages ("2ГИС • 4.9" in the hero): the page keeps its design, only the value comes live
+// from 2GIS (the client's widget code, same source as src/lib/twoGisRating.ts). On failure the saved value stays.
+(function () {
+  'use strict';
+  if (typeof fetch !== 'function') return;
+  var BRANCH = '70000001066801836';
+  var ENDPOINT = 'https://widget.2gis.ru/api/widget?org_id=70000001066801850&branch_id=' + BRANCH + '&size=small&theme=light';
+
+  function apply(value) {
+    var links = document.querySelectorAll('a[href*="2gis.kz/astana/firm/' + BRANCH + '"]');
+    for (var i = 0; i < links.length; i++) {
+      var spans = links[i].querySelectorAll('span');
+      for (var j = 0; j < spans.length; j++) {
+        var span = spans[j];
+        if (span.children.length === 0 && /^\s*\d[.,]\d\s*$/.test(span.textContent) && span.textContent.trim() !== value) {
+          span.textContent = value;
+        }
+      }
+    }
+  }
+
+  fetch(ENDPOINT, { credentials: 'omit' })
+    .then(function (response) { return response.ok ? response.text() : ''; })
+    .then(function (html) {
+      var match = /[?&;]rating=([\d.]+)/.exec(html);
+      var rating = match ? Number(match[1]) : NaN;
+      if (!(rating > 0 && rating <= 5)) return;
+      var value = rating.toFixed(1);
+      apply(value);
+      // Framer hydrates and swaps breakpoint variants after load: apply again once that has settled.
+      setTimeout(function () { apply(value); }, 1500);
+      setTimeout(function () { apply(value); }, 5000);
+      window.addEventListener('resize', function () { setTimeout(function () { apply(value); }, 300); });
+    })
+    .catch(function () {});
 })();

@@ -1,6 +1,7 @@
 import { useEffect, useRef, useState } from 'react';
 import { asset, getDoctor, heroData } from '../../data/hero';
 import { reviews } from '../../data/landing';
+import { useTwoGisRating } from '../../lib/twoGisRating';
 import { revealItem, revealScope, useInView } from './useInView';
 import { DoctorAvatar } from './Works';
 import './sections.css';
@@ -8,13 +9,13 @@ import './sections.css';
 /** Card width + gap: the ← → step. */
 const STEP = 300;
 
-/** "1 оценка", "264 оценки", "25 оценок". */
+/** "1 отзыв", "23 отзыва", "200 отзывов" (2GIS counts reviews). */
 function ratingsLabel(n: number): string {
   const mod10 = n % 10;
   const mod100 = n % 100;
-  if (mod10 === 1 && mod100 !== 11) return `${n} оценка`;
-  if (mod10 >= 2 && mod10 <= 4 && (mod100 < 12 || mod100 > 14)) return `${n} оценки`;
-  return `${n} оценок`;
+  if (mod10 === 1 && mod100 !== 11) return `${n} отзыв`;
+  if (mod10 >= 2 && mod10 <= 4 && (mod100 < 12 || mod100 > 14)) return `${n} отзыва`;
+  return `${n} отзывов`;
 }
 
 const Stars = () => (
@@ -37,6 +38,8 @@ export function Reviews() {
   const [progress, setProgress] = useState(0);
   const [edges, setEdges] = useState({ start: true, end: false });
   const { rating } = heroData.clinic;
+  // Value and review count come live from 2GIS (src/lib/twoGisRating.ts); hero.json is the fallback.
+  const live = useTwoGisRating({ value: rating.value, count: rating.count });
   const { license } = reviews;
 
   const measure = () => {
@@ -86,16 +89,16 @@ export function Reviews() {
               target="_blank"
               rel="noopener noreferrer"
               className="rr-rating flex h-[134px] w-[343px] items-center gap-5 rounded-[24px] px-7 max-md:h-[124px] max-md:w-full max-md:px-5"
-              aria-label={`Рейтинг RR Clinic в 2ГИС: ${String(rating.value).replace('.', ',')} из ${rating.max}, ${ratingsLabel(rating.count)}`}
+              aria-label={`Рейтинг RR Clinic в 2ГИС: ${String(live.value).replace('.', ',')} из ${rating.max}, ${ratingsLabel(live.count)}`}
             >
               <img src={asset(rating.logo.src)} width={64} height={64} alt="" loading="lazy" decoding="async" className="size-16 shrink-0" />
               <span className="min-w-0">
                 <span className="block font-text text-[15px] leading-[18px] text-[#625f5e]">Рейтинг RR Clinic в 2ГИС</span>
                 <span className="mt-1 flex items-center gap-3">
-                  <span className="font-display text-[40px] leading-[46px] text-[#2e2c2c]">{String(rating.value).replace('.', ',')}</span>
+                  <span className="font-display text-[40px] leading-[46px] text-[#2e2c2c]">{String(live.value).replace('.', ',')}</span>
                   <span className="flex flex-col gap-1">
                     <Stars />
-                    <span className="font-text text-[15px] leading-4 text-[#8c8784]">{ratingsLabel(rating.count)}</span>
+                    <span className="font-text text-[15px] leading-4 text-[#8c8784]">{ratingsLabel(live.count)}</span>
                   </span>
                 </span>
               </span>

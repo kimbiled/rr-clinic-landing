@@ -6,6 +6,7 @@ import { Footer } from '../../components/sections/Footer';
 import { whatsappLink } from '../../components/sections/whatsapp';
 import { SiteHeader, WhatsAppIcon } from '../shared/SiteHeader';
 import { CATEGORIES, SURGEONS, page, surgeonsIn, type CategoryId } from './doctorsData';
+import { useTwoGisRating } from '../../lib/twoGisRating';
 import '../../components/sections/sections.css';
 import '../../components/team/team.css';
 import './doctors.css';
@@ -46,6 +47,8 @@ function PersonIcon() {
 function Intro() {
   const { clinic } = heroData;
   const { rating } = clinic;
+  // Value and review count come live from 2GIS (src/lib/twoGisRating.ts); hero.json is the fallback.
+  const live = useTwoGisRating({ value: rating.value, count: rating.count });
   return (
     <div className="mx-auto mt-6 grid max-w-[1440px] grid-cols-[1fr_auto] items-start gap-8 px-(--sec-pad) max-md:mt-3 max-md:grid-cols-1 max-md:gap-6">
       <div>
@@ -60,16 +63,16 @@ function Intro() {
             href={rating.url ?? '#contacts'}
             target="_blank"
             rel="noopener noreferrer"
-            aria-label={`Рейтинг ${rating.value} из ${rating.max} в 2ГИС, ${rating.count} отзывов`}
+            aria-label={`Рейтинг ${live.value} из ${rating.max} в 2ГИС, ${live.count} отзывов`}
             className="docs-chip inline-flex h-[46px] items-center gap-2 rounded-[16px] pr-4 pl-3 font-text text-[#2e2c2c] max-md:h-10 max-md:pl-2.5"
           >
             <img src={asset(rating.logo.src)} width={28} height={28} alt="" className="size-7 rounded-[7px]" />
             <span className="flex flex-col gap-0.5">
               <span className="flex items-baseline gap-1 text-[18px] leading-none">
-                {String(rating.value).replace('.', ',')}
-                <span className="text-[13px] text-[#9a9490]">({rating.count})</span>
+                {String(live.value).replace('.', ',')}
+                <span className="text-[13px] text-[#9a9490]">({live.count})</span>
               </span>
-              <Stars value={rating.value} />
+              <Stars value={live.value} />
             </span>
           </a>
         </div>

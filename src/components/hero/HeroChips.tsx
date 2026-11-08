@@ -3,6 +3,7 @@ import { asset, getDoctor } from '../../data/hero';
 import type { Doctor } from '../../data/types';
 import { caseCount, doctorName, plural } from '../surgeon-menu/menuTrigger';
 import { useHero } from './HeroContext';
+import { useTwoGisRating } from '../../lib/twoGisRating';
 
 const CHIP =
   'inline-flex h-12 items-center rounded-md bg-glass-light backdrop-blur-[12px] font-text text-[14px] leading-[14px] ' +
@@ -44,7 +45,9 @@ export function HeroChips({ resetFocusRef }: { resetFocusRef: RefObject<HTMLElem
   const { data, selectedDoctorId, selectDoctor } = useHero();
   const { clinic } = data;
   const rating = clinic.rating;
-  const ratingValue = rating.value.toLocaleString('ru-RU', { minimumFractionDigits: 1, maximumFractionDigits: 1 });
+  // Value and review count come live from 2GIS (src/lib/twoGisRating.ts); hero.json is the fallback.
+  const live = useTwoGisRating({ value: rating.value, count: rating.count });
+  const ratingValue = live.value.toLocaleString('ru-RU', { minimumFractionDigits: 1, maximumFractionDigits: 1 });
   const ratingSource = rating.source === '2GIS' ? '2ГИС' : rating.source;
 
   const doctor = getDoctor(selectedDoctorId);
@@ -86,7 +89,7 @@ export function HeroChips({ resetFocusRef }: { resetFocusRef: RefObject<HTMLElem
         <span className="flex flex-col items-start gap-[3px]" aria-hidden="true">
           <span className="flex items-baseline gap-1">
             <span className="font-display text-[14px] leading-[14px] font-medium">{ratingValue}</span>
-            <span className="text-[9px] leading-[9px] opacity-80">({rating.count})</span>
+            <span className="text-[9px] leading-[9px] opacity-80">({live.count})</span>
           </span>
           <span className="flex gap-[0.9px]">
             {[1, 2, 3, 4, 5].map((i) => (
@@ -95,7 +98,7 @@ export function HeroChips({ resetFocusRef }: { resetFocusRef: RefObject<HTMLElem
           </span>
         </span>
         <span className="sr-only">
-          {`Рейтинг в ${ratingSource}: ${ratingValue} из ${rating.max ?? 5}, ${rating.count} ${plural(rating.count, 'отзыв', 'отзыва', 'отзывов')}`}
+          {`Рейтинг в ${ratingSource}: ${ratingValue} из ${rating.max ?? 5}, ${live.count} ${plural(live.count, 'отзыв', 'отзыва', 'отзывов')}`}
           {rating.url && ' (открывается в новой вкладке)'}
         </span>
       </RatingChip>
