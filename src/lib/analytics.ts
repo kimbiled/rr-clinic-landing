@@ -7,7 +7,10 @@
 // Events (GA4, all event-scoped parameters):
 //   ui_click       every click on a link, button or tab:
 //                  button_id, button_text, placement, link_type, link_url (internal path, external host only)
-//   contact_click  WhatsApp / phone / email links (as before): contact_method, placement, button_id
+//   contact_click  WhatsApp / phone / email links: contact_method, button_text («WhatsApp», «Позвонить», «Email»),
+//                  placement, button_id
+//   A control without visible text (an icon) is named after where it leads («WhatsApp», «Instagram», «2ГИС»…),
+//   so button_text is never empty and GA never shows «(not set)» for it.
 //   section_view   a block reached the screen, once per page view: section
 // Never sent: a contact link's destination (the WhatsApp text can carry the visitor's message) or anything typed.
 
@@ -16,6 +19,7 @@ export type LinkType = ContactMethod | 'internal' | 'anchor' | 'external' | 'but
 
 export interface ContactClick {
   contact_method: ContactMethod;
+  button_text: string;
   placement: string;
   button_id: string;
 }
@@ -57,6 +61,18 @@ function contactMethodOf(url: URL): ContactMethod | null {
   return null;
 }
 
+const CONTACT_LABEL: Record<ContactMethod, string> = { whatsapp: 'WhatsApp', phone: 'Позвонить', email: 'Email' };
+
+/** Well-known destinations, for naming icon-only links. */
+const SITE_LABEL: [RegExp, string][] = [
+  [/(^|\.)instagram\.com$/, 'Instagram'],
+  [/(^|\.)2gis\.[a-z]+$/, '2ГИС'],
+  [/^t\.me$|(^|\.)telegram\.(me|org)$/, 'Telegram'],
+  [/(^|\.)youtube\.com$|^youtu\.be$/, 'YouTube'],
+  [/(^|\.)tiktok\.com$/, 'TikTok'],
+  [/(^|\.)facebook\.com$/, 'Facebook'],
+];
+
 /** Send controlled identifiers only; never send the destination or prefilled chat message. */
 export function contactClick(href: string, placement: string, buttonId: string, baseUrl: string): ContactClick | null {
   let url: URL;
@@ -66,7 +82,24 @@ export function contactClick(href: string, placement: string, buttonId: string, 
     return null;
   }
   const method = contactMethodOf(url);
-  return method ? { contact_method: method, placement, button_id: buttonId } : null;
+  return method ? { contact_method: method, button_text: CONTACT_LABEL[method], placement, button_id: buttonId } : null;
+}
+
+/** A name for an icon-only link: the contact method, a known site, the host, or the path on this site. */
+export function linkLabel(href: string, pageUrl: string): string {
+  let url: URL;
+  try {
+    url = new URL(href, pageUrl);
+  } catch {
+    return '';
+  }
+  const method = contactMethodOf(url);
+  if (method) return CONTACT_LABEL[method];
+  if (url.protocol !== 'http:' && url.protocol !== 'https:') return '';
+  const site = SITE_LABEL.find(([host]) => host.test(url.hostname));
+  if (site) return site[1];
+  const link = describeLink(href, pageUrl);
+  return link.link_url ?? '';
 }
 
 /** A link's kind and a safe description of where it goes: a path on this site, only the host elsewhere. */
@@ -96,6 +129,7 @@ export function labelOf(el: Element): string {
     el.getAttribute?.('title') ||
     (el.tagName === 'INPUT' ? el.getAttribute?.('value') : '') ||
     el.querySelector?.('img[alt]')?.getAttribute('alt') ||
+    el.querySelector?.('svg title')?.textContent ||
     '';
   return raw.replace(/\s+/g, ' ').trim().slice(0, TEXT_LIMIT);
 }
@@ -120,9 +154,11 @@ export function uiClick(el: Element, pageUrl: string): UiClick {
   const text = labelOf(el);
   const href = el.tagName === 'A' ? el.getAttribute('href') : null;
   const link = href !== null ? describeLink(href, pageUrl) : null;
+  // An icon has no words: name it after its destination, else say so (GA would show «(not set)»).
+  const shown = text || (href !== null ? linkLabel(href, pageUrl) : '') || 'Без подписи';
   return {
     button_id: (el as HTMLElement).dataset?.analyticsId || el.id || text.toLowerCase().slice(0, 40) || el.tagName.toLowerCase(),
-    button_text: text,
+    button_text: shown,
     placement: placementOf(el),
     ...(link ?? { link_type: 'button' as const }),
   };

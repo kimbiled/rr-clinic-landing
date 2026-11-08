@@ -3,6 +3,7 @@
   var exports = {};
   Object.defineProperty(exports, "__esModule", { value: true });
   exports.contactClick = contactClick;
+  exports.linkLabel = linkLabel;
   exports.describeLink = describeLink;
   exports.labelOf = labelOf;
   exports.placementOf = placementOf;
@@ -21,6 +22,15 @@
           return 'whatsapp';
       return null;
   }
+  const CONTACT_LABEL = { whatsapp: 'WhatsApp', phone: 'Позвонить', email: 'Email' };
+  const SITE_LABEL = [
+      [/(^|\.)instagram\.com$/, 'Instagram'],
+      [/(^|\.)2gis\.[a-z]+$/, '2ГИС'],
+      [/^t\.me$|(^|\.)telegram\.(me|org)$/, 'Telegram'],
+      [/(^|\.)youtube\.com$|^youtu\.be$/, 'YouTube'],
+      [/(^|\.)tiktok\.com$/, 'TikTok'],
+      [/(^|\.)facebook\.com$/, 'Facebook'],
+  ];
   function contactClick(href, placement, buttonId, baseUrl) {
       let url;
       try {
@@ -30,7 +40,27 @@
           return null;
       }
       const method = contactMethodOf(url);
-      return method ? { contact_method: method, placement, button_id: buttonId } : null;
+      return method ? { contact_method: method, button_text: CONTACT_LABEL[method], placement, button_id: buttonId } : null;
+  }
+  function linkLabel(href, pageUrl) {
+      var _a;
+      let url;
+      try {
+          url = new URL(href, pageUrl);
+      }
+      catch {
+          return '';
+      }
+      const method = contactMethodOf(url);
+      if (method)
+          return CONTACT_LABEL[method];
+      if (url.protocol !== 'http:' && url.protocol !== 'https:')
+          return '';
+      const site = SITE_LABEL.find(([host]) => host.test(url.hostname));
+      if (site)
+          return site[1];
+      const link = describeLink(href, pageUrl);
+      return (_a = link.link_url) !== null && _a !== void 0 ? _a : '';
   }
   function describeLink(href, pageUrl) {
       let url;
@@ -54,13 +84,14 @@
       return { link_type: 'internal', link_url: url.pathname + url.hash };
   }
   function labelOf(el) {
-      var _a, _b, _c, _d, _e;
+      var _a, _b, _c, _d, _e, _f, _g;
       const raw = ((_a = el.getAttribute) === null || _a === void 0 ? void 0 : _a.call(el, 'aria-label')) ||
           el.innerText ||
           el.textContent ||
           ((_b = el.getAttribute) === null || _b === void 0 ? void 0 : _b.call(el, 'title')) ||
           (el.tagName === 'INPUT' ? (_c = el.getAttribute) === null || _c === void 0 ? void 0 : _c.call(el, 'value') : '') ||
           ((_e = (_d = el.querySelector) === null || _d === void 0 ? void 0 : _d.call(el, 'img[alt]')) === null || _e === void 0 ? void 0 : _e.getAttribute('alt')) ||
+          ((_g = (_f = el.querySelector) === null || _f === void 0 ? void 0 : _f.call(el, 'svg title')) === null || _g === void 0 ? void 0 : _g.textContent) ||
           '';
       return raw.replace(/\s+/g, ' ').trim().slice(0, TEXT_LIMIT);
   }
@@ -87,9 +118,10 @@
       const text = labelOf(el);
       const href = el.tagName === 'A' ? el.getAttribute('href') : null;
       const link = href !== null ? describeLink(href, pageUrl) : null;
+      const shown = text || (href !== null ? linkLabel(href, pageUrl) : '') || 'Без подписи';
       return {
           button_id: ((_a = el.dataset) === null || _a === void 0 ? void 0 : _a.analyticsId) || el.id || text.toLowerCase().slice(0, 40) || el.tagName.toLowerCase(),
-          button_text: text,
+          button_text: shown,
           placement: placementOf(el),
           ...(link !== null && link !== void 0 ? link : { link_type: 'button' }),
       };

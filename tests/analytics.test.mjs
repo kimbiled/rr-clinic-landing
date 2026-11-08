@@ -166,10 +166,36 @@ test('a WhatsApp click sends ui_click and contact_click, never the destination o
   assert.deepEqual(app.events('ui_click'), [{
     button_id: 'doctor_booking_test', button_text: 'Записаться', placement: 'doctors', link_type: 'whatsapp',
   }]);
-  assert.deepEqual(app.events('contact_click'), [{ contact_method: 'whatsapp', placement: 'doctors', button_id: 'doctor_booking_test' }]);
+  assert.deepEqual(app.events('contact_click'), [{
+    contact_method: 'whatsapp', button_text: 'WhatsApp', placement: 'doctors', button_id: 'doctor_booking_test',
+  }]);
   const sent = JSON.stringify(app.commands());
   assert.equal(sent.includes('private-message'), false);
   assert.equal(sent.includes('wa.me'), false);
+});
+
+test('contact clicks name their channel and icon-only controls get a name instead of «(not set)»', () => {
+  const app = setup();
+  for (const [href, text] of [['tel:+77475696969', 'Позвонить'], ['mailto:a@b.kz', 'Email'], ['https://wa.me/1', 'WhatsApp']]) {
+    assert.equal(app.contactClick(href, 'hero', 'x', 'https://rr-clinic.kz').button_text, text);
+  }
+  app.initializeAnalytics({ measurementId: 'G-TEST123' });
+  const icon = (href) => el('a', { href }, [el('svg')]);
+  for (const [href, text] of [
+    ['https://api.whatsapp.com/send/?phone=1&text=private', 'WhatsApp'],
+    ['https://www.instagram.com/rr.clinic.kz/', 'Instagram'],
+    ['https://2gis.kz/astana/firm/70000001066801836', '2ГИС'],
+    ['https://example.org/private/path', 'example.org'],
+    ['/mussa-baurzhan#start', '/mussa-baurzhan#start'],
+  ]) {
+    app.click(icon(href));
+    assert.equal(app.events('ui_click').at(-1).button_text, text, href);
+  }
+  app.click(el('button', {}, [el('svg')]));
+  assert.equal(app.events('ui_click').at(-1).button_text, 'Без подписи');
+  app.click(el('button', {}, [el('svg', {}, [el('title', {}, [], 'Закрыть')])]));
+  assert.equal(app.events('ui_click').at(-1).button_text, 'Закрыть');
+  assert.equal(JSON.stringify(app.commands()).includes('private'), false);
 });
 
 test('buttons in Framer blocks get the block name and their visible text', () => {
