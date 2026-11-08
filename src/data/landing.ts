@@ -240,18 +240,28 @@ export interface Operation {
   image?: LandingImage;
 }
 
-export interface OperationCategory {
+/** A sub-direction inside a direction ("Лицо и шея" → "Подтяжка"). */
+export interface OperationGroup {
   id: string;
-  /** Short name on the tab. */
+  /** Name in the side menu and the breadcrumb. */
   label: string;
   /** Heading above the cards. */
+  title: string;
+  items: Operation[];
+}
+
+export interface OperationCategory {
+  id: string;
+  /** Name in the side menu and the breadcrumb. */
+  label: string;
+  /** Heading above the cards when the direction has no sub-directions. */
   title: string;
   icon: OperationIcon;
   /** Extra words the search should match for every operation in the category. */
   keywords: string[];
-  /** "Смотреть результаты …" link: the matching filter in the works section. */
-  results?: { label: string; filter: WorkCategory };
-  items: Operation[];
+  /** Either the operations themselves or sub-directions with them. */
+  items?: Operation[];
+  groups?: OperationGroup[];
 }
 
 export interface OperationsContent {
@@ -259,12 +269,10 @@ export interface OperationsContent {
   eyebrow: string;
   /** Dark, then green. */
   title: [string, string];
-  /** "\n" = forced line break. */
   text: string;
   searchPlaceholder: string;
-  /** After the operations count. */
-  note: string;
-  priceLabel: string;
+  /** Breadcrumb root for directions without sub-directions. */
+  rootLabel: string;
   noPrice: string;
   moreLabel: string;
   /** Shown when the search finds nothing. */
@@ -364,6 +372,7 @@ export const journey: JourneyContent = {
   ],
 };
 
+/** The five facelift photos from the 2026-10-30 design (940 × 650 and close). */
 const operationPhoto = (name: string, width: number, height: number, alt: string): LandingImage => ({
   src: `assets/img/web/operation-${name}.webp`,
   width,
@@ -371,61 +380,71 @@ const operationPhoto = (name: string, width: number, height: number, alt: string
   alt,
 });
 
-/** Categories the design has no cards for yet: names only, no photo, description or price. */
-const names = (...items: string[]): Operation[] => items.map((name) => ({ name }));
+/** Catalog card photos (design 2026-11-08), cropped to the card's 5:4. */
+const catalogPhoto = (name: string, alt: string, width = 680, height = 544): LandingImage => ({
+  src: `assets/img/web/catalog/${name}.webp`,
+  width,
+  height,
+  alt,
+});
+
+const op = (name: string, price: string, description: string, image: LandingImage): Operation => ({
+  name,
+  description,
+  price: `от ${price} ₸`,
+  image,
+});
 
 export const operations: OperationsContent = {
   id: 'operations',
   eyebrow: 'Услуги',
   title: ['Каталог ', 'операций'],
-  text: 'Выберите направление — покажем операции, стоимость «от»\nи результаты наших хирургов.',
-  searchPlaceholder: 'Найти операцию, например «пластика век»',
-  note: 'точную стоимость хирург назовёт на консультации',
-  priceLabel: 'Стоимость',
-  noPrice: 'на консультации',
+  text: 'Выберите направление — покажем операции, стоимость «от» и результаты наших хирургов.',
+  searchPlaceholder: 'Найти операцию',
+  rootLabel: 'Каталог операций',
+  noPrice: 'Стоимость — на консультации',
   moreLabel: 'Подробнее',
   empty: 'Такой операции нет в списке — напишите нам, хирург подскажет, что подойдёт.',
   message: 'Здравствуйте! Хочу записаться на консультацию: {name}',
-  // TODO(content): only "Лицо" has photos, descriptions and prices in the design; the other lists follow the
-  // counts in it and the operations on the doctors' pages — get their cards from the client.
   categories: [
     {
       id: 'face',
-      label: 'Лицо',
-      title: 'Подтяжка и пластика лица',
+      label: 'Лицо и шея',
+      title: 'Пластика лица и шеи',
       icon: 'face',
-      keywords: ['лифтинг', 'омоложение'],
-      results: { label: 'Смотреть результаты по лицу', filter: 'face' },
-      items: [
+      keywords: ['лицо', 'шея', 'лифтинг', 'омоложение', 'фейслифтинг'],
+      groups: [
         {
-          name: 'Голливудский фейслифтинг',
-          description: 'Авторская подтяжка лица и шеи: чёткий овал и естественный результат без «натянутости».',
-          price: 'от 10 500 000 ₸',
-          image: operationPhoto('hollywood', 940, 650, 'Лицо женщины со стрелками направлений подтяжки'),
+          id: 'face-lift',
+          label: 'Подтяжка',
+          title: 'Подтяжка лица и шеи',
+          items: [
+            op('Пластика лба', '1 000 000', 'Разглаживает горизонтальные морщины и приподнимает брови — взгляд становится открытым.', operationPhoto('forehead', 847, 586, 'Женщина приподнимает кожу лба')),
+            op('Эндоскопическая подтяжка', '1 500 000', 'Подтяжка через небольшие проколы: минимум следов и короткое восстановление.', operationPhoto('endoscopic', 858, 593, 'Мужчина с отмеченными точками проколов на висках')),
+            op('СМАС-подтяжка лица', '2 500 000', 'Подтяжка глубокого мышечного слоя: возвращает контур скул, щёк и линии подбородка.', operationPhoto('smas', 940, 650, 'Врач проводит осмотр лица пациентки')),
+            op('Подтяжка шеи (платизмопластика)', '1 800 000', 'Подтягивает шею и нижнюю треть лица, убирает дряблость и «брыли».', catalogPhoto('neck-lift', 'Шея женщины со стрелками направлений подтяжки', 680, 543)),
+            op('Круговая подтяжка лица', '5 500 000', 'Комплексное омоложение лица и шеи за одну операцию.', operationPhoto('circular', 940, 650, 'Профиль женщины с линией разреза у уха')),
+          ],
         },
         {
-          name: 'Пластика лба',
-          description: 'Разглаживает горизонтальные морщины и приподнимает брови — взгляд становится открытым.',
-          price: 'от 1 000 000 ₸',
-          image: operationPhoto('forehead', 847, 586, 'Женщина приподнимает кожу лба'),
+          id: 'face-contour',
+          label: 'Контур лица',
+          title: 'Контур лица',
+          items: [
+            op('Удаление комков Биша', '500 000', 'Подчёркивает скулы и делает контур щёк тоньше.', catalogPhoto('bichat', 'Лицо женщины с отмеченной зоной на щеке')),
+            op('Липофилинг лица', '300 000', 'Восполняет объём скул и щёк собственным жиром.', catalogPhoto('face-lipofilling', 'Лицо женщины: половина до и после липофилинга')),
+            op('Липосакция подбородка', '300 000', 'Убирает второй подбородок и делает чёткой линию шеи.', catalogPhoto('chin-liposuction', 'Профиль мужчины с линией подбородка')),
+          ],
         },
         {
-          name: 'СМАС-подтяжка лица',
-          description: 'Подтяжка глубокого мышечного слоя: возвращает контур скул, щёк и линии подбородка.',
-          price: 'от 2 500 000 ₸',
-          image: operationPhoto('smas', 940, 650, 'Врач проводит осмотр лица пациентки'),
-        },
-        {
-          name: 'Эндоскопическая подтяжка',
-          description: 'Подтяжка через небольшие проколы: минимум следов и короткое восстановление.',
-          price: 'от 1 500 000 ₸',
-          image: operationPhoto('endoscopic', 858, 593, 'Мужчина с отмеченными точками проколов на висках'),
-        },
-        {
-          name: 'Круговая подтяжка лица',
-          description: 'Комплексное омоложение лица и шеи за одну операцию.',
-          price: 'от 5 500 000 ₸',
-          image: operationPhoto('circular', 940, 650, 'Профиль женщины с линией разреза у уха'),
+          id: 'face-lips-ears',
+          label: 'Губы и уши',
+          title: 'Губы и уши',
+          items: [
+            op('Пластика губ (VY, булхорн)', '300 000', 'Увеличивает объём губ или укорачивает расстояние от носа до губы.', catalogPhoto('lip-lift', 'Губы со стрелками подтяжки к носу')),
+            op('Удаление геля из губ', '600 000', 'Убирает биополимерный гель — последствие неудачного филлера.', catalogPhoto('lip-gel-removal', 'Врач осматривает губы пациентки')),
+            op('Отопластика', '600 000', 'Корректирует форму и положение ушей.', catalogPhoto('otoplasty', 'Врач размечает ухо пациента')),
+          ],
         },
       ],
     },
@@ -435,14 +454,13 @@ export const operations: OperationsContent = {
       title: 'Пластика век',
       icon: 'eye',
       keywords: ['блефаропластика', 'глаза'],
-      results: { label: 'Смотреть результаты по векам', filter: 'eyelids' },
-      items: names(
-        'Верхняя блефаропластика',
-        'Нижняя блефаропластика',
-        'Круговая блефаропластика',
-        'Трансконъюнктивальная блефаропластика',
-        'Кантопексия',
-      ),
+      items: [
+        op('Верхняя блефаропластика', '250 000', 'Убирает нависание кожи верхнего века. Европеизация — дополнительно.', catalogPhoto('upper-blepharoplasty', 'Лицо пациентки: половина до и после верхней блефаропластики', 680, 543)),
+        op('Нижняя блефаропластика', '220 000', 'Убирает мешки под глазами — с наружным швом или без него.', catalogPhoto('lower-blepharoplasty', 'Глаза мужчины до и после нижней блефаропластики')),
+        op('Круговая блефаропластика', '700 000', 'Верхние и нижние веки за одну операцию.', catalogPhoto('circular-blepharoplasty', 'Глаза пациентки до и после круговой блефаропластики', 375, 300)),
+        op('Эпикантопластика', '250 000', 'Открывает внутренний угол глаза.', catalogPhoto('epicanthoplasty', 'Глаза пациентки до и после эпикантопластики')),
+        op('Липофилинг век', '300 000', 'Восполняет запавшие зоны вокруг глаз.', catalogPhoto('eyelid-lipofilling', 'Лицо женщины с отмеченными зонами вокруг глаз')),
+      ],
     },
     {
       id: 'nose',
@@ -450,16 +468,11 @@ export const operations: OperationsContent = {
       title: 'Пластика носа',
       icon: 'nose',
       keywords: ['ринопластика'],
-      results: { label: 'Смотреть результаты по носу', filter: 'nose' },
-      items: names('Ринопластика', 'Септопластика'),
-    },
-    {
-      id: 'ears-lips',
-      label: 'Уши и губы',
-      title: 'Пластика ушей и губ',
-      icon: 'lips',
-      keywords: ['отопластика', 'хейлопластика'],
-      items: names('Отопластика', 'Хейлопластика', 'Липлифтинг'),
+      items: [
+        op('Ринопластика', '800 000', 'Коррекция формы носа — от кончика до полной.', catalogPhoto('rhinoplasty', 'Профиль пациентки до и после ринопластики')),
+        op('Вторичная ринопластика', '3 200 000', 'Исправление результата предыдущей операции.', catalogPhoto('secondary-rhinoplasty', 'Профиль женщины с линией спинки носа')),
+        op('Септопластика', '500 000', 'Выравнивает перегородку и облегчает дыхание.', catalogPhoto('septoplasty', 'Нос мужчины снизу с линией перегородки')),
+      ],
     },
     {
       id: 'breast',
@@ -467,8 +480,14 @@ export const operations: OperationsContent = {
       title: 'Пластика груди',
       icon: 'breast',
       keywords: ['маммопластика', 'импланты'],
-      results: { label: 'Смотреть результаты по груди', filter: 'breast' },
-      items: names('Увеличение груди', 'Подтяжка груди', 'Уменьшение груди', 'Замена имплантов', 'Коррекция асимметрии груди'),
+      items: [
+        op('Увеличение груди', '1 200 000', 'Импланты для желаемого объёма и формы.', catalogPhoto('breast-augmentation', 'Пациентка держит имплант у груди')),
+        op('Подтяжка груди', '1 600 000', 'Возвращает форму — с имплантами или собственными тканями.', catalogPhoto('breast-lift', 'Врач размечает грудь пациентки')),
+        op('Уменьшение груди', '2 500 000', 'Уменьшает объём и снимает нагрузку со спины.', catalogPhoto('breast-reduction', 'Пациентка в топе со стрелками уменьшения груди')),
+        op('Повторные операции', '2 200 000', 'Замена или удаление имплантов с коррекцией формы.', catalogPhoto('breast-revision', 'Врач показывает пациентке импланты')),
+        op('Липофилинг груди', '900 000', 'Мягкий объём собственным жиром.', catalogPhoto('breast-lipofilling', 'Врач размечает зоны липофилинга на теле пациентки')),
+        op('Коррекция гинекомастии', '1 000 000', 'Плоский рельеф мужской груди.', catalogPhoto('gynecomastia', 'Врач размечает грудь пациента')),
+      ],
     },
     {
       id: 'body',
@@ -476,26 +495,29 @@ export const operations: OperationsContent = {
       title: 'Пластика тела',
       icon: 'body',
       keywords: ['фигура', 'живот', 'липосакция'],
-      results: { label: 'Смотреть результаты по телу', filter: 'body' },
-      items: names(
-        'Абдоминопластика',
-        'Липоабдоминопластика',
-        'Абдоминопластика с ушиванием диастаза',
-        'Липомоделирование',
-        'Липофилинг',
-        'Брахиопластика',
-        'Подтяжка бёдер',
-        'Mommy Makeover',
-      ),
+      items: [
+        op('Абдоминопластика', '900 000', 'Плоский живот и ушивание диастаза — мини или полная.', catalogPhoto('abdominoplasty', 'Живот пациентки до и после абдоминопластики', 525, 420)),
+        op('Липосакция и липомоделирование', '250 000', 'Убирает локальные отложения и формирует силуэт.', catalogPhoto('liposuction', 'Торс пациента до и после липосакции', 525, 420)),
+        op('Липомоделирование + абдоминопластика', '3 000 000', 'Живот и талия за одну операцию.', catalogPhoto('lipo-abdominoplasty', 'Живот пациентки до и после операции', 525, 420)),
+        op('Пластика ягодиц', '600 000', 'Объём и форма — липофилингом или имплантами.', catalogPhoto('buttocks', 'Ягодицы пациентки до и после пластики', 525, 420)),
+        op('Подтяжка рук и бёдер', '1 500 000', 'Убирает дряблую кожу плеч и бёдер.', catalogPhoto('arm-thigh-lift', 'Рука с разметкой подтяжки плеча')),
+        op('Боди-лифт', '2 000 000', 'Комплексная подтяжка тела после похудения.', catalogPhoto('body-lift', 'Женщина собирает лишнюю кожу на животе')),
+        op('Пластика рубца после кесарева', '400 000', 'Делает рубец тонким и незаметным.', catalogPhoto('c-section-scar', 'Рубец после кесарева сечения')),
+        op('Липофилинг кистей рук', '200 000', 'Омолаживает кисти рук собственным жиром.', catalogPhoto('hand-lipofilling', 'Кисти рук женщины', 680, 543)),
+      ],
     },
     {
       id: 'intimate',
       label: 'Интимная пластика',
       title: 'Интимная пластика',
       icon: 'intimate',
-      keywords: ['лабиопластика'],
-      results: { label: 'Смотреть результаты по интимной пластике', filter: 'intimate' },
-      items: names('Лабиопластика', 'Пластика больших половых губ', 'Вагинопластика', 'Перинеопластика', 'Липофилинг половых губ'),
+      keywords: ['лабиопластика', 'вагинопластика'],
+      items: [
+        op('Лабиопластика', '300 000', 'Коррекция малых и больших половых губ.', catalogPhoto('labiaplasty', 'Цветок лилии')),
+        op('Липофилинг половых губ', '455 000', 'Объём и упругость собственным жиром.', catalogPhoto('labia-lipofilling', 'Половинка персика и шприц')),
+        op('Нитевой лифтинг промежности', '585 000', 'Малоинвазивная подтяжка без разрезов.', catalogPhoto('perineum-thread-lift', 'Лепесток розы с хирургической нитью')),
+        op('Пластика стенок влагалища и промежности', '1 000 000', 'Восстановление после родов: кольпорафия, перинеорафия.', catalogPhoto('vaginoplasty', 'Бутон тюльпана')),
+      ],
     },
   ],
   cta: {

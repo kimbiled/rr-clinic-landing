@@ -1039,71 +1039,71 @@
     cursor: pointer;
   }
 
-  .rr-optabs {
-    box-shadow: inset 0 0 0 1px #dfe6e3;
-    scrollbar-width: none;
+  /* Directions menu in the catalog's side column */
+  .rr-opnav {
+    background: #f5f2ef;
   }
 
-  .rr-optabs::-webkit-scrollbar {
-    display: none;
-  }
-
-  .rr-optab {
-    color: #2f4a44;
+  .rr-opnav__item,
+  .rr-opnav__sub {
+    color: #2e2c2c;
     cursor: pointer;
     transition:
       background-color 250ms var(--ease-out),
       color 250ms var(--ease-out);
   }
 
-  .rr-optab:hover {
-    background: rgb(86 126 117 / 0.08);
+  .rr-opnav__item:hover,
+  .rr-opnav__sub:hover {
+    background: rgb(255 255 255 / 0.6);
   }
 
-  .rr-optab[aria-selected='true'] {
+  .rr-opnav__item[data-active] {
+    background: #fff;
+    font-weight: 500;
+  }
+
+  .rr-opnav__icon {
+    background: #dde9e5;
+    color: #557a6f;
+    transition:
+      background-color 250ms var(--ease-out),
+      color 250ms var(--ease-out);
+  }
+
+  .rr-opnav__item[data-active] .rr-opnav__icon {
     background: #557a6f;
     color: #fff;
   }
 
-  .rr-optab__icon {
-    background: #eef3f1;
-    color: #557a6f;
+  .rr-opnav__sub {
+    color: #625f5e;
   }
 
-  .rr-optab[aria-selected='true'] .rr-optab__icon {
-    background: #fff;
+  .rr-opnav__sub[aria-current='true'] {
+    background: #d6e7e1;
+    color: #1f3a34;
+    font-weight: 500;
   }
 
-  .rr-optab__count {
-    background: #f1efed;
-    color: #8c8784;
+  .rr-opnav__dot {
+    background: #c9d3d0;
   }
 
-  .rr-optab[aria-selected='true'] .rr-optab__count {
-    background: rgb(255 255 255 / 0.22);
-    color: #fff;
+  .rr-opnav__sub[aria-current='true'] .rr-opnav__dot {
+    background: #2f4a44;
   }
 
-  .rr-oplink .rr-opcard__arrow {
-    transition: translate 220ms var(--ease-out);
+  .rr-opnav__count {
+    color: #a4a09d;
   }
 
-  .rr-oplink:hover .rr-opcard__arrow {
-    translate: 3px 0;
+  .rr-opnav__sub[aria-current='true'] .rr-opnav__count {
+    color: #2f4a44;
   }
 
   .rr-opcard {
     background: #f5f2ef;
-  }
-
-  .rr-opcard__blank {
-    background: url('/assets/img/web/programs-request-bg.svg') center / cover no-repeat, #efe9e2;
-    color: #c39b62;
-  }
-
-  .rr-opcard__blank .rr-category-icon {
-    width: 52px;
-    height: 52px;
   }
 
   .rr-opcard__btn {
