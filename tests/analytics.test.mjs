@@ -198,6 +198,17 @@ test('contact clicks name their channel and icon-only controls get a name instea
   assert.equal(JSON.stringify(app.commands()).includes('private'), false);
 });
 
+test('a role="link" span inside a WhatsApp link (Framer «Связаться») still counts as a contact', () => {
+  const app = setup();
+  app.initializeAnalytics({ measurementId: 'G-TEST123' });
+  const label = el('span', { role: 'link' }, [], 'Связаться');
+  el('section', { id: 'menu' }, [el('a', { href: 'https://api.whatsapp.com/send/?phone=1&text=x' }, [label])]);
+  app.click(label);
+  assert.equal(app.events('ui_click')[0].link_type, 'whatsapp');
+  assert.equal(app.events('ui_click')[0].button_text, 'Связаться');
+  assert.equal(app.events('contact_click')[0].contact_method, 'whatsapp');
+});
+
 test('buttons in Framer blocks get the block name and their visible text', () => {
   const app = setup();
   app.initializeAnalytics({ measurementId: 'G-TEST123' });

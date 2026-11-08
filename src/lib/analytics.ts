@@ -247,7 +247,9 @@ export function initializeAnalytics({ measurementId, clarityId, enabled = true, 
   const tracked = new WeakSet<Event>();
   const trackClick = (event: MouseEvent) => {
     if (tracked.has(event) || event.defaultPrevented || event.button !== 0 || !(event.target instanceof Element)) return;
-    const el = event.target.closest(CLICKABLE);
+    // Framer nests role="link" spans inside its links: the click belongs to the link that actually navigates.
+    const inner = event.target.closest(CLICKABLE);
+    const el = inner?.closest('a[href]') ?? inner;
     if (!el) return;
     tracked.add(event);
     // A doctor's landing names its doctor on <html data-rr-doctor>, so reports can count clicks per doctor.
